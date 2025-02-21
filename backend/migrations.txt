@@ -1,0 +1,11 @@
+Migration generieren
+npm run db:create -- ./src/migrations/CreateUsersTable
+
+Migrationen ausführen
+npm run db:generate
+
+Migration rückgängig machen
+npm run db:revert
+
+Schema droppen
+npm run db:drop

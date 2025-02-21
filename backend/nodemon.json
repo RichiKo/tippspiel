@@ -1,0 +1,9 @@
+{
+  "watch": ["src"],
+  "ignore": ["dist", "node_modules"],
+  "ext": "ts",
+  "env": {
+    "IS_TS_NODE": "true"
+  },
+  "exec": "ts-node --transpile-only -r tsconfig-paths/register src/main.ts"
+}
