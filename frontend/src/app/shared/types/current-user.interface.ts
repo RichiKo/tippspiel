@@ -1,3 +1,7 @@
+export interface CurrentUserResponse {
+  user: CurrentUserInterface;
+}
+
 export interface CurrentUserInterface {
   id: number;
   username: string;

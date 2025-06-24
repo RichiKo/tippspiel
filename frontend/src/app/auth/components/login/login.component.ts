@@ -3,6 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MaterialModule } from '../../../material.module';
 import { AuthService } from '../../services/auth.service';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { PersistingService } from '../../services/persisisting.service';
 
 @Component({
   selector: 'ts-login',
@@ -12,6 +13,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 })
 export class LoginComponent {
   authService = inject(AuthService);
+  persistingService = inject(PersistingService);
   router = inject(Router);
   fb = inject(FormBuilder);
 
@@ -29,9 +31,12 @@ export class LoginComponent {
     }
 
     this.authService.login(email, password).subscribe((user) => {
-      console.log(user);
-
+      this.persistingService.save(user.user);
       this.router.navigate(['/home']);
     });
+  }
+
+  toRegister(): void {
+    this.router.navigate(['/register']);
   }
 }

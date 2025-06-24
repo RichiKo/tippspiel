@@ -90,7 +90,7 @@ export class UserService {
     const userResponse: Partial<UserEntity> = { ...existingUser };
     delete userResponse.password;
 
-    return existingUser;
+    return userResponse as UserEntity;
   }
 
   findById(id: number): Promise<UserEntity | null> {
