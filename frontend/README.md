@@ -1,27 +1,68 @@
 # Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.2.0.
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+frontend/
+│── src/
+│ ├── app/
+│ │ ├── core/ # 🌟 Zentrale Dienste & globale Logik
+│ │ │ ├── auth/ # → Authentifizierungslogik
+│ │ │ │ ├── auth.service.ts
+│ │ │ │ ├── auth.guard.ts
+│ │ │ │ ├── jwt.interceptor.ts
+│ │ │ │ ├── models.ts
+│ │ │ ├── services/ # → API-Services (z. B. Spielstände)
+│ │ │ │ ├── game.service.ts
+│ │ │ │ ├── user.service.ts
+│ │ │ ├── state/ # 🌟 Signal-basiertes State-Management
+│ │ │ │ ├── auth.store.ts
+│ │ │ │ ├── game.store.ts
+│ │ │ ├── guards/ # → Route Guards
+│ │ │ │ ├── auth.guard.ts
+│ │ │ ├── interceptors/ # → HTTP Interceptors
+│ │ │ │ ├── jwt.interceptor.ts
+│ │ │ ├── config.ts # → API-URLs & globale Konstante
+│ │ │ ├── app.config.ts # → App-weite Konfiguration
+│ │ │
+│ │ ├── modules/ # 🌟 Feature-Module für Modularität
+│ │ │ ├── auth/ # → Auth-Modul (Login, Registrierung)
+│ │ │ │ ├── auth.module.ts
+│ │ │ │ ├── login/ # Login-Seite
+│ │ │ │ │ ├── login.component.ts
+│ │ │ │ │ ├── login.component.html
+│ │ │ │ ├── register/ # Registrierung
+│ │ │ │ │ ├── register.component.ts
+│ │ │ │ │ ├── register.component.html
+│ │ │ ├── dashboard/ # → Haupt-UI für eingeloggte Nutzer
+│ │ │ │ ├── dashboard.module.ts
+│ │ │ │ ├── dashboard.component.ts
+│ │ │ │ ├── dashboard.component.html
+│ │ │ ├── games/ # → Spielübersicht & Tipps
+│ │ │ │ ├── games.module.ts
+│ │ │ │ ├── game-list/
+│ │ │ │ ├── game-detail/
+│ │ │ ├── users/ # → Profilseite & User-Management
+│ │ │ │ ├── profile/
+│ │ │ │ ├── settings/
+│ │ │
+│ │ ├── shared/ # 🌟 Wiederverwendbare UI-Komponenten
+│ │ │ ├── components/
+│ │ │ │ ├── navbar/
+│ │ │ │ │ ├── navbar.component.ts
+│ │ │ │ │ ├── navbar.component.html
+│ │ │ │ ├── button/
+│ │ │ ├── directives/ # → Custom Directives
+│ │ │ ├── pipes/ # → Custom Pipes
+│ │ │
+│ │ ├── app.component.ts
+│ │ ├── app.module.ts
+│ │ ├── app-routing.module.ts
+│ │
+│ ├── assets/ # 🌟 Bilder, Icons, Styles
+│ ├── environments/ # 🌟 Umgebungsvariablen
+│ │ ├── environment.ts # Dev-Umgebung
+│ │ ├── environment.prod.ts # Prod-Umgebung
+│ ├── styles.scss # Globale Styles (Tailwind + Material)
+│ ├── tailwind.config.js # Tailwind Konfiguration
+│
+├── angular.json # Angular Projektkonfiguration
+├── package.json # Abhängigkeiten & Scripts
+├── tsconfig.json
