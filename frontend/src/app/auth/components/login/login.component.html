@@ -1,61 +1,29 @@
-<div
-  class="blank-layout-container justify-content-center align-items-center bg-light"
->
-  <div
-    class="position-relative row w-100 h-100 bg-gredient justify-content-center"
-  >
-    <div class="col-lg-4 d-flex align-items-center">
-      <mat-card class="cardWithShadow boxed-auth">
-        <mat-card-content class="p-32">
-          <div class="text-center">
-            Login
-            <!-- <a [routerLink]="['/dashboard']">
-              <img
-                src="./assets/images/logos/dark-logo.svg"
-                class="align-middle m-2"
-                alt="logo"
-              />
-            </a> -->
-          </div>
-
-          <form class="m-t-30" [formGroup]="form">
-            <mat-label class="f-s-14 f-w-600 m-b-12 d-block"
-              >Username</mat-label
-            >
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input formControlName="email" matInput />
-            </mat-form-field>
-            <!-- password -->
-
-            <mat-label class="f-s-14 f-w-600 m-b-12 d-block"
-              >Password</mat-label
-            >
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input formControlName="password" matInput type="password" />
-            </mat-form-field>
-
-            <div class="d-flex align-items-center m-b-12">
-              <mat-checkbox color="primary">Remember this Device</mat-checkbox>
-              <a
-                [routerLink]="['/']"
-                class="text-primary f-w-600 text-decoration-none m-l-auto f-s-14"
-                >Forgot Password ?</a
-              >
-            </div>
-            <a (click)="onLogin()" mat-flat-button color="primary" class="w-100"
-              >Sign In
-            </a>
-            <p></p>
-            <a
-              (click)="toRegister()"
-              mat-flat-button
-              color="primary"
-              class="w-100"
-              >To Register
-            </a>
-          </form>
-        </mat-card-content>
-      </mat-card>
-    </div>
+<div class="auth-container mat-elevation-z4">
+  <div class="soccer-header">
+    <mat-icon class="soccer-icon">sports_soccer</mat-icon>
+    <h1>Willkommen beim Tippspiel!</h1>
+    <p>Logge dich ein, um deine Tipps abzugeben.</p>
   </div>
+  <form [formGroup]="form" (ngSubmit)="onLogin()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>E-Mail</mat-label>
+      <input matInput formControlName="email" type="email" required />
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Passwort</mat-label>
+      <input matInput formControlName="password" type="password" required />
+    </mat-form-field>
+    <button
+      mat-raised-button
+      color="primary"
+      class="full-width soccer-btn"
+      type="submit"
+    >
+      <mat-icon>login</mat-icon> Einloggen
+    </button>
+    <div class="register-link">
+      Noch kein Account?
+      <a routerLink="/register">Jetzt registrieren</a>
+    </div>
+  </form>
 </div>

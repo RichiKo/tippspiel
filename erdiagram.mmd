@@ -1,0 +1,117 @@
+erDiagram
+  User {
+    UUID id
+    string username
+    string email
+    string password
+    enum role
+    Date createdAt
+  }
+  ChampionshipParticipant {
+    UUID id
+    UUID userId
+    UUID championshipId
+    Date createdAt
+    boolean isPaid
+    boolean isApproved
+  }
+  Championship {
+    UUID id
+    string name
+    string description
+    boolean isPublic
+    boolean isActive
+    UUID createdByUserId
+    Date createdAt
+    Date updatedAt
+    number entryFee
+    number prizePool
+    string prizeDistribution
+  }
+  Round {
+    UUID id
+    string name
+    Date startDate
+    UUID championshipId
+    Date createdAt
+  }
+  Team {
+    UUID id
+    string name
+    string shortName
+    string logoUrl
+    UUID championshipId
+    Date createdAt
+  }
+  Game {
+    UUID id
+    UUID homeTeamId
+    UUID awayTeamId
+    DateTime kickoffTime
+    UUID roundId
+    Date createdAt
+    number homeScore
+    number awayScore
+    boolean isClosed
+  }
+  Tip {
+    UUID id
+    UUID userId
+    UUID championshipId
+    UUID gameId
+    number homeTeamGoals
+    number awayTeamGoals
+    Date createdAt
+    Date updatedAt
+  }
+  ChampionGuessRule {
+    UUID id
+    UUID championshipId
+    string code
+    string label
+    number points
+    Date createdAt
+  }
+  ChampionGuess {
+    UUID id
+    UUID userId
+    UUID championshipId
+    UUID teamId
+    Date createdAt
+  }
+  ChampionGuessEvaluation {
+    UUID id
+    UUID championGuessId
+    UUID ruleId
+    boolean fulfilled
+  }
+  Ranking {
+    UUID id
+    UUID userId
+    UUID championshipId
+    number rank
+    number exactHits
+    number goalDiffHits
+    number tendencyHits
+    number missedTips
+    Date updatedAt
+  }
+  
+  User ||--o{ ChampionshipParticipant : participates
+  Championship ||--o{ ChampionshipParticipant : has
+  Championship ||--o{ Round : has
+  Championship ||--o{ Team : has
+  Round ||--o{ Game : has
+  Team ||--o{ Game : home
+  Team ||--o{ Game : away
+  Game ||--o{ Tip : has
+  User ||--o{ Tip : makes
+  Championship ||--o{ Tip : for
+  Championship ||--o{ ChampionGuessRule : has
+  User ||--o{ ChampionGuess : makes
+  Championship ||--o{ ChampionGuess : for
+  Team ||--o{ ChampionGuess : is
+  ChampionGuess ||--o{ ChampionGuessEvaluation : evaluated
+  ChampionGuessRule ||--o{ ChampionGuessEvaluation : rule
+  User ||--o{ Ranking : has
+  Championship ||--o{ Ranking : for 

@@ -1,0 +1,32 @@
+<div class="auth-landing-bg">
+  <div class="auth-landing-header">
+    <mat-icon class="auth-landing-ball">sports_soccer</mat-icon>
+    <h1>Champions League Tippspiel</h1>
+    <p>Tippe mit deinen Freunden, sammle Punkte und gewinne!</p>
+  </div>
+  <div class="auth-landing-switch">
+    <button
+      mat-stroked-button
+      color="primary"
+      [disabled]="showLogin"
+      (click)="switchToLogin()"
+    >
+      Login
+    </button>
+    <button
+      mat-stroked-button
+      color="accent"
+      [disabled]="!showLogin"
+      (click)="switchToRegister()"
+    >
+      Registrieren
+    </button>
+  </div>
+  <div class="auth-landing-form">
+    @if (showLogin) {
+    <ts-login></ts-login>
+    } @else {
+    <ts-register></ts-register>
+    }
+  </div>
+</div>
