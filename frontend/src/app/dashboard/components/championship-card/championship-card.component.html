@@ -1,0 +1,26 @@
+<div class="championship-card">
+  <img
+    class="championship-image"
+    [src]="championship()?.image"
+    [alt]="championship()?.name"
+  />
+  <div class="championship-content">
+    <h2>{{ championship()?.name }}</h2>
+    @if (championship()?.description) {
+    <p>{{ championship()?.description }}</p>
+    }
+    <div class="championship-meta">
+      <span
+        >Status:
+        <strong>{{
+          championship()?.isActive ? "Aktiv" : "Inaktiv"
+        }}</strong></span
+      >
+      @if (championship()?.isPublic) {
+      <span>Öffentlich</span>
+      } @if (!championship()?.isPublic) {
+      <span>Privat</span>
+      }
+    </div>
+  </div>
+</div>

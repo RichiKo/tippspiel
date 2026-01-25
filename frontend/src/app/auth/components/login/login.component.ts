@@ -32,7 +32,7 @@ export class LoginComponent {
 
     this.authService.login(email, password).subscribe((user) => {
       this.persistingService.save(user.user);
-      this.router.navigate(['/home']);
+      this.router.navigate(['/dashboard']);
     });
   }
 

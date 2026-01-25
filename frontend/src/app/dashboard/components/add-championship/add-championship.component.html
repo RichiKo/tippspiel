@@ -1,0 +1,45 @@
+<div class="add-championship-container">
+  <h2>Neue Championship anlegen</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-group">
+      <label for="name">Name*</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        maxlength="64"
+        required
+      />
+      @if (submitted() && form.controls.name.errors?.['required']) {
+      <div class="error">Name ist erforderlich.</div>
+      } @if (form.controls.name.errors?.['maxlength']) {
+      <div class="error">Maximal 64 Zeichen.</div>
+      }
+    </div>
+    <div class="form-group">
+      <label for="description">Beschreibung</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        maxlength="256"
+      ></textarea>
+      @if (form.controls.description.errors?.['maxlength']) {
+      <div class="error">Maximal 256 Zeichen.</div>
+      }
+    </div>
+    <div class="form-group">
+      <label for="image">Bild-URL*</label>
+      <input id="image" type="url" formControlName="image" required />
+      @if (submitted() && form.controls.image.errors?.['required']) {
+      <div class="error">Bild-URL ist erforderlich.</div>
+      }
+    </div>
+    <div class="form-row">
+      <label
+        ><input type="checkbox" formControlName="isPublic" /> Öffentlich</label
+      >
+      <label><input type="checkbox" formControlName="isActive" /> Aktiv</label>
+    </div>
+    <button type="submit" class="submit-btn">Championship anlegen</button>
+  </form>
+</div>

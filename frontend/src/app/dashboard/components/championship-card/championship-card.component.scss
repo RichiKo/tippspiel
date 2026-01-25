@@ -1,0 +1,75 @@
+.championship-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 1.2rem 1.4rem 1.4rem 1.4rem;
+  margin: 0.8rem 0;
+  min-width: 260px;
+  max-width: 350px;
+  width: 100%;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .championship-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: #f3f3f3;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .championship-content {
+    width: 100%;
+    h2 {
+      font-size: 1.3rem;
+      margin: 0 0 0.4rem 0;
+      font-weight: 700;
+      color: #222;
+    }
+    p {
+      font-size: 1rem;
+      color: #444;
+      margin: 0 0 0.7rem 0;
+    }
+    .championship-meta {
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.98rem;
+      color: #666;
+      margin-top: 0.2rem;
+      span {
+        font-weight: 400;
+        strong {
+          font-weight: 700;
+          color: #1a7f37;
+        }
+        &:last-child strong {
+          color: #b91c1c;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .championship-card {
+    padding: 0.7rem 0.5rem 1rem 0.5rem;
+    .championship-image {
+      height: 120px;
+    }
+    .championship-content h2 {
+      font-size: 1.05rem;
+    }
+    .championship-content p {
+      font-size: 0.93rem;
+    }
+  }
+}

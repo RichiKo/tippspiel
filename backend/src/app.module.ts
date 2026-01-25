@@ -7,6 +7,7 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ormConfig } from '@app/ormconfig/ormoptions.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '@app/user/user.module';
+import { ChampionshipModule } from './championship/championship.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserModule } from '@app/user/user.module';
       isGlobal: true,
     }),
     UserModule,
+    ChampionshipModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

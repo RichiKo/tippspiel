@@ -1,0 +1,13 @@
+<div class="dashboard-container">
+  <h1>Dashboard</h1>
+  <div class="dashboard-actions">
+    <a routerLink="/dashboard/create" class="add-championship-btn"
+      >+ Championship hinzufügen</a
+    >
+  </div>
+  <div class="championships-grid">
+    @for (championship of championships(); track championship.id) {
+    <app-championship-card [championship]="championship" />
+    }
+  </div>
+</div>

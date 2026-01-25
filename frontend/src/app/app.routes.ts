@@ -6,5 +6,21 @@ import { AuthLandingComponent } from './auth/components/auth-landing.component';
 export const routes: Routes = [
   { path: '', component: AuthLandingComponent },
   { path: 'home', canActivate: [AuthGuard], component: HomeComponent },
+  {
+    path: 'dashboard',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
+  },
+  {
+    path: 'dashboard/create',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import(
+        './dashboard/components/add-championship/add-championship.component'
+      ).then((m) => m.AddChampionshipComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

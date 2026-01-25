@@ -89,7 +89,7 @@ clickHandler() {
 ## Use standalone components
 
 - Always use standalone components. Avoid using NgModules.
-- For Angular 19 and later, don't add the standalone flag in Component Decorator meta data, because it is true by default.
+- For Angular 20 and later, don't add the standalone flag in Component Decorator meta data, because it is true by default.
 
 ## Modern Routing with Lazy Loading
 
