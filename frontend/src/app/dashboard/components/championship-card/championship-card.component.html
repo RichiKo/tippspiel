@@ -7,7 +7,7 @@
   <div class="championship-content">
     <h2>{{ championship()?.name }}</h2>
     @if (championship()?.description) {
-    <p>{{ championship()?.description }}</p>
+      <p>{{ championship()?.description }}</p>
     }
     <div class="championship-meta">
       <span
@@ -17,10 +17,21 @@
         }}</strong></span
       >
       @if (championship()?.isPublic) {
-      <span>Öffentlich</span>
-      } @if (!championship()?.isPublic) {
-      <span>Privat</span>
+        <span>Öffentlich</span>
+      }
+      @if (!championship()?.isPublic) {
+        <span>Privat</span>
       }
     </div>
+    @if (isAdmin()) {
+      <div class="championship-actions">
+        <a
+          [routerLink]="['/dashboard/championship', championship()?.id, 'edit']"
+          class="edit-link"
+        >
+          Bearbeiten
+        </a>
+      </div>
+    }
   </div>
 </div>
