@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ChampionshipService } from '../../services/championship.service';
 import { Championship } from '../../types/championship.interface';
+import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-add-championship',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ImageUploadComponent],
   templateUrl: './add-championship.component.html',
   styleUrl: './add-championship.component.scss',
 })
@@ -32,6 +33,14 @@ export class AddChampionshipComponent {
   readonly submitted = signal(false);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+
+  onImageUploaded(url: string): void {
+    this.form.patchValue({ image: url });
+  }
+
+  onUploadError(error: string): void {
+    this.errorMessage.set(error);
+  }
 
   onSubmit() {
     this.submitted.set(true);

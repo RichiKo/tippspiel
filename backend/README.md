@@ -181,6 +181,43 @@
 - `422 Unprocessable Entity` - Email or username already exists.
 - `404 Not Found` - User not found.
 
+---
+
+## File Upload System
+
+### **Upload Directory Structure**
+
+The backend stores uploaded files in the following structure:
+
+```
+backend/uploads/
+  teams/          # Team logos
+  users/          # User profile images
+  championships/  # Championship images
+```
+
+**Note:** The `/uploads` directory is excluded from version control (in `.gitignore`). Only the directory structure with `.gitkeep` files is versioned.
+
+### **File Upload Endpoints**
+
+See `API.md` for detailed documentation of upload endpoints:
+- `POST /upload/team-logo`
+- `POST /upload/user-image`
+- `POST /upload/championship-image`
+
+### **Upload Specifications**
+
+- **Allowed formats:** JPG, PNG, WebP
+- **Maximum file size:** 2MB
+- **File naming:** UUID-based for uniqueness
+- **Validation:** Server-side validation of MIME type and file size
+
+### **Static File Serving**
+
+Uploaded files are served statically via `/uploads/*` path, configured in `main.ts`.
+
+---
+
 ### **Next Steps**
 
 - **Database Integration:** Store the user in PostgreSQL.

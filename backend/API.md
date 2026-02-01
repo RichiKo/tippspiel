@@ -672,6 +672,86 @@ Ruft die Rangliste für eine Championship ab.
 
 ---
 
+## Upload API
+
+### **POST** `/upload/team-logo`
+
+Lädt ein Team-Logo hoch (Multipart Form Data).
+
+#### **Request**
+
+Content-Type: `multipart/form-data`
+
+Form Data:
+- `file`: File (required) - Image file (JPG, PNG, WebP, max 2MB)
+
+#### **Response (JSON)**
+
+```json
+{
+  "url": "/uploads/teams/abc-123-def.png"
+}
+```
+
+#### **Status Codes**
+- `201 Created` - Erfolgreicher Upload
+- `400 Bad Request` - Ungültiger Dateityp oder keine Datei
+- `413 Payload Too Large` - Datei zu groß (>2MB)
+
+---
+
+### **POST** `/upload/user-image`
+
+Lädt ein Benutzer-Profilbild hoch (Multipart Form Data).
+
+#### **Request**
+
+Content-Type: `multipart/form-data`
+
+Form Data:
+- `file`: File (required) - Image file (JPG, PNG, WebP, max 2MB)
+
+#### **Response (JSON)**
+
+```json
+{
+  "url": "/uploads/users/xyz-456-ghi.png"
+}
+```
+
+#### **Status Codes**
+- `201 Created` - Erfolgreicher Upload
+- `400 Bad Request` - Ungültiger Dateityp oder keine Datei
+- `413 Payload Too Large` - Datei zu groß (>2MB)
+
+---
+
+### **POST** `/upload/championship-image`
+
+Lädt ein Championship-Bild hoch (Multipart Form Data).
+
+#### **Request**
+
+Content-Type: `multipart/form-data`
+
+Form Data:
+- `file`: File (required) - Image file (JPG, PNG, WebP, max 2MB)
+
+#### **Response (JSON)**
+
+```json
+{
+  "url": "/uploads/championships/def-789-jkl.webp"
+}
+```
+
+#### **Status Codes**
+- `201 Created` - Erfolgreicher Upload
+- `400 Bad Request` - Ungültiger Dateityp oder keine Datei
+- `413 Payload Too Large` - Datei zu groß (>2MB)
+
+---
+
 ## Authentifizierung
 
 ### JWT Token

@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ChampionshipService } from '../../services/championship.service';
 import { Championship } from '../../types/championship.interface';
+import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-championship-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ImageUploadComponent],
   templateUrl: './championship-edit.component.html',
   styleUrl: './championship-edit.component.scss',
 })
@@ -99,6 +100,14 @@ export class ChampionshipEditComponent implements OnInit {
           this.isLoading.set(false);
         },
       });
+  }
+
+  onImageUploaded(url: string): void {
+    this.form.patchValue({ image: url });
+  }
+
+  onUploadError(error: string): void {
+    this.errorMessage.set(error);
   }
 
   onCancel() {
