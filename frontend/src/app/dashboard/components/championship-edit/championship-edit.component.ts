@@ -5,11 +5,14 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ChampionshipService } from '../../services/championship.service';
 import { Championship } from '../../types/championship.interface';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
+import { TeamSelectorComponent } from '../../../shared/components/team-selector/team-selector.component';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-championship-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ImageUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ImageUploadComponent, TeamSelectorComponent],
   templateUrl: './championship-edit.component.html',
   styleUrl: './championship-edit.component.scss',
 })
@@ -23,6 +26,8 @@ export class ChampionshipEditComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly submitted = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly selectedTeamIds = signal<string[]>([]);
+  readonly initialTeamIds = signal<string[]>([]);
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(64)]],
@@ -60,13 +65,33 @@ export class ChampionshipEditComponent implements OnInit {
           isPublic: championship.isPublic,
           isActive: championship.isActive,
         });
-        this.isLoading.set(false);
+
+        // Load teams
+        this.championshipService.getChampionshipTeams(id).subscribe({
+          next: (teams) => {
+            const teamIds = teams.map((t) => t.id);
+            this.selectedTeamIds.set(teamIds);
+            this.initialTeamIds.set(teamIds);
+            this.isLoading.set(false);
+          },
+          error: () => {
+            this.isLoading.set(false);
+          },
+        });
       },
       error: () => {
         this.errorMessage.set('Championship konnte nicht geladen werden.');
         this.isLoading.set(false);
       },
     });
+  }
+
+  onTeamAdded(teamId: string): void {
+    this.selectedTeamIds.update((ids) => [...ids, teamId]);
+  }
+
+  onTeamRemoved(teamId: string): void {
+    this.selectedTeamIds.update((ids) => ids.filter((id) => id !== teamId));
   }
 
   onSubmit() {
@@ -86,8 +111,41 @@ export class ChampionshipEditComponent implements OnInit {
       isActive: this.form.value.isActive ?? true,
     };
 
+    const championshipId = this.championshipId()!;
+    const currentTeamIds = this.selectedTeamIds();
+    const originalTeamIds = this.initialTeamIds();
+
+    // Determine which teams to add and remove
+    const teamsToAdd = currentTeamIds.filter((id) => !originalTeamIds.includes(id));
+    const teamsToRemove = originalTeamIds.filter((id) => !currentTeamIds.includes(id));
+
     this.championshipService
-      .updateChampionship(this.championshipId()!, payload)
+      .updateChampionship(championshipId, payload)
+      .pipe(
+        switchMap(() => {
+          const operations = [];
+
+          // Add new teams
+          if (teamsToAdd.length > 0) {
+            operations.push(
+              ...teamsToAdd.map((teamId) =>
+                this.championshipService.addTeamToChampionship(championshipId, teamId)
+              )
+            );
+          }
+
+          // Remove teams
+          if (teamsToRemove.length > 0) {
+            operations.push(
+              ...teamsToRemove.map((teamId) =>
+                this.championshipService.removeTeamFromChampionship(championshipId, teamId)
+              )
+            );
+          }
+
+          return operations.length > 0 ? forkJoin(operations) : of(null);
+        })
+      )
       .subscribe({
         next: () => {
           this.isLoading.set(false);

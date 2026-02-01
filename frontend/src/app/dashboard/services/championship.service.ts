@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Championship } from '../types/championship.interface';
+import { Team } from '../../teams/types/team.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ChampionshipService {
@@ -31,5 +32,23 @@ export class ChampionshipService {
 
   deleteChampionship(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  // Team Management
+  addTeamToChampionship(championshipId: string, teamId: string): Observable<Championship> {
+    return this.http.post<Championship>(
+      `${this.apiUrl}/${championshipId}/teams/${teamId}`,
+      {}
+    );
+  }
+
+  removeTeamFromChampionship(championshipId: string, teamId: string): Observable<Championship> {
+    return this.http.delete<Championship>(
+      `${this.apiUrl}/${championshipId}/teams/${teamId}`
+    );
+  }
+
+  getChampionshipTeams(championshipId: string): Observable<Team[]> {
+    return this.http.get<Team[]>(`${this.apiUrl}/${championshipId}/teams`);
   }
 }

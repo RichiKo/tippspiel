@@ -22,10 +22,11 @@ h1 {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1.2rem;
+  gap: 1rem;
 }
 
 .add-championship-btn {
-  display: inline-block;
+  display: block;
   background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
   color: #fff;
   font-weight: 700;

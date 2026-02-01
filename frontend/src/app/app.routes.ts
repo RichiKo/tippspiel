@@ -30,5 +30,11 @@ export const routes: Routes = [
         (m) => m.ChampionshipEditComponent,
       ),
   },
+  {
+    path: 'teams',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./teams/teams.component').then((m) => m.TeamsComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

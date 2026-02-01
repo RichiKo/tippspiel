@@ -44,6 +44,16 @@
     @if (submitted() && form.controls.image.errors?.["required"]) {
       <div class="error">Bild ist erforderlich.</div>
     }
+    
+    <div class="team-selector-section">
+      <app-team-selector
+        [selectedTeamIds]="selectedTeamIds()"
+        [disabled]="isLoading()"
+        (teamAdded)="onTeamAdded($event)"
+        (teamRemoved)="onTeamRemoved($event)"
+      />
+    </div>
+
     <div class="form-row">
       <label
         ><input type="checkbox" formControlName="isPublic" /> Öffentlich</label

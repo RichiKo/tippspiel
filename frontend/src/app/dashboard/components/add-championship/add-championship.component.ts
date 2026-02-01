@@ -5,11 +5,14 @@ import { Router } from '@angular/router';
 import { ChampionshipService } from '../../services/championship.service';
 import { Championship } from '../../types/championship.interface';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
+import { TeamSelectorComponent } from '../../../shared/components/team-selector/team-selector.component';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-championship',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ImageUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, ImageUploadComponent, TeamSelectorComponent],
   templateUrl: './add-championship.component.html',
   styleUrl: './add-championship.component.scss',
 })
@@ -33,6 +36,7 @@ export class AddChampionshipComponent {
   readonly submitted = signal(false);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly selectedTeamIds = signal<string[]>([]);
 
   onImageUploaded(url: string): void {
     this.form.patchValue({ image: url });
@@ -40,6 +44,14 @@ export class AddChampionshipComponent {
 
   onUploadError(error: string): void {
     this.errorMessage.set(error);
+  }
+
+  onTeamAdded(teamId: string): void {
+    this.selectedTeamIds.update((ids) => [...ids, teamId]);
+  }
+
+  onTeamRemoved(teamId: string): void {
+    this.selectedTeamIds.update((ids) => ids.filter((id) => id !== teamId));
   }
 
   onSubmit() {
@@ -58,17 +70,33 @@ export class AddChampionshipComponent {
       createdByUserId: '',
     };
 
-    this.championshipService.createChampionship(payload).subscribe({
-      next: () => {
-        this.isLoading.set(false);
-        this.form.reset({ isPublic: true, isActive: true });
-        this.submitted.set(false);
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Championship konnte nicht erstellt werden.');
-      },
-    });
+    this.championshipService
+      .createChampionship(payload)
+      .pipe(
+        switchMap((championship) => {
+          const teamIds = this.selectedTeamIds();
+          if (teamIds.length === 0) {
+            return of(championship);
+          }
+          // Add all selected teams
+          const addTeamRequests = teamIds.map((teamId) =>
+            this.championshipService.addTeamToChampionship(championship.id, teamId)
+          );
+          return forkJoin(addTeamRequests);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isLoading.set(false);
+          this.form.reset({ isPublic: true, isActive: true });
+          this.submitted.set(false);
+          this.selectedTeamIds.set([]);
+          this.router.navigate(['/dashboard']);
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.errorMessage.set('Championship konnte nicht erstellt werden.');
+        },
+      });
   }
 }

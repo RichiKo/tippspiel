@@ -1,4 +1,4 @@
-import { IsString, MaxLength, IsUrl } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 
 export class CreateTeamDto {
   @IsString()
@@ -10,6 +10,5 @@ export class CreateTeamDto {
   shortName: string;
 
   @IsString()
-  @IsUrl()
   logoUrl: string;
 }

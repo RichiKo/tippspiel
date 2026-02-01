@@ -1,5 +1,5 @@
 .championship-edit-container {
-  max-width: 600px;
+  max-width: 900px;
   margin: 2rem auto;
   padding: 2rem;
   background: #ffffff;
@@ -24,6 +24,10 @@
     border: 1px solid #d1d5db;
     font-size: 0.95rem;
   }
+}
+
+.team-selector-section {
+  margin: 1.5rem 0;
 }
 
 .form-row {
@@ -58,9 +62,27 @@
   color: #ffffff;
 }
 
+.submit-btn:hover:not(:disabled) {
+  background: #1e40af;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cancel-btn {
   background: #e5e7eb;
   color: #111827;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #d1d5db;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .error {
@@ -75,4 +97,11 @@
   border-radius: 4px;
   background: #fee2e2;
   color: #7f1d1d;
+}
+
+@media (max-width: 900px) {
+  .championship-edit-container {
+    max-width: 100%;
+    margin: 1rem;
+  }
 }

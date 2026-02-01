@@ -13,6 +13,7 @@ import { ChampionshipService } from './championship.service';
 import { CreateChampionshipDto } from './dto/create-championship.dto';
 import { UpdateChampionshipDto } from './dto/update-championship.dto';
 import { ChampionshipEntity } from './championship.entity';
+import { TeamEntity } from '../team/team.entity';
 
 @Controller('championships')
 export class ChampionshipController {
@@ -48,5 +49,26 @@ export class ChampionshipController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return this.championshipService.remove(id);
+  }
+
+  @Post(':id/teams/:teamId')
+  async addTeam(
+    @Param('id') championshipId: string,
+    @Param('teamId') teamId: string,
+  ): Promise<ChampionshipEntity> {
+    return this.championshipService.addTeam(championshipId, teamId);
+  }
+
+  @Delete(':id/teams/:teamId')
+  async removeTeam(
+    @Param('id') championshipId: string,
+    @Param('teamId') teamId: string,
+  ): Promise<ChampionshipEntity> {
+    return this.championshipService.removeTeam(championshipId, teamId);
+  }
+
+  @Get(':id/teams')
+  async getTeams(@Param('id') championshipId: string): Promise<TeamEntity[]> {
+    return this.championshipService.getTeams(championshipId);
   }
 }

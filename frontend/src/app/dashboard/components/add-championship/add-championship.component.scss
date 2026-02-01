@@ -1,5 +1,5 @@
 .add-championship-container {
-  max-width: 480px;
+  max-width: 900px;
   margin: 2.5rem auto 0 auto;
   background: #fff;
   border-radius: 12px;
@@ -54,6 +54,10 @@ textarea {
   resize: vertical;
 }
 
+.team-selector-section {
+  margin: 1rem 0;
+}
+
 .form-row {
   display: flex;
   gap: 2.5rem;
@@ -64,6 +68,15 @@ textarea {
   color: #b91c1c;
   font-size: 0.97rem;
   margin-top: 0.1rem;
+}
+
+.error-banner {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-radius: 4px;
+  font-size: 0.95rem;
 }
 
 .submit-btn {
@@ -81,10 +94,22 @@ textarea {
   letter-spacing: 0.01em;
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
   background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.13);
   transform: translateY(-2px) scale(1.03);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .add-championship-container {
+    max-width: 100%;
+    margin: 1rem;
+  }
 }
 
 @media (max-width: 600px) {
