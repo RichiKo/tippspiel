@@ -31,7 +31,23 @@
         >
           Bearbeiten
         </a>
+        <button type="button" class="delete-btn" (click)="onDeleteClick()">
+          Löschen
+        </button>
       </div>
     }
   </div>
+  <app-confirmation-dialog
+    [visible]="showDeleteDialog()"
+    [title]="'Löschen bestätigen'"
+    [message]="
+      'Möchtest du die Championship »' +
+      (championship()?.name ?? '') +
+      '« wirklich löschen?'
+    "
+    [confirmLabel]="'Löschen'"
+    [cancelLabel]="'Abbrechen'"
+    (confirmed)="handleDeleteConfirm()"
+    (cancelled)="handleDeleteCancel()"
+  />
 </div>
