@@ -1,0 +1,26 @@
+@if (visible()) {
+  <div class="cd-backdrop">
+    <div class="cd-dialog">
+      <h3 class="cd-title">{{ title() }}</h3>
+      <p class="cd-message">
+        {{ message() }}
+      </p>
+      <div class="cd-actions">
+        <button
+          type="button"
+          class="cd-btn cd-btn-secondary"
+          (click)="onCancel()"
+        >
+          {{ cancelLabel() }}
+        </button>
+        <button
+          type="button"
+          class="cd-btn cd-btn-primary"
+          (click)="onConfirm()"
+        >
+          {{ confirmLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
