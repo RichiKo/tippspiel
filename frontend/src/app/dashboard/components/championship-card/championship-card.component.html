@@ -1,4 +1,4 @@
-<div class="championship-card">
+<div class="championship-card" (click)="onCardClick()">
   <img
     class="championship-image"
     [src]="championship()?.image"
@@ -24,7 +24,7 @@
       }
     </div>
     @if (isAdmin()) {
-      <div class="championship-actions">
+      <div class="championship-actions" (click)="$event.stopPropagation()">
         <a
           [routerLink]="['/dashboard/championship', championship()?.id, 'edit']"
           class="edit-link"

@@ -12,7 +12,12 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-add-championship',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ImageUploadComponent, TeamSelectorComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ImageUploadComponent,
+    TeamSelectorComponent,
+  ],
   templateUrl: './add-championship.component.html',
   styleUrl: './add-championship.component.scss',
 })
@@ -80,7 +85,10 @@ export class AddChampionshipComponent {
           }
           // Add all selected teams
           const addTeamRequests = teamIds.map((teamId) =>
-            this.championshipService.addTeamToChampionship(championship.id, teamId)
+            this.championshipService.addTeamToChampionship(
+              championship.id,
+              teamId
+            )
           );
           return forkJoin(addTeamRequests);
         })

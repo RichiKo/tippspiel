@@ -12,7 +12,13 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-championship-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ImageUploadComponent, TeamSelectorComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    ImageUploadComponent,
+    TeamSelectorComponent,
+  ],
   templateUrl: './championship-edit.component.html',
   styleUrl: './championship-edit.component.scss',
 })
@@ -38,7 +44,7 @@ export class ChampionshipEditComponent implements OnInit {
   });
 
   readonly canSubmit = computed(
-    () => !this.isLoading() && this.form.valid && !!this.championshipId(),
+    () => !this.isLoading() && this.form.valid && !!this.championshipId()
   );
 
   ngOnInit() {
@@ -116,8 +122,12 @@ export class ChampionshipEditComponent implements OnInit {
     const originalTeamIds = this.initialTeamIds();
 
     // Determine which teams to add and remove
-    const teamsToAdd = currentTeamIds.filter((id) => !originalTeamIds.includes(id));
-    const teamsToRemove = originalTeamIds.filter((id) => !currentTeamIds.includes(id));
+    const teamsToAdd = currentTeamIds.filter(
+      (id) => !originalTeamIds.includes(id)
+    );
+    const teamsToRemove = originalTeamIds.filter(
+      (id) => !currentTeamIds.includes(id)
+    );
 
     this.championshipService
       .updateChampionship(championshipId, payload)
@@ -129,7 +139,10 @@ export class ChampionshipEditComponent implements OnInit {
           if (teamsToAdd.length > 0) {
             operations.push(
               ...teamsToAdd.map((teamId) =>
-                this.championshipService.addTeamToChampionship(championshipId, teamId)
+                this.championshipService.addTeamToChampionship(
+                  championshipId,
+                  teamId
+                )
               )
             );
           }
@@ -138,7 +151,10 @@ export class ChampionshipEditComponent implements OnInit {
           if (teamsToRemove.length > 0) {
             operations.push(
               ...teamsToRemove.map((teamId) =>
-                this.championshipService.removeTeamFromChampionship(championshipId, teamId)
+                this.championshipService.removeTeamFromChampionship(
+                  championshipId,
+                  teamId
+                )
               )
             );
           }
@@ -153,7 +169,7 @@ export class ChampionshipEditComponent implements OnInit {
         },
         error: () => {
           this.errorMessage.set(
-            'Championship konnte nicht aktualisiert werden.',
+            'Championship konnte nicht aktualisiert werden.'
           );
           this.isLoading.set(false);
         },

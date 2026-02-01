@@ -23,6 +23,10 @@ export class ChampionshipCardComponent {
   readonly showDeleteDialog = signal(false);
   readonly isDeleting = signal(false);
 
+  onCardClick() {
+    this.router.navigate(['/championship', this.championship()?.id]);
+  }
+
   onDeleteClick() {
     if (!this.isAdmin()) {
       return;

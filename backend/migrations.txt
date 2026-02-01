@@ -9,3 +9,13 @@ npm run db:revert
 
 Schema droppen
 npm run db:drop
+
+---
+
+Ausgeführte Migrationen:
+1. 1739907893835-CreateUsersTable.ts
+2. 1739978213001-CreateRoleField.ts
+3. 1740000000000-CreateChampionshipsTable.ts
+4. 1740100000000-CreateTeamsTable.ts
+5. 1740200000000-CreateRoundsTable.ts (NEU)
+6. 1740300000000-CreateGamesTable.ts (NEU)

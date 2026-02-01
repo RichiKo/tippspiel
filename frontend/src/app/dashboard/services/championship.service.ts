@@ -35,14 +35,20 @@ export class ChampionshipService {
   }
 
   // Team Management
-  addTeamToChampionship(championshipId: string, teamId: string): Observable<Championship> {
+  addTeamToChampionship(
+    championshipId: string,
+    teamId: string
+  ): Observable<Championship> {
     return this.http.post<Championship>(
       `${this.apiUrl}/${championshipId}/teams/${teamId}`,
       {}
     );
   }
 
-  removeTeamFromChampionship(championshipId: string, teamId: string): Observable<Championship> {
+  removeTeamFromChampionship(
+    championshipId: string,
+    teamId: string
+  ): Observable<Championship> {
     return this.http.delete<Championship>(
       `${this.apiUrl}/${championshipId}/teams/${teamId}`
     );

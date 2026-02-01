@@ -10,6 +10,8 @@ import { UserModule } from '@app/user/user.module';
 import { ChampionshipModule } from './championship/championship.module';
 import { TeamModule } from './team/team.module';
 import { UploadModule } from './upload/upload.module';
+import { RoundModule } from './round/round.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { UploadModule } from './upload/upload.module';
     UserModule,
     ChampionshipModule,
     TeamModule,
+    RoundModule,
+    GameModule,
     UploadModule,
   ],
   controllers: [AppController],

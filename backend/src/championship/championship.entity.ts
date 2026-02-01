@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 import { TeamEntity } from '../team/team.entity';
+import { RoundEntity } from '../round/round.entity';
 
 @Entity({ name: 'championships' })
 export class ChampionshipEntity {
@@ -39,4 +41,7 @@ export class ChampionshipEntity {
 
   @ManyToMany(() => TeamEntity, (team) => team.championships)
   teams: TeamEntity[];
+
+  @OneToMany(() => RoundEntity, (round) => round.championship)
+  rounds: RoundEntity[];
 }

@@ -11,23 +11,31 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     loadComponent: () =>
       import('./dashboard/dashboard.component').then(
-        (m) => m.DashboardComponent,
+        (m) => m.DashboardComponent
       ),
   },
   {
     path: 'dashboard/create',
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./dashboard/components/add-championship/add-championship.component').then(
-        (m) => m.AddChampionshipComponent,
-      ),
+      import(
+        './dashboard/components/add-championship/add-championship.component'
+      ).then((m) => m.AddChampionshipComponent),
   },
   {
     path: 'dashboard/championship/:id/edit',
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./dashboard/components/championship-edit/championship-edit.component').then(
-        (m) => m.ChampionshipEditComponent,
+      import(
+        './dashboard/components/championship-edit/championship-edit.component'
+      ).then((m) => m.ChampionshipEditComponent),
+  },
+  {
+    path: 'championship/:id',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./championship/championship-detail.component').then(
+        (m) => m.ChampionshipDetailComponent
       ),
   },
   {

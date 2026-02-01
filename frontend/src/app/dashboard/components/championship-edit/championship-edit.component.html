@@ -2,9 +2,9 @@
   <h2>Championship bearbeiten</h2>
 
   @if (errorMessage()) {
-    <div class="error-banner">
-      {{ errorMessage() }}
-    </div>
+  <div class="error-banner">
+    {{ errorMessage() }}
+  </div>
   }
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
@@ -19,10 +19,9 @@
         [disabled]="isLoading()"
       />
       @if (submitted() && form.controls.name.errors?.["required"]) {
-        <div class="error">Name ist erforderlich.</div>
-      }
-      @if (form.controls.name.errors?.["maxlength"]) {
-        <div class="error">Maximal 64 Zeichen.</div>
+      <div class="error">Name ist erforderlich.</div>
+      } @if (form.controls.name.errors?.["maxlength"]) {
+      <div class="error">Maximal 64 Zeichen.</div>
       }
     </div>
 
@@ -35,7 +34,7 @@
         [disabled]="isLoading()"
       ></textarea>
       @if (form.controls.description.errors?.["maxlength"]) {
-        <div class="error">Maximal 256 Zeichen.</div>
+      <div class="error">Maximal 256 Zeichen.</div>
       }
     </div>
 
@@ -47,7 +46,7 @@
       (uploadError)="onUploadError($event)"
     />
     @if (submitted() && form.controls.image.errors?.["required"]) {
-      <div class="error">Bild ist erforderlich.</div>
+    <div class="error">Bild ist erforderlich.</div>
     }
 
     <div class="team-selector-section">
