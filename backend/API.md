@@ -472,7 +472,7 @@ Ruft alle Spiele einer Championship ab.
 
 ### **PUT** `/games/:id/result`
 
-Setzt das Ergebnis eines Spiels (authentifiziert, nur Admin/Creator).
+Setzt das Ergebnis eines Spiels und triggert automatisch Punkteberechnung und Ranking-Update (authentifiziert, nur Admin/Creator).
 
 #### **Headers**
 ```
@@ -488,6 +488,22 @@ Authorization: Bearer <token>
   "isClosed": true
 }
 ```
+
+#### **Verhalten**
+
+**Fall 1: Spiel wird geschlossen (isClosed: true)**
+- Beim **ersten Schließen**: Automatische Erstellung von `notTipped` Tips für User, die keinen Tipp abgegeben haben
+- Bei **Korrekturen** (bereits geschlossen): Alle Tips werden neu ausgewertet mit dem neuen Ergebnis, keine neuen `notTipped` Tips
+- Rankings werden neu berechnet
+
+**Fall 2: Spiel wird wieder geöffnet (isClosed: false)**
+- Alle `notTipped` Tips werden gelöscht
+- Alle User-Tips werden zurückgesetzt (`points` und `outcomeType` werden `null`)
+- Rankings werden neu berechnet (ohne die Tips dieses Spiels)
+
+**Fall 3: Nur Score-Korrektur (isClosed bleibt true)**
+- Alle Tips werden mit dem neuen Score neu ausgewertet
+- Rankings werden aktualisiert
 
 #### **Response (JSON)**
 
@@ -506,11 +522,69 @@ Authorization: Bearer <token>
 ```
 
 #### **Status Codes**
-- `200 OK` - Ergebnis gesetzt
+- `200 OK` - Ergebnis gesetzt, Tipps ausgewertet, Rankings aktualisiert
 - `400 Bad Request` - Ungültige Eingabe
 - `401 Unauthorized` - Nicht authentifiziert
 - `403 Forbidden` - Keine Berechtigung
 - `404 Not Found` - Spiel existiert nicht
+
+---
+
+### **GET** `/games/:id/tips`
+
+Ruft alle Tipps für ein bestimmtes Spiel ab (für Tabelle 1: "Tipps aller User für dieses Spiel").
+
+#### **Response (JSON)**
+
+```json
+[
+  {
+    "id": "uuid-v4",
+    "userId": 1,
+    "gameId": "game-uuid",
+    "championshipId": "championship-uuid",
+    "homeTeamGoals": 2,
+    "awayTeamGoals": 1,
+    "points": 3,
+    "outcomeType": "exact",
+    "createdAt": "2026-06-14T10:00:00.000Z",
+    "updatedAt": "2026-06-15T20:00:00.000Z",
+    "user": {
+      "id": 1,
+      "username": "testuser",
+      "email": "testuser@example.com"
+    }
+  }
+]
+```
+
+**Hinweis:** 
+- `points` und `outcomeType` sind `null`, wenn das Spiel noch nicht abgeschlossen (`isClosed = false`) ist.
+- Wenn `outcomeType = 'notTipped'` und `homeTeamGoals`/`awayTeamGoals` sind `null`, dann wurde kein Tipp abgegeben (User hat vergessen zu tippen).
+
+**Beispiel für nicht getipptes Spiel:**
+```json
+{
+  "id": "uuid-v4",
+  "userId": 2,
+  "gameId": "game-uuid",
+  "championshipId": "championship-uuid",
+  "homeTeamGoals": null,
+  "awayTeamGoals": null,
+  "points": 0,
+  "outcomeType": "notTipped",
+  "createdAt": "2026-06-15T18:05:00.000Z",
+  "updatedAt": "2026-06-15T18:05:00.000Z",
+  "user": {
+    "id": 2,
+    "username": "forgetfulUser",
+    "email": "forgetful@example.com"
+  }
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Abfrage
 
 ---
 
@@ -640,31 +714,32 @@ Authorization: Bearer <token>
 
 ### **GET** `/rankings/championship/:championshipId`
 
-Ruft die Rangliste für eine Championship ab.
+Ruft die Rangliste für eine Championship ab (für Tabellen 2 & 3: Prüf-Kalkulation und Ergebnis-Tabelle).
 
 #### **Response (JSON)**
 
 ```json
-{
-  "rankings": [
-    {
-      "id": "uuid-v4",
-      "userId": "user-uuid",
-      "championshipId": "championship-uuid",
-      "rank": 1,
-      "exactHits": 5,
-      "goalDiffHits": 3,
-      "tendencyHits": 2,
-      "missedTips": 1,
-      "updatedAt": "2026-06-20T10:00:00.000Z",
-      "user": {
-        "id": "user-uuid",
-        "username": "testuser"
-      }
+[
+  {
+    "id": "uuid-v4",
+    "userId": 1,
+    "championshipId": "championship-uuid",
+    "rank": 1,
+    "exactHits": 5,
+    "goalDiffHits": 3,
+    "tendencyHits": 2,
+    "missedTips": 1,
+    "updatedAt": "2026-06-20T10:00:00.000Z",
+    "user": {
+      "id": 1,
+      "username": "testuser",
+      "email": "testuser@example.com"
     }
-  ]
-}
+  }
+]
 ```
+
+**Hinweis:** `totalPoints` kann im Frontend berechnet werden als: `(exactHits × 3) + (goalDiffHits × 2) + (tendencyHits × 1)`.
 
 #### **Status Codes**
 - `200 OK` - Erfolgreiche Abfrage

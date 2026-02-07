@@ -12,6 +12,8 @@ import { TeamModule } from './team/team.module';
 import { UploadModule } from './upload/upload.module';
 import { RoundModule } from './round/round.module';
 import { GameModule } from './game/game.module';
+import { TipModule } from './tip/tip.module';
+import { RankingModule } from './ranking/ranking.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { GameModule } from './game/game.module';
     TeamModule,
     RoundModule,
     GameModule,
+    TipModule,
+    RankingModule,
     UploadModule,
   ],
   controllers: [AppController],

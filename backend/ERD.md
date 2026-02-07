@@ -183,11 +183,13 @@ Repräsentiert einen Tipp eines Users auf ein Spiel.
 
 **Felder:**
 - `id` (UUID) - Primärschlüssel
-- `userId` (UUID) - Foreign Key → User
+- `userId` (number) - Foreign Key → User
 - `championshipId` (UUID) - Foreign Key → Championship
 - `gameId` (UUID) - Foreign Key → Game
-- `homeTeamGoals` (number) - Getippte Tore Heimmannschaft
-- `awayTeamGoals` (number) - Getippte Tore Auswärtsmannschaft
+- `homeTeamGoals` (number, nullable) - Getippte Tore Heimmannschaft (null wenn nicht getippt)
+- `awayTeamGoals` (number, nullable) - Getippte Tore Auswärtsmannschaft (null wenn nicht getippt)
+- `points` (number, nullable) - Erreichte Punkte (0-3), null vor Spielende
+- `outcomeType` (enum, nullable) - Tipp-Ergebnis: `exact`, `goalDiff`, `tendency`, `missed`, `notTipped`, null vor Spielende
 - `createdAt` (Date) - Erstellungsdatum
 - `updatedAt` (Date) - Letzte Änderung
 
@@ -199,13 +201,16 @@ Repräsentiert einen Tipp eines Users auf ein Spiel.
 **Geschäftslogik:**
 - Ein User kann pro Game nur einen Tipp abgeben (eindeutig: `userId` + `gameId`)
 - Tipp kann nur vor `game.kickoffTime` abgegeben/geändert werden
-- Nach Spielende: Punkteberechnung basierend auf Vergleich `homeTeamGoals/awayTeamGoals` vs. `game.homeScore/awayScore`
+- Wenn User keinen Tipp abgibt: Beim Schließen des Spiels wird automatisch ein Tip-Eintrag mit `homeTeamGoals = null`, `awayTeamGoals = null`, `points = 0`, `outcomeType = 'notTipped'` erstellt
+- Nach Spielende: Automatische Punkteberechnung basierend auf Vergleich `homeTeamGoals/awayTeamGoals` vs. `game.homeScore/awayScore`
+- `points` und `outcomeType` werden beim Schließen des Spiels (`isClosed = true`) automatisch gesetzt
 
-**Punkteverteilung (typisch):**
-- **Exakter Tipp:** z. B. 3 Punkte (Ergebnis und Tordifferenz korrekt)
-- **Tordifferenz:** z. B. 2 Punkte (Tendenz und Tordifferenz korrekt)
-- **Tendenz:** z. B. 1 Punkt (nur Sieger/Unentschieden korrekt)
-- **Falsch:** 0 Punkte
+**Punkteverteilung:**
+- **Exakter Tipp (exact):** 3 Punkte (Ergebnis exakt richtig)
+- **Tordifferenz (goalDiff):** 2 Punkte (Tendenz und Tordifferenz korrekt)
+- **Tendenz (tendency):** 1 Punkt (nur Sieger/Unentschieden korrekt)
+- **Falsch (missed):** 0 Punkte
+- **Nicht getippt (notTipped):** 0 Punkte (User hat vergessen zu tippen)
 
 ---
 

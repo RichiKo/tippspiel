@@ -2,6 +2,8 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +13,8 @@ import { TeamEntity } from '../team/team.entity';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { UpdateGameResultDto } from './dto/update-game-result.dto';
+import { TipService } from '../tip/tip.service';
+import { RankingService } from '../ranking/ranking.service';
 
 @Injectable()
 export class GameService {
@@ -21,6 +25,10 @@ export class GameService {
     private readonly roundRepository: Repository<RoundEntity>,
     @InjectRepository(TeamEntity)
     private readonly teamRepository: Repository<TeamEntity>,
+    @Inject(forwardRef(() => TipService))
+    private readonly tipService: TipService,
+    @Inject(forwardRef(() => RankingService))
+    private readonly rankingService: RankingService,
   ) {}
 
   async create(roundId: string, createDto: CreateGameDto): Promise<GameEntity> {
@@ -214,18 +222,56 @@ export class GameService {
 
     const updatedGame = await this.gameRepository.save(game);
 
-    return this.gameRepository.findOne({
+    const result = await this.gameRepository.findOne({
       where: { id: updatedGame.id },
       relations: ['round', 'homeTeam', 'awayTeam'],
     });
+
+    if (!result) {
+      throw new NotFoundException('Game not found after update');
+    }
+
+    return result;
   }
 
   async updateResult(
     id: string,
     updateDto: UpdateGameResultDto,
   ): Promise<GameEntity> {
-    const game = await this.findOne(id);
+    const game = await this.gameRepository.findOne({
+      where: { id },
+      relations: ['round'],
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    const wasClosedBefore = game.isClosed;
+
     await this.gameRepository.update(id, updateDto);
+
+    if (updateDto.isClosed === true) {
+      if (!wasClosedBefore) {
+        await this.tipService.createMissingTipsForGame(
+          id,
+          game.round.championshipId,
+        );
+      }
+
+      await this.tipService.evaluateTipsForGame(id);
+      await this.rankingService.recalculateForChampionship(
+        game.round.championshipId,
+      );
+    }
+
+    if (updateDto.isClosed === false && wasClosedBefore) {
+      await this.tipService.resetTipsForGame(id);
+      await this.rankingService.recalculateForChampionship(
+        game.round.championshipId,
+      );
+    }
+
     return this.findOne(id);
   }
 
