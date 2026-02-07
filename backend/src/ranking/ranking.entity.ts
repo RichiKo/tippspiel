@@ -37,6 +37,9 @@ export class RankingEntity {
   @Column({ type: 'int', default: 0 })
   missedTips: number;
 
+  @Column({ type: 'int', default: 0 })
+  totalPoints: number;
+
   @UpdateDateColumn()
   updatedAt: Date;
 

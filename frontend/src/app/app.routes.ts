@@ -47,6 +47,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'championship/:id/standings',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./championship/components/standings/standings.component').then(
+        (m) => m.StandingsComponent
+      ),
+  },
+  {
     path: 'teams',
     canActivate: [AuthGuard],
     loadComponent: () =>

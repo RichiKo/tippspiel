@@ -102,6 +102,7 @@ export class RankingService {
         existingRanking.goalDiffHits = userData.goalDiffHits;
         existingRanking.tendencyHits = userData.tendencyHits;
         existingRanking.missedTips = userData.missedTips;
+        existingRanking.totalPoints = userData.totalPoints;
         await this.rankingRepository.save(existingRanking);
       } else {
         const newRanking = this.rankingRepository.create({
@@ -112,6 +113,7 @@ export class RankingService {
           goalDiffHits: userData.goalDiffHits,
           tendencyHits: userData.tendencyHits,
           missedTips: userData.missedTips,
+          totalPoints: userData.totalPoints,
         });
         await this.rankingRepository.save(newRanking);
       }

@@ -729,6 +729,7 @@ Ruft die Rangliste für eine Championship ab (für Tabellen 2 & 3: Prüf-Kalkula
     "goalDiffHits": 3,
     "tendencyHits": 2,
     "missedTips": 1,
+    "totalPoints": 21,
     "updatedAt": "2026-06-20T10:00:00.000Z",
     "user": {
       "id": 1,
@@ -739,7 +740,7 @@ Ruft die Rangliste für eine Championship ab (für Tabellen 2 & 3: Prüf-Kalkula
 ]
 ```
 
-**Hinweis:** `totalPoints` kann im Frontend berechnet werden als: `(exactHits × 3) + (goalDiffHits × 2) + (tendencyHits × 1)`.
+**Hinweis:** `totalPoints` wird automatisch berechnet als: `(exactHits × 3) + (goalDiffHits × 2) + (tendencyHits × 1)` und in der Datenbank gespeichert.
 
 #### **Status Codes**
 - `200 OK` - Erfolgreiche Abfrage
