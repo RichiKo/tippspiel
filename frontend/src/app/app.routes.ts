@@ -39,6 +39,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'championship/:id/ranking',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./championship/components/ranking/ranking.component').then(
+        (m) => m.RankingComponent
+      ),
+  },
+  {
     path: 'teams',
     canActivate: [AuthGuard],
     loadComponent: () =>
