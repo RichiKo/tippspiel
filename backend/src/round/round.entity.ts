@@ -18,8 +18,11 @@ export class RoundEntity {
   @Column({ length: 100 })
   name: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date' })
   startDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  endDate: Date | null;
 
   @Column()
   championshipId: string;

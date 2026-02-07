@@ -1,4 +1,4 @@
-import { IsString, MaxLength, IsDate } from 'class-validator';
+import { IsString, MaxLength, IsDate, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateRoundDto {
@@ -9,4 +9,9 @@ export class CreateRoundDto {
   @IsDate()
   @Type(() => Date)
   startDate: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
 }

@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/create-game.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
 import { UpdateGameResultDto } from './dto/update-game-result.dto';
 import { GameEntity } from './game.entity';
 
@@ -50,6 +51,15 @@ export class GameController {
   @Get('games/:id')
   async findOne(@Param('id') id: string): Promise<GameEntity> {
     return this.gameService.findOne(id);
+  }
+
+  @Put('games/:id')
+  @UsePipes(new ValidationPipe())
+  async update(
+    @Param('id') id: string,
+    @Body() updateGameDto: UpdateGameDto,
+  ): Promise<GameEntity> {
+    return this.gameService.update(id, updateGameDto);
   }
 
   @Put('games/:id/result')

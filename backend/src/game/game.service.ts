@@ -9,6 +9,7 @@ import { GameEntity } from './game.entity';
 import { RoundEntity } from '../round/round.entity';
 import { TeamEntity } from '../team/team.entity';
 import { CreateGameDto } from './dto/create-game.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
 import { UpdateGameResultDto } from './dto/update-game-result.dto';
 
 @Injectable()
@@ -129,6 +130,94 @@ export class GameService {
     }
 
     return game;
+  }
+
+  async update(id: string, updateDto: UpdateGameDto): Promise<GameEntity> {
+    const game = await this.gameRepository.findOne({
+      where: { id },
+      relations: ['round', 'round.championship', 'homeTeam', 'awayTeam'],
+    });
+
+    if (!game) {
+      throw new NotFoundException(`Game with ID ${id} not found`);
+    }
+
+    // Validate if teams are being changed
+    if (updateDto.homeTeamId || updateDto.awayTeamId) {
+      const homeTeamId = updateDto.homeTeamId || game.homeTeamId;
+      const awayTeamId = updateDto.awayTeamId || game.awayTeamId;
+
+      // Check if teams are different
+      if (homeTeamId === awayTeamId) {
+        throw new BadRequestException(
+          'Home team and away team must be different',
+        );
+      }
+
+      // Validate homeTeam exists and belongs to championship
+      if (updateDto.homeTeamId) {
+        const homeTeam = await this.teamRepository.findOne({
+          where: { id: updateDto.homeTeamId },
+          relations: ['championships'],
+        });
+
+        if (!homeTeam) {
+          throw new NotFoundException(
+            `Home team with ID ${updateDto.homeTeamId} not found`,
+          );
+        }
+
+        const belongsToChampionship = homeTeam.championships.some(
+          (c) => c.id === game.round.championshipId,
+        );
+
+        if (!belongsToChampionship) {
+          throw new BadRequestException(
+            'Home team does not belong to this championship',
+          );
+        }
+
+        game.homeTeamId = updateDto.homeTeamId;
+      }
+
+      // Validate awayTeam exists and belongs to championship
+      if (updateDto.awayTeamId) {
+        const awayTeam = await this.teamRepository.findOne({
+          where: { id: updateDto.awayTeamId },
+          relations: ['championships'],
+        });
+
+        if (!awayTeam) {
+          throw new NotFoundException(
+            `Away team with ID ${updateDto.awayTeamId} not found`,
+          );
+        }
+
+        const belongsToChampionship = awayTeam.championships.some(
+          (c) => c.id === game.round.championshipId,
+        );
+
+        if (!belongsToChampionship) {
+          throw new BadRequestException(
+            'Away team does not belong to this championship',
+          );
+        }
+
+        game.awayTeamId = updateDto.awayTeamId;
+      }
+    }
+
+    // Update kickoff time if provided
+    if (updateDto.kickoffTime) {
+      game.kickoffTime = updateDto.kickoffTime;
+    }
+
+    const updatedGame = await this.gameRepository.save(game);
+
+    return this.gameRepository.findOne({
+      where: { id: updatedGame.id },
+      relations: ['round', 'homeTeam', 'awayTeam'],
+    });
   }
 
   async updateResult(
