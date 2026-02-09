@@ -1,0 +1,258 @@
+.game-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .game-meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+
+    .kickoff-time {
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .edit-game-btn,
+    .delete-game-btn {
+      padding: 0.4rem 0.8rem;
+      background: transparent;
+      border: 1px solid;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+
+    .edit-game-btn {
+      color: #1976d2;
+      border-color: #1976d2;
+
+      &:hover {
+        background: #1976d2;
+        color: white;
+      }
+    }
+
+    .delete-game-btn {
+      color: #d32f2f;
+      border-color: #d32f2f;
+
+      &:hover {
+        background: #d32f2f;
+        color: white;
+      }
+    }
+  }
+
+  .game-info {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+
+      span {
+        font-weight: 500;
+        font-size: 1rem;
+      }
+
+      &.home-team {
+        justify-content: flex-end;
+        text-align: right;
+      }
+
+      &.away-team {
+        justify-content: flex-start;
+        text-align: left;
+      }
+    }
+
+    .game-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 180px;
+
+      .final-score {
+        text-align: center;
+
+        .score {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #1976d2;
+        }
+
+        .status {
+          display: block;
+          margin-top: 0.25rem;
+          font-size: 0.875rem;
+          color: #666;
+
+          &.closed {
+            color: #4caf50;
+          }
+        }
+      }
+
+      .tip-locked-info {
+        text-align: center;
+
+        .tip-locked {
+          color: #f57c00;
+          font-weight: 500;
+        }
+      }
+
+      .tip-input {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .goal-input {
+          width: 60px;
+          padding: 0.5rem;
+          text-align: center;
+          font-size: 1rem;
+          border: 2px solid #e0e0e0;
+          border-radius: 4px;
+          transition: border-color 0.2s;
+
+          &:focus {
+            outline: none;
+            border-color: #1976d2;
+          }
+
+          &:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+          }
+        }
+
+        .colon {
+          font-size: 1.25rem;
+          font-weight: bold;
+          color: #666;
+        }
+
+        .save-tip-btn {
+          padding: 0.5rem 1rem;
+          background: #1976d2;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.875rem;
+          transition: background 0.2s;
+
+          &:hover:not(:disabled) {
+            background: #1565c0;
+          }
+
+          &:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+          }
+        }
+
+        .cancel-edit-btn {
+          padding: 0.5rem 1rem;
+          background: transparent;
+          color: #666;
+          border: 1px solid #bdbdbd;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+
+          &:hover {
+            background: #f5f5f5;
+            border-color: #666;
+          }
+        }
+      }
+
+      .tip-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+
+        .saved-tip {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.25rem;
+
+          .tip-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1976d2;
+          }
+
+          .tip-label {
+            font-size: 0.875rem;
+            color: #666;
+            font-style: italic;
+          }
+        }
+
+        .edit-tip-btn {
+          padding: 0.5rem 1rem;
+          background: transparent;
+          color: #1976d2;
+          border: 1px solid #1976d2;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+
+          &:hover {
+            background: #1976d2;
+            color: white;
+          }
+        }
+      }
+
+      .user-tip {
+        color: #666;
+        font-size: 0.875rem;
+        font-style: italic;
+      }
+    }
+  }
+
+  .game-meta {
+    margin-top: 0;
+  }
+}

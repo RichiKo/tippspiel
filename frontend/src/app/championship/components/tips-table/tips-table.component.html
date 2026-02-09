@@ -1,0 +1,37 @@
+<div class="tips-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Teilnehmer</th>
+        <th>Tipp</th>
+        <th>Punkte</th>
+        <th>Ergebnis</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (tip of sortedTips(); track tip.id) {
+        <tr [class.current-user]="isCurrentUser(tip.userId)">
+          <td class="username">{{ tip.user?.username || "Unbekannt" }}</td>
+          <td class="tip-score">
+            @if (tip.homeTeamGoals !== null && tip.awayTeamGoals !== null) {
+              {{ tip.homeTeamGoals }} : {{ tip.awayTeamGoals }}
+            } @else {
+              <span class="no-tip">-</span>
+            }
+          </td>
+          <td class="points">{{ isClosed() ? (tip.points ?? 0) : "-" }}</td>
+          <td class="outcome">
+            <span
+              [class]="
+                'outcome-badge ' +
+                (isClosed() ? getOutcomeClass(tip.outcomeType) : 'none')
+              "
+            >
+              {{ isClosed() ? getOutcomeLabel(tip.outcomeType) : "-" }}
+            </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

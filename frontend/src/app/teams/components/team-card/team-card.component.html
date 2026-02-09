@@ -1,0 +1,91 @@
+@if (!isEditing()) {
+<div class="team-card">
+  <img
+    class="team-logo"
+    [src]="team()?.logoUrl"
+    [alt]="team()?.name"
+    onerror="this.src='https://via.placeholder.com/150?text=Team'"
+  />
+  <div class="team-content">
+    <h3>{{ team()?.name }}</h3>
+    <p class="team-short">{{ team()?.shortName }}</p>
+
+    @if (isAdmin()) {
+    <div class="team-actions">
+      <button type="button" class="edit-btn" (click)="onEditClick()">
+        Bearbeiten
+      </button>
+      <button type="button" class="delete-btn" (click)="onDeleteClick()">
+        Löschen
+      </button>
+    </div>
+    }
+  </div>
+</div>
+} @else {
+<div class="team-card team-card-editing">
+  <form [formGroup]="editForm" (ngSubmit)="onSaveEdit()">
+    <div class="form-group">
+      <label for="name">Name*</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        maxlength="100"
+        [disabled]="isSaving()"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="shortName">Kurzname*</label>
+      <input
+        id="shortName"
+        type="text"
+        formControlName="shortName"
+        maxlength="10"
+        [disabled]="isSaving()"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Team-Logo*</label>
+      <app-image-upload
+        [uploadCategory]="'teams'"
+        [label]="'Logo ändern'"
+        [currentImageUrl]="uploadedLogoUrl()"
+        (imageUploaded)="onImageUploaded($event)"
+      />
+    </div>
+
+    <div class="team-actions">
+      <button
+        type="submit"
+        class="save-btn"
+        [disabled]="editForm.invalid || isSaving()"
+      >
+        Speichern
+      </button>
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="onCancelEdit()"
+        [disabled]="isSaving()"
+      >
+        Abbrechen
+      </button>
+    </div>
+  </form>
+</div>
+}
+
+<app-confirmation-dialog
+  [visible]="showDeleteDialog()"
+  [title]="'Team löschen'"
+  [message]="
+    'Möchtest du das Team »' + (team()?.name ?? '') + '« wirklich löschen?'
+  "
+  [confirmLabel]="'Löschen'"
+  [cancelLabel]="'Abbrechen'"
+  (confirmed)="handleDeleteConfirm()"
+  (cancelled)="handleDeleteCancel()"
+/>

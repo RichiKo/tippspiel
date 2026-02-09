@@ -1,0 +1,107 @@
+<div class="game-card">
+  <div class="game-meta-header">
+    <span class="kickoff-time">
+      {{ formatKickoffTime(game().kickoffTime) }}
+    </span>
+    @if (isAdmin()) {
+      <div class="admin-actions">
+        <button class="edit-game-btn" (click)="onEditGame()">
+          Bearbeiten
+        </button>
+        <button class="delete-game-btn" (click)="onDeleteGame()">
+          Löschen
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="game-info">
+    <div class="team home-team">
+      @if (game().homeTeam) {
+        <img [src]="game().homeTeam?.logoUrl" [alt]="game().homeTeam?.name" />
+        <span>{{ game().homeTeam?.name }}</span>
+      } @else {
+        <span>Team {{ game().homeTeamId }}</span>
+      }
+    </div>
+
+    <div class="game-score">
+      @if (game().isClosed) {
+        <div class="final-score">
+          <span class="score">{{ game().homeScore }} : {{ game().awayScore }}</span>
+          <small class="status closed">Beendet</small>
+        </div>
+      } @else if (isTipLocked()) {
+        <div class="tip-locked-info">
+          <span class="tip-locked">Tippabgabe beendet</span>
+        </div>
+        @if (tip()) {
+          <small class="user-tip">
+            Dein Tipp: {{ tip()?.homeTeamGoals }} : {{ tip()?.awayTeamGoals }}
+          </small>
+        }
+      } @else {
+        @if (showTipDisplay()) {
+          <div class="tip-display">
+            <div class="saved-tip">
+              <span class="tip-value">{{ tip()?.homeTeamGoals }} : {{ tip()?.awayTeamGoals }}</span>
+              <small class="tip-label">Dein Tipp</small>
+            </div>
+            <button class="edit-tip-btn" (click)="enterEditMode()">
+              Bearbeiten
+            </button>
+          </div>
+        } @else {
+          <div class="tip-input">
+            <input
+              type="number"
+              [value]="homeGoals() ?? ''"
+              (input)="onHomeGoalsChange($event)"
+              min="0"
+              placeholder="-"
+              class="goal-input"
+            />
+            <span class="colon">:</span>
+            <input
+              type="number"
+              [value]="awayGoals() ?? ''"
+              (input)="onAwayGoalsChange($event)"
+              min="0"
+              placeholder="-"
+              class="goal-input"
+            />
+            <button 
+              class="save-tip-btn"
+              (click)="saveTip()" 
+              [disabled]="!canSaveTip()"
+            >
+              Speichern
+            </button>
+            @if (hasTip()) {
+              <button class="cancel-edit-btn" (click)="cancelEdit()">
+                Abbrechen
+              </button>
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <div class="team away-team">
+      @if (game().awayTeam) {
+        <img [src]="game().awayTeam?.logoUrl" [alt]="game().awayTeam?.name" />
+        <span>{{ game().awayTeam?.name }}</span>
+      } @else {
+        <span>Team {{ game().awayTeamId }}</span>
+      }
+    </div>
+  </div>
+
+  @if ((game().isClosed || isTipLocked()) && gameTips().length > 0) {
+    <app-tips-table 
+      [tips]="gameTips()" 
+      [currentUserId]="currentUserId()"
+      [isClosed]="game().isClosed"
+    />
+  }
+</div>

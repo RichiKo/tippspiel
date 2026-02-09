@@ -1,0 +1,43 @@
+<header class="app-header">
+  @if (currentUser()) {
+    <div class="header-content">
+      <div class="header-left">
+        <button class="logo-btn" (click)="navigateToDashboard()">
+          <span class="logo-icon">⚽</span>
+          <span class="logo-text">Tipp-Spiel</span>
+        </button>
+      </div>
+
+      <div class="header-right">
+        <div class="user-info">
+          <div class="user-avatar">
+            @if (currentUser()!.image) {
+              <img [src]="currentUser()!.image" [alt]="currentUser()!.username" />
+            } @else {
+              <span class="avatar-placeholder">{{ currentUser()!.username.charAt(0).toUpperCase() }}</span>
+            }
+          </div>
+          <span class="username">{{ currentUser()!.username }}</span>
+        </div>
+
+        <button class="settings-btn" (click)="navigateToSettings()" title="Einstellungen">
+          <span>⚙️</span>
+        </button>
+
+        <button class="logout-btn" (click)="onLogoutClick()">
+          Abmelden
+        </button>
+      </div>
+    </div>
+  }
+
+  <app-confirmation-dialog
+    [visible]="showLogoutConfirm()"
+    [title]="'Abmelden'"
+    [message]="'Möchtest du dich wirklich abmelden?'"
+    [confirmLabel]="'Abmelden'"
+    [cancelLabel]="'Abbrechen'"
+    (confirmed)="onLogoutConfirmed()"
+    (cancelled)="onLogoutCancelled()"
+  />
+</header>

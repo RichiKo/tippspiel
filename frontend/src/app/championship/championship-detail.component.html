@@ -1,0 +1,115 @@
+<div class="championship-detail">
+  @if (isLoading()) {
+    <div class="loading">Lädt...</div>
+  } @else if (error()) {
+    <div class="error">{{ error() }}</div>
+  } @else {
+    <header class="championship-header">
+      @if (championship(); as champ) {
+        <img [src]="champ.image" [alt]="champ.name" class="championship-image" />
+        <div class="championship-info">
+          <h1>{{ champ.name }}</h1>
+          @if (champ.description) {
+            <p>{{ champ.description }}</p>
+          }
+          <div class="action-links">
+            <a [routerLink]="['/championship', championshipId, 'ranking']" class="ranking-link">
+              📊 Prüf-Kalkulation
+            </a>
+            <a [routerLink]="['/championship', championshipId, 'standings']" class="standings-link">
+              🏆 Ergebnis-Tabelle
+            </a>
+          </div>
+        </div>
+      }
+    </header>
+
+    <div class="championship-content">
+      <aside class="rounds-sidebar">
+        @if (isAdmin()) {
+          <button class="create-round-btn" (click)="onCreateRound()">
+            + Neuer Spieltag
+          </button>
+        }
+
+        <div class="rounds-list">
+          @for (round of rounds(); track round.id) {
+            <div
+              class="round-item"
+              [class.selected]="selectedRound()?.id === round.id"
+              (click)="selectRound(round)"
+            >
+              <span class="round-name">{{ round.name }}</span>
+              <small class="round-date">{{ formatRoundDate(round) }}</small>
+            </div>
+          } @empty {
+            <p class="no-rounds">Keine Spieltage vorhanden</p>
+          }
+        </div>
+      </aside>
+
+      <main class="games-section">
+        @if (selectedRound(); as round) {
+          <div class="games-header">
+            <h2>{{ round.name }}</h2>
+            @if (isAdmin()) {
+              <button class="add-game-btn" (click)="onAddGame()">
+                + Spiel hinzufügen
+              </button>
+            }
+          </div>
+
+          <div class="games-list">
+            @for (group of groupedGames(); track group.date) {
+              <div class="game-group">
+                <h3 class="game-date-header">{{ formatGameDateHeader(group.date) }}</h3>
+                @for (game of group.games; track game.id) {
+                  <app-game-card
+                    [game]="game"
+                    [tip]="userTips().get(game.id)"
+                    [gameTips]="gameTips().get(game.id) || []"
+                    [currentUserId]="currentUser()?.id || 0"
+                    [isAdmin]="isAdmin()"
+                    [championshipId]="championshipId"
+                    (tipChanged)="onTipChanged($event)"
+                    (editGame)="onEditGame($event)"
+                    (deleteGame)="onDeleteGameClick($event)"
+                  />
+                }
+              </div>
+            } @empty {
+              <p class="no-games">Keine Spiele vorhanden</p>
+            }
+          </div>
+        } @else {
+          <p class="no-selection">Wähle einen Spieltag aus</p>
+        }
+      </main>
+    </div>
+  }
+  
+  <app-round-dialog
+    [visible]="showRoundDialog()"
+    (confirmed)="onRoundDialogConfirmed($event)"
+    (cancelled)="onRoundDialogCancelled()"
+  />
+  
+  <app-game-dialog
+    [visible]="showGameDialog()"
+    [gameId]="selectedGame()?.id ?? null"
+    [gameData]="selectedGame()"
+    [teams]="teams()"
+    (confirmed)="onGameDialogConfirmed($event)"
+    (cancelled)="onGameDialogCancelled()"
+  />
+
+  <app-confirmation-dialog
+    [visible]="showDeleteConfirm()"
+    [title]="'Spiel löschen'"
+    [message]="'Möchtest du dieses Spiel wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+    [confirmLabel]="'Löschen'"
+    [cancelLabel]="'Abbrechen'"
+    (confirmed)="onDeleteGameConfirmed()"
+    (cancelled)="onDeleteGameCancelled()"
+  />
+</div>

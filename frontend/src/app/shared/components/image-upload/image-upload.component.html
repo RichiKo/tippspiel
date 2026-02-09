@@ -1,0 +1,61 @@
+<div class="image-upload-container">
+  <div class="upload-label">{{ label() }}</div>
+
+  @if (hasImage()) {
+    <div class="image-preview-box">
+      <img [src]="displayImageUrl()" alt="Preview" class="preview-image" />
+      
+      @if (isUploading()) {
+        <div class="loading-overlay">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      }
+      
+      @if (!isUploading()) {
+        <button
+          mat-icon-button
+          class="remove-btn"
+          type="button"
+          (click)="removeImage()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="upload-box">
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        (change)="onFileSelected($event)"
+        #fileInput
+        class="file-input"
+      />
+      
+      @if (isUploading()) {
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Wird hochgeladen...</p>
+        </div>
+      } @else {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="fileInput.click()"
+        >
+          <mat-icon>cloud_upload</mat-icon>
+          Bild auswählen
+        </button>
+        <p class="upload-hint">Max. {{ maxSizeMB() }}MB (JPG, PNG, WebP)</p>
+      }
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <mat-icon>error</mat-icon>
+      {{ errorMessage() }}
+    </div>
+  }
+</div>

@@ -1,0 +1,46 @@
+<div class="standings-container">
+  @if (isLoading()) {
+    <div class="loading">Laden...</div>
+  } @else if (error()) {
+    <div class="error">{{ error() }}</div>
+  } @else {
+    <div class="standings-header">
+      <h2>Ergebnis-Tabelle</h2>
+      @if (championship()) {
+        <h3>{{ championship()!.name }}</h3>
+      }
+      <button class="back-btn" (click)="backToChampionship()">← Zurück</button>
+    </div>
+
+    <div class="standings-table-wrapper">
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th class="rank-col">Platz</th>
+            <th>Teilnehmer</th>
+            <th class="points-col">Punkte</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (standing of sortedStandings(); track standing.id; let i = $index) {
+            <tr [class.current-user]="isCurrentUser(standing.userId)" [class.top-three]="i < 3">
+              <td class="rank">
+                @if (i === 0) {
+                  <span class="medal gold">🥇</span>
+                } @else if (i === 1) {
+                  <span class="medal silver">🥈</span>
+                } @else if (i === 2) {
+                  <span class="medal bronze">🥉</span>
+                } @else {
+                  {{ i + 1 }}
+                }
+              </td>
+              <td class="username">{{ standing.user.username }}</td>
+              <td class="points">{{ standing.totalPoints }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

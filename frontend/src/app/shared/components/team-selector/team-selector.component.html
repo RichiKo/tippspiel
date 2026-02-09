@@ -1,0 +1,94 @@
+<div class="team-selector">
+  <div class="selector-header">
+    <h3>Teams auswählen</h3>
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Team suchen..."
+        [value]="searchTerm()"
+        (input)="onSearchChange($any($event.target).value)"
+        [disabled]="disabled()"
+        class="search-input"
+      />
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+  <div class="error-message">{{ errorMessage() }}</div>
+  }
+
+  <div class="selector-content">
+    <!-- Selected Teams -->
+    <div class="selected-section">
+      <h4>Ausgewählte Teams ({{ selectedTeams().length }})</h4>
+      @if (selectedTeams().length === 0) {
+      <div class="empty-state">Noch keine Teams ausgewählt</div>
+      } @else {
+      <div class="team-list">
+        @for (team of selectedTeams(); track team.id) {
+        <div class="team-item selected">
+          <img
+            [src]="team.logoUrl"
+            [alt]="team.name"
+            class="team-logo"
+            onerror="this.src='https://via.placeholder.com/40?text=Team'"
+          />
+          <div class="team-info">
+            <div class="team-name">{{ team.name }}</div>
+            <div class="team-short">{{ team.shortName }}</div>
+          </div>
+          <button
+            type="button"
+            class="remove-btn"
+            (click)="onRemoveTeam(team.id)"
+            [disabled]="disabled()"
+            title="Team entfernen"
+          >
+            ✕
+          </button>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Available Teams -->
+    <div class="available-section">
+      <h4>Verfügbare Teams ({{ availableTeams().length }})</h4>
+      @if (isLoading()) {
+      <div class="loading">Lade Teams...</div>
+      } @else if (availableTeams().length === 0) {
+      <div class="empty-state">
+        @if (searchTerm()) { Keine Teams gefunden für "{{ searchTerm() }}" }
+        @else { Alle Teams sind bereits ausgewählt }
+      </div>
+      } @else {
+      <div class="team-list">
+        @for (team of availableTeams(); track team.id) {
+        <div class="team-item available">
+          <img
+            [src]="team.logoUrl"
+            [alt]="team.name"
+            class="team-logo"
+            onerror="this.src='https://via.placeholder.com/40?text=Team'"
+          />
+          <div class="team-info">
+            <div class="team-name">{{ team.name }}</div>
+            <div class="team-short">{{ team.shortName }}</div>
+          </div>
+          <button
+            type="button"
+            class="add-btn"
+            (click)="onAddTeam(team.id)"
+            [disabled]="disabled()"
+            title="Team hinzufügen"
+          >
+            +
+          </button>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

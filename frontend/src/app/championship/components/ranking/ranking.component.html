@@ -1,0 +1,43 @@
+<div class="ranking-container">
+  @if (isLoading()) {
+    <div class="loading">Laden...</div>
+  } @else if (error()) {
+    <div class="error">{{ error() }}</div>
+  } @else {
+    <div class="ranking-header">
+      <h2>Prüf-Kalkulation</h2>
+      @if (championship()) {
+        <h3>{{ championship()!.name }}</h3>
+      }
+      <div class="games-info">
+        {{ closedGames() }} von {{ totalGames() }} Spielen ausgewertet
+      </div>
+      <button class="back-btn" (click)="backToChampionship()">← Zurück</button>
+    </div>
+
+    <div class="ranking-table-wrapper">
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>Teilnehmer</th>
+            <th>Exakt (3P)</th>
+            <th>Differenz (2P)</th>
+            <th>Tendenz (1P)</th>
+            <th>Missed (0P)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ranking of sortedRankings(); track ranking.id) {
+            <tr [class.current-user]="isCurrentUser(ranking.userId)">
+              <td class="username">{{ ranking.user.username }}</td>
+              <td class="exact">{{ ranking.exactHits }}</td>
+              <td class="goal-diff">{{ ranking.goalDiffHits }}</td>
+              <td class="tendency">{{ ranking.tendencyHits }}</td>
+              <td class="missed">{{ ranking.missedTips }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
