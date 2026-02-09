@@ -19,10 +19,20 @@
             <a [routerLink]="['/championship', championshipId, 'standings']" class="standings-link">
               🏆 Ergebnis-Tabelle
             </a>
+            <a [routerLink]="['/championship', championshipId, 'bonus-overview']" class="bonus-link">
+              🎁 Bonus-Übersicht
+            </a>
           </div>
         </div>
       }
     </header>
+
+    <div class="bonus-section-full">
+      <app-bonus-pick-form
+        [championshipId]="championshipId"
+        [availableTeams]="teams()"
+      />
+    </div>
 
     <div class="championship-content">
       <aside class="rounds-sidebar">

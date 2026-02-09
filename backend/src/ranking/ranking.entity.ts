@@ -40,6 +40,9 @@ export class RankingEntity {
   @Column({ type: 'int', default: 0 })
   totalPoints: number;
 
+  @Column({ type: 'int', default: 0 })
+  bonusPoints: number;
+
   @UpdateDateColumn()
   updatedAt: Date;
 

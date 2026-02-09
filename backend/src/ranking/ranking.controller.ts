@@ -1,10 +1,7 @@
-import {
-  Controller,
-  Get,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { RankingService } from './ranking.service';
 import { RankingEntity } from './ranking.entity';
+import { StandingsResponseDto } from './ranking.service';
 
 @Controller()
 export class RankingController {
@@ -15,5 +12,12 @@ export class RankingController {
     @Param('championshipId') championshipId: string,
   ): Promise<RankingEntity[]> {
     return this.rankingService.findByChampionship(championshipId);
+  }
+
+  @Get('rankings/championship/:championshipId/standings')
+  async getStandings(
+    @Param('championshipId') championshipId: string,
+  ): Promise<StandingsResponseDto> {
+    return this.rankingService.findStandingsByChampionship(championshipId);
   }
 }

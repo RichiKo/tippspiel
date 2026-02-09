@@ -67,6 +67,14 @@
           [disabled]="isLoading()"
         />
       </div>
+
+      <div class="bonus-section">
+        <h3>Bonus-Regeln verwalten</h3>
+        <app-bonus-admin
+          [championshipId]="championshipId()!"
+          [availableTeams]="availableTeams()"
+        />
+      </div>
     }
 
     <div class="form-row">

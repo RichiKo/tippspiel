@@ -54,7 +54,7 @@ export class RankingComponent {
         this.championshipId = id;
         this.loadData();
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   loadData(): void {

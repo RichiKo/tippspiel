@@ -18,7 +18,11 @@
           <tr>
             <th class="rank-col">Platz</th>
             <th>Teilnehmer</th>
-            <th class="points-col">Punkte</th>
+            <th class="points-col">Punkte (Spiele)</th>
+            @for (rule of evaluatedBonusRules(); track rule.id) {
+              <th class="bonus-col">{{ rule.name }}</th>
+            }
+            <th class="total-col">Gesamt</th>
           </tr>
         </thead>
         <tbody>
@@ -36,7 +40,17 @@
                 }
               </td>
               <td class="username">{{ standing.user.username }}</td>
-              <td class="points">{{ standing.totalPoints }}</td>
+              <td class="points">{{ standing.gamePoints }}</td>
+              @for (rule of evaluatedBonusRules(); track rule.id) {
+                <td class="bonus-points">
+                  @if (getBonusPointsForRule(standing, rule.id) > 0) {
+                    {{ getBonusPointsForRule(standing, rule.id) }}
+                  } @else {
+                    <span class="no-bonus">-</span>
+                  }
+                </td>
+              }
+              <td class="total-points">{{ standing.totalPoints }}</td>
             </tr>
           }
         </tbody>

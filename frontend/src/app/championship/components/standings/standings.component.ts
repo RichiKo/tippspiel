@@ -2,7 +2,11 @@ import { Component, signal, computed, inject, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Championship } from '../../../dashboard/types/championship.interface';
-import { Ranking } from '../../types/ranking.interface';
+import {
+  StandingsResponse,
+  StandingRow,
+  EvaluatedBonusRule,
+} from '../../types/ranking.interface';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../services/ranking.service';
 import { PersistingService } from '../../../auth/services/persisisting.service';
@@ -21,7 +25,8 @@ export class StandingsComponent {
   private readonly persistingService = inject(PersistingService);
 
   championship = signal<Championship | null>(null);
-  standings = signal<Ranking[]>([]);
+  evaluatedBonusRules = signal<EvaluatedBonusRule[]>([]);
+  standings = signal<StandingRow[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
@@ -29,8 +34,7 @@ export class StandingsComponent {
 
   readonly sortedStandings = computed(() => {
     const allStandings = this.standings();
-    
-    // Sort by totalPoints descending, then by exactHits, goalDiffHits, tendencyHits
+
     return allStandings.sort((a, b) => {
       if (b.totalPoints !== a.totalPoints) {
         return b.totalPoints - a.totalPoints;
@@ -54,7 +58,7 @@ export class StandingsComponent {
         this.championshipId = id;
         this.loadData();
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   loadData(): void {
@@ -66,33 +70,40 @@ export class StandingsComponent {
   }
 
   loadChampionship(): void {
-    this.championshipService.getChampionshipById(this.championshipId).subscribe({
-      next: (championship) => {
-        this.championship.set(championship);
-      },
-      error: (err) => {
-        console.error('Failed to load championship:', err);
-        this.error.set('Fehler beim Laden der Championship-Daten.');
-      }
-    });
+    this.championshipService
+      .getChampionshipById(this.championshipId)
+      .subscribe({
+        next: (championship) => {
+          this.championship.set(championship);
+        },
+        error: (err) => {
+          console.error('Failed to load championship:', err);
+          this.error.set('Fehler beim Laden der Championship-Daten.');
+        },
+      });
   }
 
   loadStandings(): void {
-    this.rankingService.getRankingByChampionship(this.championshipId).subscribe({
-      next: (standings) => {
-        this.standings.set(standings);
+    this.rankingService.getStandings(this.championshipId).subscribe({
+      next: (response: StandingsResponse) => {
+        this.evaluatedBonusRules.set(response.evaluatedBonusRules);
+        this.standings.set(response.standings);
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Failed to load standings:', err);
         this.error.set('Fehler beim Laden der Ergebnis-Tabelle.');
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
   isCurrentUser(userId: number): boolean {
     return this.currentUser()?.id === userId;
+  }
+
+  getBonusPointsForRule(standing: StandingRow, ruleId: string): number {
+    return standing.bonusPointsByRule[ruleId] ?? 0;
   }
 
   backToChampionship(): void {

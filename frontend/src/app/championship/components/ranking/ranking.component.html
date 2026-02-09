@@ -24,6 +24,8 @@
             <th>Differenz (2P)</th>
             <th>Tendenz (1P)</th>
             <th>Missed (0P)</th>
+            <th class="bonus-col">Bonus</th>
+            <th class="total-col">Gesamt</th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +36,14 @@
               <td class="goal-diff">{{ ranking.goalDiffHits }}</td>
               <td class="tendency">{{ ranking.tendencyHits }}</td>
               <td class="missed">{{ ranking.missedTips }}</td>
+              <td class="bonus">
+                @if (ranking.bonusPoints > 0) {
+                  <span class="bonus-value">+{{ ranking.bonusPoints }}</span>
+                } @else {
+                  <span class="no-bonus">-</span>
+                }
+              </td>
+              <td class="total-points">{{ ranking.totalPoints }}</td>
             </tr>
           }
         </tbody>

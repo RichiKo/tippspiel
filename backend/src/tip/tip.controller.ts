@@ -50,7 +50,7 @@ export class TipController {
     @Param('championshipId') championshipId: string,
   ): Promise<TipEntity[]> {
     const requestedUserId = parseInt(userId, 10);
-    
+
     if (currentUser.id !== requestedUserId && currentUser.role !== 'admin') {
       return this.tipService.findByUserAndChampionship(
         currentUser.id,

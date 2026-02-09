@@ -25,10 +25,7 @@ export class TeamEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToMany(
-    () => ChampionshipEntity,
-    (championship) => championship.teams,
-  )
+  @ManyToMany(() => ChampionshipEntity, (championship) => championship.teams)
   @JoinTable({
     name: 'team_championships',
     joinColumn: { name: 'teamId', referencedColumnName: 'id' },

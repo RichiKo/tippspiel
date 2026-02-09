@@ -1,17 +1,17 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddTotalPointsToRankings1740700000000
+export class AddBonusPointsToRankings1741000000003
   implements MigrationInterface
 {
-  name = 'AddTotalPointsToRankings1740700000000';
+  name = 'AddBonusPointsToRankings1741000000003';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "rankings" ADD "totalPoints" integer NOT NULL DEFAULT '0'`,
+      `ALTER TABLE "rankings" ADD COLUMN "bonusPoints" integer NOT NULL DEFAULT 0`,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "rankings" DROP COLUMN "totalPoints"`);
+    await queryRunner.query(`ALTER TABLE "rankings" DROP COLUMN "bonusPoints"`);
   }
 }

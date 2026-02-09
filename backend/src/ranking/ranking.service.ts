@@ -1,15 +1,42 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { RankingEntity } from './ranking.entity';
 import { TipEntity } from '../tip/tip.entity';
 import { TipOutcome } from '../tip/tip-outcome.enum';
 import { ChampionshipEntity } from '../championship/championship.entity';
 import { MembershipEntity } from '../membership/membership.entity';
 import { MembershipStatus } from '../membership/membership-status.enum';
+import { BonusEvaluationEntity } from '../bonus/bonus-evaluation.entity';
+import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
+import { BonusRuleStatus } from '../bonus/bonus-rule-status.enum';
+
+export interface EvaluatedBonusRuleDto {
+  id: string;
+  name: string;
+}
+
+export interface StandingRowDto {
+  id: string;
+  userId: number;
+  championshipId: string;
+  rank: number;
+  exactHits: number;
+  goalDiffHits: number;
+  tendencyHits: number;
+  missedTips: number;
+  totalPoints: number;
+  bonusPoints: number;
+  gamePoints: number;
+  bonusPointsByRule: Record<string, number>;
+  updatedAt: Date;
+  user: { id: number; username: string; email: string };
+}
+
+export interface StandingsResponseDto {
+  evaluatedBonusRules: EvaluatedBonusRuleDto[];
+  standings: StandingRowDto[];
+}
 
 interface UserRankingData {
   userId: number;
@@ -18,6 +45,7 @@ interface UserRankingData {
   tendencyHits: number;
   missedTips: number;
   totalPoints: number;
+  bonusPoints: number;
 }
 
 @Injectable()
@@ -31,6 +59,10 @@ export class RankingService {
     private readonly championshipRepository: Repository<ChampionshipEntity>,
     @InjectRepository(MembershipEntity)
     private readonly membershipRepository: Repository<MembershipEntity>,
+    @InjectRepository(BonusEvaluationEntity)
+    private readonly bonusEvaluationRepository: Repository<BonusEvaluationEntity>,
+    @InjectRepository(BonusRuleEntity)
+    private readonly bonusRuleRepository: Repository<BonusRuleEntity>,
   ) {}
 
   async recalculateForChampionship(championshipId: string): Promise<void> {
@@ -58,6 +90,7 @@ export class RankingService {
           tendencyHits: 0,
           missedTips: 0,
           totalPoints: 0,
+          bonusPoints: 0,
         });
       }
 
@@ -94,8 +127,30 @@ export class RankingService {
           tendencyHits: 0,
           missedTips: 0,
           totalPoints: 0,
+          bonusPoints: 0,
         });
       }
+    }
+
+    // Load bonus evaluations for this championship
+    const bonusEvaluations = await this.bonusEvaluationRepository
+      .createQueryBuilder('evaluation')
+      .innerJoin('evaluation.bonusRule', 'bonusRule')
+      .where('bonusRule.championshipId = :championshipId', { championshipId })
+      .getMany();
+
+    // Aggregate bonus points per user
+    const userBonusMap = new Map<number, number>();
+    for (const evaluation of bonusEvaluations) {
+      const current = userBonusMap.get(evaluation.userId) || 0;
+      userBonusMap.set(evaluation.userId, current + evaluation.points);
+    }
+
+    // Add bonus points to user data
+    for (const userData of userDataMap.values()) {
+      const bonusPoints = userBonusMap.get(userData.userId) || 0;
+      userData.bonusPoints = bonusPoints;
+      userData.totalPoints += bonusPoints;
     }
 
     const sortedUsers = Array.from(userDataMap.values()).sort((a, b) => {
@@ -125,6 +180,7 @@ export class RankingService {
         existingRanking.goalDiffHits = userData.goalDiffHits;
         existingRanking.tendencyHits = userData.tendencyHits;
         existingRanking.missedTips = userData.missedTips;
+        existingRanking.bonusPoints = userData.bonusPoints;
         existingRanking.totalPoints = userData.totalPoints;
         await this.rankingRepository.save(existingRanking);
       } else {
@@ -136,6 +192,7 @@ export class RankingService {
           goalDiffHits: userData.goalDiffHits,
           tendencyHits: userData.tendencyHits,
           missedTips: userData.missedTips,
+          bonusPoints: userData.bonusPoints,
           totalPoints: userData.totalPoints,
         });
         await this.rankingRepository.save(newRanking);
@@ -149,6 +206,99 @@ export class RankingService {
       relations: ['user'],
       order: { rank: 'ASC' },
     });
+  }
+
+  async findStandingsByChampionship(
+    championshipId: string,
+  ): Promise<StandingsResponseDto> {
+    const rankings = await this.rankingRepository.find({
+      where: { championshipId },
+      relations: ['user'],
+      order: { rank: 'ASC' },
+    });
+
+    const evaluatedRules = await this.bonusRuleRepository.find({
+      where: { championshipId, status: BonusRuleStatus.EVALUATED },
+      select: ['id', 'name'],
+      order: { name: 'ASC' },
+    });
+
+    const evaluatedBonusRules: EvaluatedBonusRuleDto[] = evaluatedRules.map(
+      (r) => ({ id: r.id, name: r.name }),
+    );
+
+    if (evaluatedRules.length === 0) {
+      const standings: StandingRowDto[] = rankings.map((r) => ({
+        id: r.id,
+        userId: r.userId,
+        championshipId: r.championshipId,
+        rank: r.rank,
+        exactHits: r.exactHits,
+        goalDiffHits: r.goalDiffHits,
+        tendencyHits: r.tendencyHits,
+        missedTips: r.missedTips,
+        totalPoints: r.totalPoints,
+        bonusPoints: r.bonusPoints,
+        gamePoints: r.totalPoints - r.bonusPoints,
+        bonusPointsByRule: {},
+        updatedAt: r.updatedAt,
+        user: {
+          id: r.user.id,
+          username: r.user.username,
+          email: r.user.email,
+        },
+      }));
+      return { evaluatedBonusRules: [], standings };
+    }
+
+    const ruleIds = evaluatedRules.map((r) => r.id);
+    const evaluations = await this.bonusEvaluationRepository.find({
+      where: { bonusRuleId: In(ruleIds) },
+      select: ['bonusRuleId', 'userId', 'points'],
+    });
+
+    const userBonusByRule = new Map<
+      number,
+      Map<string, number>
+    >();
+    for (const ev of evaluations) {
+      if (!userBonusByRule.has(ev.userId)) {
+        userBonusByRule.set(ev.userId, new Map());
+      }
+      const ruleMap = userBonusByRule.get(ev.userId)!;
+      const current = ruleMap.get(ev.bonusRuleId) || 0;
+      ruleMap.set(ev.bonusRuleId, current + ev.points);
+    }
+
+    const standings: StandingRowDto[] = rankings.map((r) => {
+      const rulePoints: Record<string, number> = {};
+      const map = userBonusByRule.get(r.userId);
+      for (const rule of evaluatedRules) {
+        rulePoints[rule.id] = map?.get(rule.id) ?? 0;
+      }
+      return {
+        id: r.id,
+        userId: r.userId,
+        championshipId: r.championshipId,
+        rank: r.rank,
+        exactHits: r.exactHits,
+        goalDiffHits: r.goalDiffHits,
+        tendencyHits: r.tendencyHits,
+        missedTips: r.missedTips,
+        totalPoints: r.totalPoints,
+        bonusPoints: r.bonusPoints,
+        gamePoints: r.totalPoints - r.bonusPoints,
+        bonusPointsByRule: rulePoints,
+        updatedAt: r.updatedAt,
+        user: {
+          id: r.user.id,
+          username: r.user.username,
+          email: r.user.email,
+        },
+      };
+    });
+
+    return { evaluatedBonusRules, standings };
   }
 
   async ensureRankingExistsForUser(

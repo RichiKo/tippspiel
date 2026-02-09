@@ -1096,6 +1096,55 @@ Ruft die Rangliste für eine Championship ab (für Tabellen 2 & 3: Prüf-Kalkula
 
 ---
 
+### **GET** `/rankings/championship/:championshipId/standings`
+
+Ruft die Ergebnis-Tabelle mit Aufschlüsselung der Bonus-Punkte pro ausgewerteter Bonus-Regel ab. Für jede Bonus-Regel mit Status `EVALUATED` wird eine eigene Spalte geliefert.
+
+#### **Response (JSON)**
+
+```json
+{
+  "evaluatedBonusRules": [
+    { "id": "bonus-rule-uuid-1", "name": "Champion LE" },
+    { "id": "bonus-rule-uuid-2", "name": "Finalist LCH" }
+  ],
+  "standings": [
+    {
+      "id": "uuid-v4",
+      "userId": 1,
+      "championshipId": "championship-uuid",
+      "rank": 1,
+      "exactHits": 5,
+      "goalDiffHits": 3,
+      "tendencyHits": 2,
+      "missedTips": 1,
+      "totalPoints": 24,
+      "bonusPoints": 3,
+      "gamePoints": 21,
+      "bonusPointsByRule": {
+        "bonus-rule-uuid-1": 3,
+        "bonus-rule-uuid-2": 0
+      },
+      "updatedAt": "2026-06-20T10:00:00.000Z",
+      "user": {
+        "id": 1,
+        "username": "testuser",
+        "email": "testuser@example.com"
+      }
+    }
+  ]
+}
+```
+
+- `evaluatedBonusRules`: Liste der ausgewerteten Bonus-Regeln (Reihenfolge = Spaltenreihenfolge).
+- `standings`: Pro Zeile `gamePoints` = Punkte aus Spielen, `bonusPointsByRule` = Punkte pro Regel-ID, `totalPoints` = Spielpunkte + alle Bonus-Punkte.
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Abfrage
+- `404 Not Found` - Championship existiert nicht
+
+---
+
 ## Upload API
 
 ### **POST** `/upload/team-logo`
@@ -1247,3 +1296,120 @@ Authorization: Bearer <token>
 - `homeTeamGoals`: Number, erforderlich, >= 0
 - `awayTeamGoals`: Number, erforderlich, >= 0
 - Tippabgabe nur vor `kickoffTime` erlaubt
+
+---
+
+## Bonus API
+
+### **POST** `/championships/:championshipId/bonus-rules`
+
+Erstellt eine neue Bonus-Regel für ein Championship (nur Admin/Owner).
+
+**Authentication:** Bearer Token (AuthGuard, BonusAdminGuard)
+
+**Request Body:**
+```json
+{
+  "championshipId": "abc-123",
+  "type": "champion",
+  "name": "Bundesliga Champion 2024/25",
+  "config": { "championPoints": 10 },
+  "deadline": "2025-05-15T23:59:59.000Z"
+}
+```
+
+**Bonus Types:**
+- `champion`: Config `{ championPoints: number }`
+- `champion_finalist`: Config `{ championPoints: number, finalistPoints: number }`
+
+**Status Codes:** `201 Created`, `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+---
+
+### **GET** `/championships/:championshipId/bonus-rules`
+
+Listet alle Bonus-Regeln auf (Admin/Owner). Query param `?status=draft|published|locked|evaluated` optional.
+
+---
+
+### **PATCH** `/bonus-rules/:id`
+
+Bearbeitet Bonus-Regel (nur DRAFT/PUBLISHED).
+
+---
+
+### **PATCH** `/bonus-rules/:id/publish`
+
+Veröffentlicht DRAFT Bonus-Regel → PUBLISHED.
+
+---
+
+### **DELETE** `/bonus-rules/:id`
+
+Löscht DRAFT Bonus-Regel ohne Picks.
+
+---
+
+### **POST** `/bonus-rules/:id/evaluate`
+
+Wertet PUBLISHED/LOCKED Bonus-Regel aus, vergibt Punkte und ruft Ranking-Neuberechnung auf.
+
+**Request Body:**
+```json
+{
+  "championTeamId": "team-uuid",           // optional
+  "finalistTeamIds": ["uuid1", "uuid2"]    // optional, genau 2 Teams
+}
+```
+
+**Hinweise:**
+- Mindestens `championTeamId` ODER `finalistTeamIds` muss ausgefüllt sein
+- `finalistTeamIds`: Wenn vorhanden, **genau 2 Team-IDs** (immer beide Finalisten)
+- Champion und Finalisten können **unabhängig** gespeichert werden
+- Ein Team kann sowohl Champion als auch Finalist sein
+
+---
+
+### **GET** `/bonus-rules/:id/picks`
+
+Alle Picks (Admin).
+
+---
+
+### **GET** `/championships/:championshipId/bonus-rules/active`
+
+Aktive Bonus-Regeln für User (PUBLISHED, Deadline in Zukunft).
+
+---
+
+### **POST** `/bonus-rules/:id/pick`
+
+Pick abgeben/ändern (nur vor Deadline).
+
+**Request Body:**
+```json
+{ "teamId": "team-uuid" }
+```
+
+---
+
+### **GET** `/bonus-rules/:id/my-pick`
+
+Eigenen Pick abrufen. Gibt `null` zurück falls kein Pick vorhanden.
+
+---
+
+### **GET** `/bonus-rules/:id/all-picks`
+
+Alle Picks für User (nur nach Deadline).
+
+---
+
+### **GET** `/championships/:championshipId/bonus-rules/evaluated`
+
+Alle ausgewerteten Bonus-Regeln mit Ergebnissen.
+
+---
+
+**Hinweis:** Bonus-Punkte werden in `rankings.bonusPoints` gespeichert und in `rankings.totalPoints` addiert.
+

@@ -11,10 +11,7 @@ export function computeTipOutcome(
   resultHomeGoals: number,
   resultAwayGoals: number,
 ): TipOutcomeResult {
-  if (
-    tipHomeGoals === resultHomeGoals &&
-    tipAwayGoals === resultAwayGoals
-  ) {
+  if (tipHomeGoals === resultHomeGoals && tipAwayGoals === resultAwayGoals) {
     return { points: 3, outcomeType: TipOutcome.EXACT };
   }
 

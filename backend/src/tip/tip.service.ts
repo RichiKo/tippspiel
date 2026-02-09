@@ -22,10 +22,7 @@ export class TipService {
     private readonly gameRepository: Repository<GameEntity>,
   ) {}
 
-  async create(
-    userId: number,
-    createDto: CreateTipDto,
-  ): Promise<TipEntity> {
+  async create(userId: number, createDto: CreateTipDto): Promise<TipEntity> {
     const game = await this.gameRepository.findOne({
       where: { id: createDto.gameId },
       relations: ['round'],
@@ -95,9 +92,7 @@ export class TipService {
 
     const now = new Date();
     if (game.kickoffTime <= now) {
-      throw new ForbiddenException(
-        'Cannot update tip after kickoff time',
-      );
+      throw new ForbiddenException('Cannot update tip after kickoff time');
     }
 
     if (updateDto.homeTeamGoals !== undefined) {
@@ -136,9 +131,7 @@ export class TipService {
     });
 
     if (!game || game.homeScore === null || game.awayScore === null) {
-      throw new BadRequestException(
-        'Game result not available for evaluation',
-      );
+      throw new BadRequestException('Game result not available for evaluation');
     }
 
     const tips = await this.tipRepository.find({

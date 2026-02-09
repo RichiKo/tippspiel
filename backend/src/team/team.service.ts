@@ -97,7 +97,9 @@ export class TeamService {
     return team;
   }
 
-  async findChampionshipsForTeam(teamId: string): Promise<ChampionshipEntity[]> {
+  async findChampionshipsForTeam(
+    teamId: string,
+  ): Promise<ChampionshipEntity[]> {
     const team = await this.findOne(teamId);
     return team.championships;
   }

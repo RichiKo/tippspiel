@@ -62,7 +62,9 @@ export class GameService {
 
     // Validate teams are different
     if (createDto.homeTeamId === createDto.awayTeamId) {
-      throw new BadRequestException('Home team and away team must be different');
+      throw new BadRequestException(
+        'Home team and away team must be different',
+      );
     }
 
     // Validate teams belong to the championship

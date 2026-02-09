@@ -55,6 +55,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'championship/:id/bonus-overview',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import(
+        './bonus/components/bonus-overview/bonus-overview.component'
+      ).then((m) => m.BonusOverviewComponent),
+  },
+  {
     path: 'teams',
     canActivate: [AuthGuard],
     loadComponent: () =>

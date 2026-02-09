@@ -35,9 +35,7 @@ export class RoundService {
     return this.roundRepository.save(round);
   }
 
-  async findAllByChampionship(
-    championshipId: string,
-  ): Promise<RoundEntity[]> {
+  async findAllByChampionship(championshipId: string): Promise<RoundEntity[]> {
     return this.roundRepository.find({
       where: { championshipId },
       order: { startDate: 'ASC' },

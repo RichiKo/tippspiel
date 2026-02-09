@@ -20,6 +20,7 @@ import { GameCardComponent } from './components/game-card/game-card.component';
 import { RoundDialogComponent } from './components/round-dialog/round-dialog.component';
 import { GameDialogComponent } from './components/game-dialog/game-dialog.component';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { BonusPickFormComponent } from '../bonus/components/bonus-pick-form/bonus-pick-form.component';
 
 @Component({
   selector: 'app-championship-detail',
@@ -30,6 +31,7 @@ import { ConfirmationDialogComponent } from '../shared/components/confirmation-d
     RoundDialogComponent,
     GameDialogComponent,
     ConfirmationDialogComponent,
+    BonusPickFormComponent,
   ],
   templateUrl: './championship-detail.component.html',
   styleUrl: './championship-detail.component.scss',

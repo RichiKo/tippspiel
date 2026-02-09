@@ -85,6 +85,18 @@
           width: 120px;
           text-align: center;
         }
+
+        &.bonus-col {
+          min-width: 100px;
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        &.total-col {
+          width: 100px;
+          text-align: center;
+          font-weight: 700;
+        }
       }
     }
 
@@ -150,6 +162,24 @@
             font-size: 18px;
             color: #1976d2;
           }
+
+          &.bonus-points {
+            text-align: center;
+            font-weight: 600;
+            color: #555;
+
+            .no-bonus {
+              color: #bbb;
+              font-weight: 400;
+            }
+          }
+
+          &.total-points {
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #2e7d32;
+          }
         }
       }
     }
@@ -184,6 +214,15 @@
         &.points-col {
           width: 80px;
         }
+
+        &.bonus-col {
+          min-width: 70px;
+          font-size: 11px;
+        }
+
+        &.total-col {
+          width: 70px;
+        }
       }
 
       tbody td {
@@ -202,6 +241,14 @@
         }
 
         &.points {
+          font-size: 16px;
+        }
+
+        &.bonus-points {
+          font-size: 13px;
+        }
+
+        &.total-points {
           font-size: 16px;
         }
       }

@@ -6,6 +6,8 @@ import { RankingController } from './ranking.controller';
 import { TipEntity } from '../tip/tip.entity';
 import { ChampionshipEntity } from '../championship/championship.entity';
 import { MembershipEntity } from '../membership/membership.entity';
+import { BonusEvaluationEntity } from '../bonus/bonus-evaluation.entity';
+import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { MembershipEntity } from '../membership/membership.entity';
       TipEntity,
       ChampionshipEntity,
       MembershipEntity,
+      BonusEvaluationEntity,
+      BonusRuleEntity,
     ]),
   ],
   controllers: [RankingController],

@@ -31,11 +31,7 @@ export class UploadController {
         fileSize: 2 * 1024 * 1024, // 2MB
       },
       fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-        ];
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (allowedMimeTypes.includes(file.mimetype)) {
           cb(null, true);
         } else {
@@ -80,11 +76,7 @@ export class UploadController {
         fileSize: 2 * 1024 * 1024, // 2MB
       },
       fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-        ];
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (allowedMimeTypes.includes(file.mimetype)) {
           cb(null, true);
         } else {
@@ -129,11 +121,7 @@ export class UploadController {
         fileSize: 2 * 1024 * 1024, // 2MB
       },
       fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-        ];
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (allowedMimeTypes.includes(file.mimetype)) {
           cb(null, true);
         } else {

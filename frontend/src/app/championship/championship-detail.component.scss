@@ -51,7 +51,8 @@
       }
 
       .ranking-link,
-      .standings-link {
+      .standings-link,
+      .bonus-link {
         display: inline-block;
         padding: 0.5rem 1rem;
         color: white;
@@ -85,7 +86,26 @@
           background: #388e3c;
         }
       }
+
+      .bonus-link {
+        background: #9c27b0;
+
+        &:hover {
+          background: #7b1fa2;
+        }
+
+        &:active {
+          background: #6a1b9a;
+        }
+      }
     }
+  }
+
+  .bonus-section-full {
+    background: white;
+    padding: 2rem;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .championship-content {

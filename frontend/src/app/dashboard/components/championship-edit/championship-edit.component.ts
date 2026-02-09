@@ -7,6 +7,7 @@ import { Championship } from '../../types/championship.interface';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 import { TeamSelectorComponent } from '../../../shared/components/team-selector/team-selector.component';
 import { MemberSelectorComponent } from '../../../shared/components/member-selector/member-selector.component';
+import { BonusAdminComponent } from '../../../bonus/components/bonus-admin/bonus-admin.component';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -20,6 +21,7 @@ import { switchMap } from 'rxjs/operators';
     ImageUploadComponent,
     TeamSelectorComponent,
     MemberSelectorComponent,
+    BonusAdminComponent,
   ],
   templateUrl: './championship-edit.component.html',
   styleUrl: './championship-edit.component.scss',
@@ -36,6 +38,7 @@ export class ChampionshipEditComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly selectedTeamIds = signal<string[]>([]);
   readonly initialTeamIds = signal<string[]>([]);
+  readonly availableTeams = signal<any[]>([]);
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(64)]],
@@ -80,6 +83,7 @@ export class ChampionshipEditComponent implements OnInit {
             const teamIds = teams.map((t) => t.id);
             this.selectedTeamIds.set(teamIds);
             this.initialTeamIds.set(teamIds);
+            this.availableTeams.set(teams);
             this.isLoading.set(false);
           },
           error: () => {
