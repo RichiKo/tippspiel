@@ -35,7 +35,10 @@ export class UserEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    this.password = await hash(this.password, 10);
+    // Only hash if password is provided and not already hashed
+    if (this.password && !this.password.startsWith('$2b$')) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      this.password = await hash(this.password, 10);
+    }
   }
 }

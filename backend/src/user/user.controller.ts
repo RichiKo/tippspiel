@@ -46,7 +46,7 @@ export class UserController {
   }
 
   @Put('user')
-  @UsePipes(new ValidationPipe())
+  @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
   @UseGuards(AuthGuard)
   async updateCurrentUser(
     @Body('user') userToUpdate: UpdateUserDto,

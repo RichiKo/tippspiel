@@ -43,7 +43,11 @@ export class UserService {
     userId: number,
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
-    const user = await this.findById(userId);
+    // Load user with password field (needed to avoid re-hashing)
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'username', 'email', 'role', 'image', 'password'],
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -51,9 +55,10 @@ export class UserService {
 
     if (updateUserDto.username) user.username = updateUserDto.username;
     if (updateUserDto.email) user.email = updateUserDto.email;
-    if (updateUserDto.image) user.image = updateUserDto.image;
+    if (updateUserDto.image !== undefined) user.image = updateUserDto.image;
     if (updateUserDto.role) user.role = updateUserDto.role;
 
+    // Only update password if provided
     if (updateUserDto.password) {
       user.password = updateUserDto.password;
     }

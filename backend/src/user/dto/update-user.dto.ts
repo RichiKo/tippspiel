@@ -1,17 +1,23 @@
-import { IsEmail, IsEnum, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, MaxLength, MinLength, IsOptional } from 'class-validator';
 import { UserRole } from '@app/user/user-rolle.enum';
 
 export class UpdateUserDto {
+  @IsOptional()
   @MaxLength(30)
-  readonly username: string;
+  readonly username?: string;
 
+  @IsOptional()
   @IsEmail()
-  readonly email: string;
+  readonly email?: string;
 
+  @IsOptional()
   @MinLength(6)
-  readonly password: string;
-  readonly image: string;
+  readonly password?: string;
 
+  @IsOptional()
+  readonly image?: string;
+
+  @IsOptional()
   @IsEnum(UserRole)
-  role: UserRole;
+  role?: UserRole;
 }

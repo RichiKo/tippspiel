@@ -128,10 +128,16 @@ Authorization: Bearer <token>
     "username": "updatedUser",
     "email": "updateduser@example.com",
     "password": "newpassword",
-    "image": "new-image-url.png"
+    "image": "/uploads/users/xyz.webp"
   }
 }
 ```
+
+**Hinweise:**
+- Alle Felder sind optional
+- `password`: Wird gehashed gespeichert (min. 6 Zeichen)
+- `username`: Max. 30 Zeichen
+- `image`: URL zum Profilbild (von `/upload/user-image` Endpoint)
 
 #### **Response (JSON)**
 
@@ -142,7 +148,7 @@ Authorization: Bearer <token>
     "username": "updatedUser",
     "email": "updateduser@example.com",
     "role": "user",
-    "image": "new-image-url.png",
+    "image": "/uploads/users/xyz.webp",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
 }
@@ -152,6 +158,7 @@ Authorization: Bearer <token>
 - `200 OK` - Erfolgreiche Aktualisierung
 - `400 Bad Request` - Ungültige Eingabe
 - `401 Unauthorized` - Fehlende Authentifizierung
+- `404 Not Found` - Benutzer nicht gefunden
 - `422 Unprocessable Entity` - Email oder Username bereits vergeben
 
 ---

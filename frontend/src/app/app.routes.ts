@@ -60,5 +60,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./teams/teams.component').then((m) => m.TeamsComponent),
   },
+  {
+    path: 'settings',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./user-settings/user-settings.component').then(
+        (m) => m.UserSettingsComponent
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];
