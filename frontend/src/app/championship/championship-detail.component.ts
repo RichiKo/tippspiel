@@ -139,7 +139,8 @@ export class ChampionshipDetailComponent {
       next: (data) => {
         this.rounds.set(data);
         if (data.length > 0) {
-          this.selectRound(data[0]);
+          const lastRoundIndex = data.length - 1;
+          this.selectRound(data[lastRoundIndex]);
         }
         this.isLoading.set(false);
       },
