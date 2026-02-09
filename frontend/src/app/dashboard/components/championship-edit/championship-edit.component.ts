@@ -171,7 +171,7 @@ export class ChampionshipEditComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/championship', championshipId]);
         },
         error: () => {
           this.errorMessage.set(
@@ -191,6 +191,11 @@ export class ChampionshipEditComponent implements OnInit {
   }
 
   onCancel() {
+    const id = this.championshipId();
+    if (id) {
+      this.router.navigate(['/championship', id]);
+      return;
+    }
     this.router.navigate(['/dashboard']);
   }
 }

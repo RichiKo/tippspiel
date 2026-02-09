@@ -22,12 +22,23 @@ export interface EvaluatedBonusRule {
   name: string;
 }
 
+export type BonusColumnSubrule = 'single' | 'finalist' | 'champion';
+
+export interface BonusColumn {
+  key: string;
+  ruleId: string;
+  subrule: BonusColumnSubrule;
+  label: string;
+}
+
 export interface StandingRow extends Ranking {
   gamePoints: number;
   bonusPointsByRule: Record<string, number>;
+  bonusPointsByColumn: Record<string, number>;
 }
 
 export interface StandingsResponse {
   evaluatedBonusRules: EvaluatedBonusRule[];
+  bonusColumns: BonusColumn[];
   standings: StandingRow[];
 }

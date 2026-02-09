@@ -1098,15 +1098,21 @@ Ruft die Rangliste für eine Championship ab (für Tabellen 2 & 3: Prüf-Kalkula
 
 ### **GET** `/rankings/championship/:championshipId/standings`
 
-Ruft die Ergebnis-Tabelle mit Aufschlüsselung der Bonus-Punkte pro ausgewerteter Bonus-Regel ab. Für jede Bonus-Regel mit Status `EVALUATED` wird eine eigene Spalte geliefert.
+Ruft die Ergebnis-Tabelle mit Aufschlüsselung der Bonus-Punkte pro ausgewerteter Bonus-Regel ab.
+Für `champion` wird eine Spalte geliefert, für `champion_finalist` zwei Spalten (`Finalist`, `Champion`).
 
 #### **Response (JSON)**
 
 ```json
 {
   "evaluatedBonusRules": [
-    { "id": "bonus-rule-uuid-1", "name": "Champion LE" },
-    { "id": "bonus-rule-uuid-2", "name": "Finalist LCH" }
+    { "id": "bonus-rule-uuid-1", "name": "Champion LE", "type": "champion" },
+    { "id": "bonus-rule-uuid-2", "name": "UCL Bonus", "type": "champion_finalist" }
+  ],
+  "bonusColumns": [
+    { "key": "bonus-rule-uuid-1:single", "ruleId": "bonus-rule-uuid-1", "subrule": "single", "label": "Champion LE" },
+    { "key": "bonus-rule-uuid-2:finalist", "ruleId": "bonus-rule-uuid-2", "subrule": "finalist", "label": "UCL Bonus (Finalist)" },
+    { "key": "bonus-rule-uuid-2:champion", "ruleId": "bonus-rule-uuid-2", "subrule": "champion", "label": "UCL Bonus (Champion)" }
   ],
   "standings": [
     {
@@ -1123,7 +1129,12 @@ Ruft die Ergebnis-Tabelle mit Aufschlüsselung der Bonus-Punkte pro ausgewertete
       "gamePoints": 21,
       "bonusPointsByRule": {
         "bonus-rule-uuid-1": 3,
-        "bonus-rule-uuid-2": 0
+        "bonus-rule-uuid-2": 3
+      },
+      "bonusPointsByColumn": {
+        "bonus-rule-uuid-1:single": 3,
+        "bonus-rule-uuid-2:finalist": 3,
+        "bonus-rule-uuid-2:champion": 0
       },
       "updatedAt": "2026-06-20T10:00:00.000Z",
       "user": {
@@ -1137,7 +1148,8 @@ Ruft die Ergebnis-Tabelle mit Aufschlüsselung der Bonus-Punkte pro ausgewertete
 ```
 
 - `evaluatedBonusRules`: Liste der ausgewerteten Bonus-Regeln (Reihenfolge = Spaltenreihenfolge).
-- `standings`: Pro Zeile `gamePoints` = Punkte aus Spielen, `bonusPointsByRule` = Punkte pro Regel-ID, `totalPoints` = Spielpunkte + alle Bonus-Punkte.
+- `bonusColumns`: Dynamische Bonus-Spalten (inkl. `single|finalist|champion`).
+- `standings`: Pro Zeile `gamePoints` = Punkte aus Spielen, `bonusPointsByRule` = Summe je Regel-ID, `bonusPointsByColumn` = Punkte je Spalte, `totalPoints` = Spielpunkte + alle Bonus-Punkte.
 
 #### **Status Codes**
 - `200 OK` - Erfolgreiche Abfrage
@@ -1328,7 +1340,7 @@ Erstellt eine neue Bonus-Regel für ein Championship (nur Admin/Owner).
 
 ### **GET** `/championships/:championshipId/bonus-rules`
 
-Listet alle Bonus-Regeln auf (Admin/Owner). Query param `?status=draft|published|locked|evaluated` optional.
+Listet alle Bonus-Regeln auf (Admin/Owner). Query param `?status=draft|published|locked|partially_evaluated|evaluated` optional.
 
 ---
 
@@ -1346,13 +1358,14 @@ Veröffentlicht DRAFT Bonus-Regel → PUBLISHED.
 
 ### **DELETE** `/bonus-rules/:id`
 
-Löscht DRAFT Bonus-Regel ohne Picks.
+Löscht eine Bonus-Regel (Admin/Owner). Vorhandene Picks/Evaluations werden durch FK-Cascade mit gelöscht.
+Nach dem Löschen wird das Ranking der Championship neu berechnet.
 
 ---
 
 ### **POST** `/bonus-rules/:id/evaluate`
 
-Wertet PUBLISHED/LOCKED Bonus-Regel aus, vergibt Punkte und ruft Ranking-Neuberechnung auf.
+Wertet Bonus-Regeln aus und ruft Ranking-Neuberechnung auf.
 
 **Request Body:**
 ```json
@@ -1363,16 +1376,34 @@ Wertet PUBLISHED/LOCKED Bonus-Regel aus, vergibt Punkte und ruft Ranking-Neubere
 ```
 
 **Hinweise:**
-- Mindestens `championTeamId` ODER `finalistTeamIds` muss ausgefüllt sein
-- `finalistTeamIds`: Wenn vorhanden, **genau 2 Team-IDs** (immer beide Finalisten)
-- Champion und Finalisten können **unabhängig** gespeichert werden
-- Ein Team kann sowohl Champion als auch Finalist sein
+- `champion`: benötigt `championTeamId`, setzt Status auf `evaluated`.
+- `champion_finalist` ist 2-stufig:
+  - **Phase 1:** nur `finalistTeamIds` (genau 2 verschiedene Teams) -> Status `partially_evaluated`.
+  - **Phase 2:** nur `championTeamId`, und dieses Team muss eines der 2 gespeicherten Finalisten sein -> Status `evaluated`.
+- Champion vor Finalisten ist ungültig (`400`).
 
 ---
 
 ### **GET** `/bonus-rules/:id/picks`
 
 Alle Picks (Admin).
+
+---
+
+### **GET** `/bonus-rules/:id/evaluation-result`
+
+Liefert den aktuellen Auswertungsstand für den Admin-Dialog.
+
+**Response (JSON):**
+```json
+{
+  "phase": "finalists_done",
+  "finalistTeamIds": ["uuid1", "uuid2"],
+  "championTeamId": "uuid1"
+}
+```
+
+`phase` ist einer von: `none`, `finalists_done`, `complete`.
 
 ---
 
@@ -1412,4 +1443,3 @@ Alle ausgewerteten Bonus-Regeln mit Ergebnissen.
 ---
 
 **Hinweis:** Bonus-Punkte werden in `rankings.bonusPoints` gespeichert und in `rankings.totalPoints` addiert.
-

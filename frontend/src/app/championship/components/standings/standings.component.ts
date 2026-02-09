@@ -5,7 +5,7 @@ import { Championship } from '../../../dashboard/types/championship.interface';
 import {
   StandingsResponse,
   StandingRow,
-  EvaluatedBonusRule,
+  BonusColumn,
 } from '../../types/ranking.interface';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../services/ranking.service';
@@ -25,12 +25,13 @@ export class StandingsComponent {
   private readonly persistingService = inject(PersistingService);
 
   championship = signal<Championship | null>(null);
-  evaluatedBonusRules = signal<EvaluatedBonusRule[]>([]);
+  bonusColumns = signal<BonusColumn[]>([]);
   standings = signal<StandingRow[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
   readonly currentUser = this.persistingService.currentUser;
+  readonly showTotalColumn = computed(() => this.bonusColumns().length > 0);
 
   readonly sortedStandings = computed(() => {
     const allStandings = this.standings();
@@ -86,7 +87,7 @@ export class StandingsComponent {
   loadStandings(): void {
     this.rankingService.getStandings(this.championshipId).subscribe({
       next: (response: StandingsResponse) => {
-        this.evaluatedBonusRules.set(response.evaluatedBonusRules);
+        this.bonusColumns.set(response.bonusColumns ?? []);
         this.standings.set(response.standings);
         this.isLoading.set(false);
       },
@@ -102,8 +103,8 @@ export class StandingsComponent {
     return this.currentUser()?.id === userId;
   }
 
-  getBonusPointsForRule(standing: StandingRow, ruleId: string): number {
-    return standing.bonusPointsByRule[ruleId] ?? 0;
+  getBonusPointsForColumn(standing: StandingRow, columnKey: string): number {
+    return standing.bonusPointsByColumn[columnKey] ?? 0;
   }
 
   backToChampionship(): void {

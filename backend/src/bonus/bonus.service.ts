@@ -125,24 +125,14 @@ export class BonusService {
 
   async deleteBonusRule(id: string): Promise<void> {
     const bonusRule = await this.getBonusRuleById(id);
+    await this.bonusRuleRepository.remove(bonusRule);
 
-    // Only DRAFT can be deleted
+    // Deleting a rule can change totals/ranks when evaluations existed.
     if (bonusRule.status !== BonusRuleStatus.DRAFT) {
-      throw new BadRequestException('Only DRAFT bonus rules can be deleted');
-    }
-
-    // Check if there are any picks
-    const picksCount = await this.bonusPickRepository.count({
-      where: { bonusRuleId: id },
-    });
-
-    if (picksCount > 0) {
-      throw new BadRequestException(
-        'Cannot delete bonus rule with existing picks',
+      await this.rankingService.recalculateForChampionship(
+        bonusRule.championshipId,
       );
     }
-
-    await this.bonusRuleRepository.remove(bonusRule);
   }
 
   async publishBonusRule(id: string): Promise<BonusRuleEntity> {
@@ -259,17 +249,10 @@ export class BonusService {
   ): Promise<{ evaluationsCreated: number }> {
     const bonusRule = await this.getBonusRuleById(bonusRuleId);
 
-    // Check status - can evaluate PUBLISHED, LOCKED or EVALUATED (re-evaluation for corrections)
     if (bonusRule.status === BonusRuleStatus.DRAFT) {
       throw new BadRequestException('Cannot evaluate DRAFT bonus rules');
     }
 
-    // Re-evaluation: remove existing evaluations so new result replaces old
-    if (bonusRule.status === BonusRuleStatus.EVALUATED) {
-      await this.bonusEvaluationRepository.delete({ bonusRuleId });
-    }
-
-    // Get all picks
     const picks = await this.bonusPickRepository.find({
       where: { bonusRuleId },
     });
@@ -278,91 +261,120 @@ export class BonusService {
       throw new BadRequestException('No picks to evaluate');
     }
 
-    // Validate: At least one field must be provided
-    if (!dto.championTeamId && (!dto.finalistTeamIds || dto.finalistTeamIds.length === 0)) {
-      throw new BadRequestException('Either championTeamId or finalistTeamIds must be provided');
-    }
-
-    let evaluationsCreated = 0;
-    const finalistTeamIds: string[] = dto.finalistTeamIds || [];
-
     if (bonusRule.type === BonusRuleType.CHAMPION) {
-      // CHAMPION type
       if (!dto.championTeamId) {
-        throw new BadRequestException('championTeamId is required for CHAMPION type');
+        throw new BadRequestException(
+          'championTeamId is required for CHAMPION type',
+        );
+      }
+      if (dto.finalistTeamIds?.length) {
+        throw new BadRequestException(
+          'finalistTeamIds are not supported for CHAMPION type',
+        );
       }
 
       const config = bonusRule.config as ChampionConfig;
+      await this.bonusEvaluationRepository.delete({ bonusRuleId });
 
-      for (const pick of picks) {
-        if (pick.teamId === dto.championTeamId) {
-          await this.bonusEvaluationRepository.save({
-            bonusRuleId,
-            userId: pick.userId,
-            subrule: 'champion',
-            points: config.championPoints,
-          });
-          evaluationsCreated++;
-        }
-      }
-    } else if (bonusRule.type === BonusRuleType.CHAMPION_FINALIST) {
-      // CHAMPION_FINALIST type
-      const config = bonusRule.config as ChampionFinalistConfig;
+      const evaluationsCreated = await this.upsertChampionEvaluation(
+        bonusRuleId,
+        picks,
+        dto.championTeamId,
+        config.championPoints,
+      );
 
-      for (const pick of picks) {
-        // Check for champion (independent)
-        if (dto.championTeamId && pick.teamId === dto.championTeamId) {
-          // Check if evaluation already exists
-          const existingChampion = await this.bonusEvaluationRepository.findOne({
-            where: {
-              bonusRuleId,
-              userId: pick.userId,
-              subrule: 'champion',
-            },
-          });
+      await this.bonusRuleRepository.update(
+        { id: bonusRuleId },
+        { status: BonusRuleStatus.EVALUATED },
+      );
+      await this.rankingService.recalculateForChampionship(
+        bonusRule.championshipId,
+      );
 
-          if (!existingChampion) {
-            await this.bonusEvaluationRepository.save({
-              bonusRuleId,
-              userId: pick.userId,
-              subrule: 'champion',
-              points: config.championPoints,
-            });
-            evaluationsCreated++;
-          }
-        }
-        
-        // Check for finalist (independent, can be same team as champion)
-        if (finalistTeamIds.length > 0 && finalistTeamIds.includes(pick.teamId)) {
-          // Check if evaluation already exists
-          const existingFinalist = await this.bonusEvaluationRepository.findOne({
-            where: {
-              bonusRuleId,
-              userId: pick.userId,
-              subrule: 'finalist',
-            },
-          });
-
-          if (!existingFinalist) {
-            await this.bonusEvaluationRepository.save({
-              bonusRuleId,
-              userId: pick.userId,
-              subrule: 'finalist',
-              points: config.finalistPoints,
-            });
-            evaluationsCreated++;
-          }
-        }
-      }
+      return { evaluationsCreated };
     }
 
-    // Update only status (avoid save(entity) so TypeORM does not sync relations and UPDATE deleted evaluations)
-    await this.bonusRuleRepository.update(
-      { id: bonusRuleId },
-      { status: BonusRuleStatus.EVALUATED },
+    const hasChampion = Boolean(dto.championTeamId);
+    const hasFinalists = Array.isArray(dto.finalistTeamIds);
+
+    if (!hasChampion && !hasFinalists) {
+      throw new BadRequestException(
+        'Either championTeamId or finalistTeamIds must be provided',
+      );
+    }
+
+    const config = bonusRule.config as ChampionFinalistConfig;
+
+    // Phase 1: evaluate finalists only
+    if (hasFinalists) {
+      if (hasChampion) {
+        throw new BadRequestException(
+          'Champion can only be evaluated after finalists are set',
+        );
+      }
+
+      const finalistTeamIds = this.validateFinalistsInput(dto.finalistTeamIds);
+      const evaluationsCreated = await this.upsertFinalistEvaluations(
+        bonusRuleId,
+        picks,
+        finalistTeamIds,
+        config.finalistPoints,
+      );
+
+      // Finalist re-evaluation invalidates prior champion evaluation.
+      await this.bonusEvaluationRepository.delete({
+        bonusRuleId,
+        subrule: 'champion',
+      });
+      await this.bonusRuleRepository.update(
+        { id: bonusRuleId },
+        {
+          status: BonusRuleStatus.PARTIALLY_EVALUATED,
+          config: {
+            ...config,
+            selectedFinalistTeamIds: finalistTeamIds,
+            selectedChampionTeamId: undefined,
+          },
+        },
+      );
+      await this.rankingService.recalculateForChampionship(
+        bonusRule.championshipId,
+      );
+
+      return { evaluationsCreated };
+    }
+
+    // Phase 2: evaluate champion after finalists were evaluated
+    const savedFinalists = this.getSelectedFinalistsFromConfig(config);
+    if (savedFinalists.length !== 2) {
+      throw new BadRequestException(
+        'Finalists must be evaluated first before champion can be evaluated',
+      );
+    }
+    if (!savedFinalists.includes(dto.championTeamId!)) {
+      throw new BadRequestException(
+        'Champion must be one of the previously selected finalists',
+      );
+    }
+
+    const evaluationsCreated = await this.upsertChampionEvaluation(
+      bonusRuleId,
+      picks,
+      dto.championTeamId!,
+      config.championPoints,
     );
 
-    // Recalculate rankings to include bonus points
+    await this.bonusRuleRepository.update(
+      { id: bonusRuleId },
+      {
+        status: BonusRuleStatus.EVALUATED,
+        config: {
+          ...config,
+          selectedFinalistTeamIds: savedFinalists,
+          selectedChampionTeamId: dto.championTeamId,
+        },
+      },
+    );
     await this.rankingService.recalculateForChampionship(
       bonusRule.championshipId,
     );
@@ -370,17 +382,20 @@ export class BonusService {
     return { evaluationsCreated };
   }
 
-  /** Returns the current evaluation result (champion + finalists) for an EVALUATED rule, for pre-filling re-evaluate form. */
+  /** Returns the current evaluation state and result for pre-filling the evaluate form. */
   async getEvaluationResult(bonusRuleId: string): Promise<{
+    phase: 'none' | 'finalists_done' | 'complete';
     championTeamId?: string;
     finalistTeamIds: string[];
   }> {
     const rule = await this.getBonusRuleById(bonusRuleId);
-    if (rule.status !== BonusRuleStatus.EVALUATED) {
-      return { finalistTeamIds: [] };
-    }
 
-    const result: { championTeamId?: string; finalistTeamIds: string[] } = {
+    const result: {
+      phase: 'none' | 'finalists_done' | 'complete';
+      championTeamId?: string;
+      finalistTeamIds: string[];
+    } = {
+      phase: 'none',
       finalistTeamIds: [],
     };
 
@@ -398,22 +413,23 @@ export class BonusService {
       }
     }
 
-    const finalistEvals = await this.bonusEvaluationRepository.find({
-      where: { bonusRuleId, subrule: 'finalist' },
-      select: ['userId'],
-    });
-    const finalistTeamIdsSet = new Set<string>();
-    for (const ev of finalistEvals) {
-      const pick = await this.bonusPickRepository.findOne({
-        where: { bonusRuleId, userId: ev.userId },
-        select: ['teamId'],
-      });
-      if (pick?.teamId) {
-        finalistTeamIdsSet.add(pick.teamId);
-      }
+    const config = rule.config as ChampionFinalistConfig;
+    result.finalistTeamIds = this.getSelectedFinalistsFromConfig(config);
+    if (config.selectedChampionTeamId) {
+      result.championTeamId = config.selectedChampionTeamId;
     }
-    // Deterministic order so both finalists are reliably returned as [0] and [1]
-    result.finalistTeamIds = Array.from(finalistTeamIdsSet).sort();
+
+    if (rule.type === BonusRuleType.CHAMPION_FINALIST) {
+      if (result.finalistTeamIds.length === 2 && result.championTeamId) {
+        result.phase = 'complete';
+      } else if (result.finalistTeamIds.length === 2) {
+        result.phase = 'finalists_done';
+      } else {
+        result.phase = 'none';
+      }
+    } else if (result.championTeamId) {
+      result.phase = 'complete';
+    }
 
     return result;
   }
@@ -460,6 +476,91 @@ export class BonusService {
       relations: ['evaluations', 'evaluations.user'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  private validateFinalistsInput(finalistTeamIds?: string[]): string[] {
+    if (!Array.isArray(finalistTeamIds) || finalistTeamIds.length !== 2) {
+      throw new BadRequestException(
+        'finalistTeamIds must contain exactly 2 teams',
+      );
+    }
+    if (finalistTeamIds[0] === finalistTeamIds[1]) {
+      throw new BadRequestException(
+        'Finalist teams must be different from each other',
+      );
+    }
+
+    return [...finalistTeamIds].sort();
+  }
+
+  private getSelectedFinalistsFromConfig(config: ChampionFinalistConfig): string[] {
+    if (!Array.isArray(config.selectedFinalistTeamIds)) {
+      return [];
+    }
+    if (config.selectedFinalistTeamIds.length !== 2) {
+      return [];
+    }
+    const finalists = [...new Set(config.selectedFinalistTeamIds)];
+    if (finalists.length !== 2) {
+      return [];
+    }
+    return finalists.sort();
+  }
+
+  private async upsertFinalistEvaluations(
+    bonusRuleId: string,
+    picks: BonusPickEntity[],
+    finalistTeamIds: string[],
+    points: number,
+  ): Promise<number> {
+    await this.bonusEvaluationRepository.delete({
+      bonusRuleId,
+      subrule: 'finalist',
+    });
+
+    const matched = picks.filter((pick) => finalistTeamIds.includes(pick.teamId));
+    if (matched.length === 0) {
+      return 0;
+    }
+
+    await this.bonusEvaluationRepository.save(
+      matched.map((pick) => ({
+        bonusRuleId,
+        userId: pick.userId,
+        subrule: 'finalist',
+        points,
+      })),
+    );
+
+    return matched.length;
+  }
+
+  private async upsertChampionEvaluation(
+    bonusRuleId: string,
+    picks: BonusPickEntity[],
+    championTeamId: string,
+    points: number,
+  ): Promise<number> {
+    await this.bonusEvaluationRepository.delete({
+      bonusRuleId,
+      subrule: 'champion',
+    });
+
+    const matched = picks.filter((pick) => pick.teamId === championTeamId);
+    if (matched.length === 0) {
+      return 0;
+    }
+
+    await this.bonusEvaluationRepository.save(
+      matched.map((pick) => ({
+        bonusRuleId,
+        userId: pick.userId,
+        subrule: 'champion',
+        points,
+      })),
+    );
+
+    return matched.length;
   }
 
   private validateBonusRuleConfig(

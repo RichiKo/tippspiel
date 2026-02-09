@@ -22,6 +22,14 @@
             <a [routerLink]="['/championship', championshipId, 'bonus-overview']" class="bonus-link">
               🎁 Bonus-Übersicht
             </a>
+            @if (isAdmin()) {
+              <a
+                [routerLink]="['/dashboard/championship', championshipId, 'edit']"
+                class="bonus-link"
+              >
+                ✏️ Championship bearbeiten
+              </a>
+            }
           </div>
         </div>
       }

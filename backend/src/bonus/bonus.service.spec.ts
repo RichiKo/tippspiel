@@ -27,6 +27,7 @@ describe('BonusService', () => {
     findOne: jest.fn(),
     find: jest.fn(),
     remove: jest.fn(),
+    update: jest.fn(),
   };
 
   const mockBonusPickRepository = {
@@ -40,6 +41,9 @@ describe('BonusService', () => {
   const mockBonusEvaluationRepository = {
     save: jest.fn(),
     createQueryBuilder: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    delete: jest.fn(),
   };
 
   const mockChampionshipRepository = {
@@ -251,26 +255,24 @@ describe('BonusService', () => {
       mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
       mockBonusPickRepository.find.mockResolvedValue(picks);
       mockBonusEvaluationRepository.save.mockResolvedValue({});
-      mockBonusRuleRepository.save.mockResolvedValue({
-        ...bonusRule,
-        status: BonusRuleStatus.EVALUATED,
-      });
+      mockBonusEvaluationRepository.delete.mockResolvedValue({});
+      mockBonusRuleRepository.update.mockResolvedValue({});
 
       const result = await service.evaluateBonus('rule-1', {
         championTeamId: 'team-1',
       });
 
       expect(result.evaluationsCreated).toBe(2); // users 1 and 3
-      expect(bonusEvaluationRepository.save).toHaveBeenCalledTimes(2);
+      expect(bonusEvaluationRepository.save).toHaveBeenCalledTimes(1);
       expect(rankingService.recalculateForChampionship).toHaveBeenCalledWith(
         'champ-1',
       );
     });
 
-    it('should throw BadRequestException if status is not LOCKED', async () => {
+    it('should throw BadRequestException if status is DRAFT', async () => {
       const bonusRule = {
         id: 'rule-1',
-        status: BonusRuleStatus.PUBLISHED,
+        status: BonusRuleStatus.DRAFT,
       };
 
       mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
@@ -278,6 +280,86 @@ describe('BonusService', () => {
       await expect(
         service.evaluateBonus('rule-1', { championTeamId: 'team-1' }),
       ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should evaluate CHAMPION_FINALIST in phase 1 (finalists only)', async () => {
+      const bonusRule = {
+        id: 'rule-1',
+        championshipId: 'champ-1',
+        type: BonusRuleType.CHAMPION_FINALIST,
+        status: BonusRuleStatus.LOCKED,
+        config: { championPoints: 10, finalistPoints: 5 },
+      };
+      const picks = [
+        { userId: 1, teamId: 'team-a' },
+        { userId: 2, teamId: 'team-b' },
+        { userId: 3, teamId: 'team-c' },
+      ];
+
+      mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
+      mockBonusPickRepository.find.mockResolvedValue(picks);
+      mockBonusEvaluationRepository.delete.mockResolvedValue({});
+      mockBonusEvaluationRepository.save.mockResolvedValue({});
+      mockBonusRuleRepository.update.mockResolvedValue({});
+
+      const result = await service.evaluateBonus('rule-1', {
+        finalistTeamIds: ['team-a', 'team-b'],
+      });
+
+      expect(result.evaluationsCreated).toBe(2);
+      expect(bonusRuleRepository.update).toHaveBeenCalledWith(
+        { id: 'rule-1' },
+        {
+          status: BonusRuleStatus.PARTIALLY_EVALUATED,
+          config: {
+            championPoints: 10,
+            finalistPoints: 5,
+            selectedFinalistTeamIds: ['team-a', 'team-b'],
+            selectedChampionTeamId: undefined,
+          },
+        },
+      );
+      expect(rankingService.recalculateForChampionship).toHaveBeenCalledWith(
+        'champ-1',
+      );
+    });
+
+    it('should reject champion evaluation before finalists are set', async () => {
+      const bonusRule = {
+        id: 'rule-1',
+        championshipId: 'champ-1',
+        type: BonusRuleType.CHAMPION_FINALIST,
+        status: BonusRuleStatus.LOCKED,
+        config: { championPoints: 10, finalistPoints: 5 },
+      };
+
+      mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
+      mockBonusPickRepository.find.mockResolvedValue([{ userId: 1, teamId: 'team-a' }]);
+      mockBonusEvaluationRepository.find.mockResolvedValue([]);
+
+      await expect(
+        service.evaluateBonus('rule-1', { championTeamId: 'team-a' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('deleteBonusRule', () => {
+    it('should delete evaluated bonus rule and recalculate ranking', async () => {
+      const bonusRule = {
+        id: 'rule-1',
+        championshipId: 'champ-1',
+        status: BonusRuleStatus.EVALUATED,
+      };
+
+      mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
+      mockBonusRuleRepository.remove.mockResolvedValue(undefined);
+
+      await service.deleteBonusRule('rule-1');
+
+      expect(bonusRuleRepository.remove).toHaveBeenCalledWith(bonusRule);
+      expect(rankingService.recalculateForChampionship).toHaveBeenCalledWith(
+        'champ-1',
+      );
     });
   });
 });

@@ -89,7 +89,11 @@ export class BonusController {
   @UseGuards(AuthGuard, BonusAdminGuard)
   async getEvaluationResult(
     @Param('id') id: string,
-  ): Promise<{ championTeamId?: string; finalistTeamIds: string[] }> {
+  ): Promise<{
+    phase: 'none' | 'finalists_done' | 'complete';
+    championTeamId?: string;
+    finalistTeamIds: string[];
+  }> {
     return this.bonusService.getEvaluationResult(id);
   }
 

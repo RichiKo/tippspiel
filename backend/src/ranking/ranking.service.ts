@@ -10,10 +10,21 @@ import { MembershipStatus } from '../membership/membership-status.enum';
 import { BonusEvaluationEntity } from '../bonus/bonus-evaluation.entity';
 import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
 import { BonusRuleStatus } from '../bonus/bonus-rule-status.enum';
+import { BonusRuleType } from '../bonus/bonus-rule-type.enum';
 
 export interface EvaluatedBonusRuleDto {
   id: string;
   name: string;
+  type: BonusRuleType;
+}
+
+export type BonusColumnSubrule = 'single' | 'finalist' | 'champion';
+
+export interface BonusColumnDto {
+  key: string;
+  ruleId: string;
+  subrule: BonusColumnSubrule;
+  label: string;
 }
 
 export interface StandingRowDto {
@@ -29,12 +40,14 @@ export interface StandingRowDto {
   bonusPoints: number;
   gamePoints: number;
   bonusPointsByRule: Record<string, number>;
+  bonusPointsByColumn: Record<string, number>;
   updatedAt: Date;
   user: { id: number; username: string; email: string };
 }
 
 export interface StandingsResponseDto {
   evaluatedBonusRules: EvaluatedBonusRuleDto[];
+  bonusColumns: BonusColumnDto[];
   standings: StandingRowDto[];
 }
 
@@ -218,13 +231,49 @@ export class RankingService {
     });
 
     const evaluatedRules = await this.bonusRuleRepository.find({
-      where: { championshipId, status: BonusRuleStatus.EVALUATED },
-      select: ['id', 'name'],
+      where: {
+        championshipId,
+        status: In([
+          BonusRuleStatus.PARTIALLY_EVALUATED,
+          BonusRuleStatus.EVALUATED,
+        ]),
+      },
+      select: ['id', 'name', 'type'],
       order: { name: 'ASC' },
     });
 
     const evaluatedBonusRules: EvaluatedBonusRuleDto[] = evaluatedRules.map(
-      (r) => ({ id: r.id, name: r.name }),
+      (r) => ({ id: r.id, name: r.name, type: r.type }),
+    );
+    const bonusColumns = evaluatedRules.reduce<BonusColumnDto[]>(
+      (columns, rule) => {
+        if (rule.type === BonusRuleType.CHAMPION_FINALIST) {
+          columns.push(
+            {
+              key: `${rule.id}:finalist`,
+              ruleId: rule.id,
+              subrule: 'finalist',
+              label: `${rule.name} (Finalist)`,
+            },
+            {
+              key: `${rule.id}:champion`,
+              ruleId: rule.id,
+              subrule: 'champion',
+              label: `${rule.name} (Champion)`,
+            },
+          );
+          return columns;
+        }
+
+        columns.push({
+          key: `${rule.id}:single`,
+          ruleId: rule.id,
+          subrule: 'single',
+          label: rule.name,
+        });
+        return columns;
+      },
+      [],
     );
 
     if (evaluatedRules.length === 0) {
@@ -241,6 +290,7 @@ export class RankingService {
         bonusPoints: r.bonusPoints,
         gamePoints: r.totalPoints - r.bonusPoints,
         bonusPointsByRule: {},
+        bonusPointsByColumn: {},
         updatedAt: r.updatedAt,
         user: {
           id: r.user.id,
@@ -248,34 +298,62 @@ export class RankingService {
           email: r.user.email,
         },
       }));
-      return { evaluatedBonusRules: [], standings };
+      return { evaluatedBonusRules: [], bonusColumns: [], standings };
     }
 
     const ruleIds = evaluatedRules.map((r) => r.id);
     const evaluations = await this.bonusEvaluationRepository.find({
       where: { bonusRuleId: In(ruleIds) },
-      select: ['bonusRuleId', 'userId', 'points'],
+      select: ['bonusRuleId', 'userId', 'points', 'subrule'],
     });
+    const ruleById = new Map<string, EvaluatedBonusRuleDto>(
+      evaluatedBonusRules.map((rule) => [rule.id, rule]),
+    );
 
-    const userBonusByRule = new Map<
-      number,
-      Map<string, number>
-    >();
+    const userBonusByRule = new Map<number, Map<string, number>>();
+    const userBonusByColumn = new Map<number, Map<string, number>>();
     for (const ev of evaluations) {
       if (!userBonusByRule.has(ev.userId)) {
         userBonusByRule.set(ev.userId, new Map());
       }
+      if (!userBonusByColumn.has(ev.userId)) {
+        userBonusByColumn.set(ev.userId, new Map());
+      }
       const ruleMap = userBonusByRule.get(ev.userId)!;
       const current = ruleMap.get(ev.bonusRuleId) || 0;
       ruleMap.set(ev.bonusRuleId, current + ev.points);
+
+      const rule = ruleById.get(ev.bonusRuleId);
+      if (!rule) {
+        continue;
+      }
+
+      let columnKey = `${ev.bonusRuleId}:single`;
+      if (rule.type === BonusRuleType.CHAMPION_FINALIST) {
+        if (ev.subrule !== 'finalist' && ev.subrule !== 'champion') {
+          continue;
+        }
+        columnKey = `${ev.bonusRuleId}:${ev.subrule}`;
+      }
+
+      const columnMap = userBonusByColumn.get(ev.userId)!;
+      const currentColumnValue = columnMap.get(columnKey) || 0;
+      columnMap.set(columnKey, currentColumnValue + ev.points);
     }
 
     const standings: StandingRowDto[] = rankings.map((r) => {
       const rulePoints: Record<string, number> = {};
-      const map = userBonusByRule.get(r.userId);
+      const ruleMap = userBonusByRule.get(r.userId);
       for (const rule of evaluatedRules) {
-        rulePoints[rule.id] = map?.get(rule.id) ?? 0;
+        rulePoints[rule.id] = ruleMap?.get(rule.id) ?? 0;
       }
+
+      const columnPoints: Record<string, number> = {};
+      const columnMap = userBonusByColumn.get(r.userId);
+      for (const column of bonusColumns) {
+        columnPoints[column.key] = columnMap?.get(column.key) ?? 0;
+      }
+
       return {
         id: r.id,
         userId: r.userId,
@@ -289,6 +367,7 @@ export class RankingService {
         bonusPoints: r.bonusPoints,
         gamePoints: r.totalPoints - r.bonusPoints,
         bonusPointsByRule: rulePoints,
+        bonusPointsByColumn: columnPoints,
         updatedAt: r.updatedAt,
         user: {
           id: r.user.id,
@@ -298,7 +377,7 @@ export class RankingService {
       };
     });
 
-    return { evaluatedBonusRules, standings };
+    return { evaluatedBonusRules, bonusColumns, standings };
   }
 
   async ensureRankingExistsForUser(
