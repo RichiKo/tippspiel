@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { TeamEntity } from '../team/team.entity';
 import { RoundEntity } from '../round/round.entity';
+import { MembershipEntity } from '../membership/membership.entity';
 
 @Entity({ name: 'championships' })
 export class ChampionshipEntity {
@@ -44,4 +45,7 @@ export class ChampionshipEntity {
 
   @OneToMany(() => RoundEntity, (round) => round.championship)
   rounds: RoundEntity[];
+
+  @OneToMany(() => MembershipEntity, (membership) => membership.championship)
+  memberships: MembershipEntity[];
 }

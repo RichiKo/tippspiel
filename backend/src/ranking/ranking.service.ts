@@ -8,6 +8,8 @@ import { RankingEntity } from './ranking.entity';
 import { TipEntity } from '../tip/tip.entity';
 import { TipOutcome } from '../tip/tip-outcome.enum';
 import { ChampionshipEntity } from '../championship/championship.entity';
+import { MembershipEntity } from '../membership/membership.entity';
+import { MembershipStatus } from '../membership/membership-status.enum';
 
 interface UserRankingData {
   userId: number;
@@ -27,6 +29,8 @@ export class RankingService {
     private readonly tipRepository: Repository<TipEntity>,
     @InjectRepository(ChampionshipEntity)
     private readonly championshipRepository: Repository<ChampionshipEntity>,
+    @InjectRepository(MembershipEntity)
+    private readonly membershipRepository: Repository<MembershipEntity>,
   ) {}
 
   async recalculateForChampionship(championshipId: string): Promise<void> {
@@ -72,6 +76,25 @@ export class RankingService {
         userData.missedTips++;
       } else if (tip.outcomeType === TipOutcome.NOT_TIPPED) {
         userData.missedTips++;
+      }
+    }
+
+    // Ensure all ACTIVE members have a ranking entry (even with 0 points)
+    const allActiveMembers = await this.membershipRepository.find({
+      where: { championshipId, status: MembershipStatus.ACTIVE },
+    });
+
+    for (const member of allActiveMembers) {
+      if (!userDataMap.has(member.userId)) {
+        // Add members without tips with 0 points
+        userDataMap.set(member.userId, {
+          userId: member.userId,
+          exactHits: 0,
+          goalDiffHits: 0,
+          tendencyHits: 0,
+          missedTips: 0,
+          totalPoints: 0,
+        });
       }
     }
 
@@ -126,5 +149,32 @@ export class RankingService {
       relations: ['user'],
       order: { rank: 'ASC' },
     });
+  }
+
+  async ensureRankingExistsForUser(
+    userId: number,
+    championshipId: string,
+  ): Promise<RankingEntity> {
+    // Check if ranking already exists
+    let ranking = await this.rankingRepository.findOne({
+      where: { userId, championshipId },
+    });
+
+    // If not, create with 0 points
+    if (!ranking) {
+      ranking = this.rankingRepository.create({
+        userId,
+        championshipId,
+        rank: 0, // Will be recalculated on next recalculate
+        exactHits: 0,
+        goalDiffHits: 0,
+        tendencyHits: 0,
+        missedTips: 0,
+        totalPoints: 0,
+      });
+      await this.rankingRepository.save(ranking);
+    }
+
+    return ranking;
   }
 }

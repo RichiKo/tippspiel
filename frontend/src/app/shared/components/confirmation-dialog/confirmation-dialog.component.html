@@ -6,13 +6,15 @@
         {{ message() }}
       </p>
       <div class="cd-actions">
-        <button
-          type="button"
-          class="cd-btn cd-btn-secondary"
-          (click)="onCancel()"
-        >
-          {{ cancelLabel() }}
-        </button>
+        @if (showCancelButton()) {
+          <button
+            type="button"
+            class="cd-btn cd-btn-secondary"
+            (click)="onCancel()"
+          >
+            {{ cancelLabel() }}
+          </button>
+        }
         <button
           type="button"
           class="cd-btn cd-btn-primary"

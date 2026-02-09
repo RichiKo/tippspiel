@@ -5,9 +5,17 @@ import { RankingService } from './ranking.service';
 import { RankingController } from './ranking.controller';
 import { TipEntity } from '../tip/tip.entity';
 import { ChampionshipEntity } from '../championship/championship.entity';
+import { MembershipEntity } from '../membership/membership.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RankingEntity, TipEntity, ChampionshipEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      RankingEntity,
+      TipEntity,
+      ChampionshipEntity,
+      MembershipEntity,
+    ]),
+  ],
   controllers: [RankingController],
   providers: [RankingService],
   exports: [RankingService],

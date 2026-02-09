@@ -23,6 +23,28 @@
         <span>Privat</span>
       }
     </div>
+
+    <!-- Membership Status Badge -->
+    @if (membershipStatus() === MembershipStatus.PENDING) {
+      <div class="membership-status pending">
+        <span class="status-icon">⏳</span>
+        <span class="status-text">Deine Anfrage wurde noch nicht freigegeben</span>
+      </div>
+    }
+    @if (membershipStatus() === MembershipStatus.REJECTED) {
+      <div class="membership-status rejected">
+        <span class="status-icon">❌</span>
+        <span class="status-text">Beitritt abgelehnt</span>
+        <button 
+          type="button" 
+          class="retry-btn" 
+          (click)="onReRequestClick($event)"
+          [disabled]="isJoining()"
+        >
+          Erneut anfragen
+        </button>
+      </div>
+    }
     @if (isAdmin()) {
       <div class="championship-actions" (click)="$event.stopPropagation()">
         <a
@@ -37,6 +59,7 @@
       </div>
     }
   </div>
+  <!-- Delete Dialog -->
   <app-confirmation-dialog
     [visible]="showDeleteDialog()"
     [title]="'Löschen bestätigen'"
@@ -49,5 +72,16 @@
     [cancelLabel]="'Abbrechen'"
     (confirmed)="handleDeleteConfirm()"
     (cancelled)="handleDeleteCancel()"
+  />
+
+  <!-- Join Confirm Dialog -->
+  <app-confirmation-dialog
+    [visible]="showJoinConfirmDialog()"
+    [title]="championship()?.isPublic ? 'Mitspielen?' : 'Beitritt anfragen?'"
+    [message]="joinConfirmMessage()"
+    [confirmLabel]="championship()?.isPublic ? 'Ja, mitspielen' : 'Ja, anfragen'"
+    [cancelLabel]="'Abbrechen'"
+    (confirmed)="handleJoinConfirm()"
+    (cancelled)="showJoinConfirmDialog.set(false)"
   />
 </div>

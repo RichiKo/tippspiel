@@ -6,6 +6,7 @@ import { ChampionshipService } from '../../services/championship.service';
 import { Championship } from '../../types/championship.interface';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 import { TeamSelectorComponent } from '../../../shared/components/team-selector/team-selector.component';
+import { MemberSelectorComponent } from '../../../shared/components/member-selector/member-selector.component';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -18,6 +19,7 @@ import { switchMap } from 'rxjs/operators';
     RouterModule,
     ImageUploadComponent,
     TeamSelectorComponent,
+    MemberSelectorComponent,
   ],
   templateUrl: './championship-edit.component.html',
   styleUrl: './championship-edit.component.scss',
@@ -28,7 +30,7 @@ export class ChampionshipEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly championshipService = inject(ChampionshipService);
 
-  private readonly championshipId = signal<string | null>(null);
+  readonly championshipId = signal<string | null>(null);
   readonly isLoading = signal(false);
   readonly submitted = signal(false);
   readonly errorMessage = signal<string | null>(null);

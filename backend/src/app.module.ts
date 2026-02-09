@@ -14,6 +14,7 @@ import { RoundModule } from './round/round.module';
 import { GameModule } from './game/game.module';
 import { TipModule } from './tip/tip.module';
 import { RankingModule } from './ranking/ranking.module';
+import { MembershipModule } from './membership/membership.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { RankingModule } from './ranking/ranking.module';
     GameModule,
     TipModule,
     RankingModule,
+    MembershipModule,
     UploadModule,
   ],
   controllers: [AppController],

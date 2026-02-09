@@ -187,6 +187,347 @@ Ruft Benutzer-Details nach ID ab.
 
 ---
 
+## Membership API
+
+### **POST** `/championships/:id/join`
+
+Tritt einem Championship bei oder fordert Beitritt an (authentifiziert).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `id` (string) - Championship ID
+
+#### **Response (JSON)**
+
+**Public Championship (sofortiger Beitritt):**
+```json
+{
+  "membership": {
+    "id": "uuid-v4",
+    "userId": 1,
+    "championshipId": "championship-uuid",
+    "status": "active",
+    "createdAt": "2026-01-25T10:00:00.000Z",
+    "updatedAt": "2026-01-25T10:00:00.000Z"
+  },
+  "message": "Successfully joined championship"
+}
+```
+
+**Private Championship (Beitrittsanfrage):**
+```json
+{
+  "membership": {
+    "id": "uuid-v4",
+    "userId": 1,
+    "championshipId": "championship-uuid",
+    "status": "pending",
+    "createdAt": "2026-01-25T10:00:00.000Z",
+    "updatedAt": "2026-01-25T10:00:00.000Z"
+  },
+  "message": "Request submitted, waiting for approval"
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Beitritt erfolgreich oder bereits Member
+- `400 Bad Request` - Championship ist nicht aktiv
+- `401 Unauthorized` - Nicht authentifiziert
+- `404 Not Found` - Championship existiert nicht
+
+#### **Idempotenz**
+- Wenn User bereits `ACTIVE` Member ist: Gibt existierende Membership zurück
+- Wenn User bereits `PENDING` Request hat: Gibt existierende Membership zurück
+- Wenn User `REJECTED` wurde: Status wird auf `PENDING` gesetzt (erneute Anfrage)
+
+---
+
+### **GET** `/championships/:id/membership`
+
+Ruft den eigenen Membership-Status für ein Championship ab (authentifiziert).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `id` (string) - Championship ID
+
+#### **Response (JSON)**
+
+```json
+{
+  "membership": {
+    "id": "uuid-v4",
+    "userId": 1,
+    "championshipId": "championship-uuid",
+    "status": "active",
+    "createdAt": "2026-01-25T10:00:00.000Z",
+    "updatedAt": "2026-01-25T10:00:00.000Z"
+  }
+}
+```
+
+**Wenn kein Membership existiert:**
+```json
+{
+  "membership": null
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreich
+- `401 Unauthorized` - Nicht authentifiziert
+
+---
+
+### **GET** `/championships/:id/members`
+
+Ruft alle Members eines Championships ab (authentifiziert, nur Owner/Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `id` (string) - Championship ID
+
+#### **Query Parameters**
+- `status` (optional) - Filter nach Status: `active`, `pending`, `rejected`
+
+#### **Response (JSON)**
+
+```json
+{
+  "members": [
+    {
+      "id": "uuid-v4",
+      "userId": 1,
+      "championshipId": "championship-uuid",
+      "status": "active",
+      "createdAt": "2026-01-25T10:00:00.000Z",
+      "updatedAt": "2026-01-25T10:00:00.000Z",
+      "user": {
+        "id": 1,
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "role": "user",
+        "image": "default.png"
+      }
+    }
+  ]
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreich
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung (nicht Owner/Admin)
+- `404 Not Found` - Championship nicht gefunden
+
+---
+
+### **GET** `/championships/:id/members/pending`
+
+Ruft alle offenen Beitrittsanfragen ab (authentifiziert, nur Owner/Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `id` (string) - Championship ID
+
+#### **Response (JSON)**
+
+```json
+{
+  "pendingRequests": [
+    {
+      "id": "uuid-v4",
+      "userId": 2,
+      "championshipId": "championship-uuid",
+      "status": "pending",
+      "createdAt": "2026-01-25T11:00:00.000Z",
+      "updatedAt": "2026-01-25T11:00:00.000Z",
+      "user": {
+        "id": 2,
+        "username": "newuser",
+        "email": "newuser@example.com",
+        "role": "user",
+        "image": "default.png"
+      }
+    }
+  ]
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreich
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung (nicht Owner/Admin)
+- `404 Not Found` - Championship nicht gefunden
+
+---
+
+### **PUT** `/memberships/:membershipId/approve`
+
+Genehmigt eine Beitrittsanfrage (authentifiziert, nur Owner/Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `membershipId` (string) - Membership ID
+
+#### **Response (JSON)**
+
+```json
+{
+  "membership": {
+    "id": "uuid-v4",
+    "userId": 2,
+    "championshipId": "championship-uuid",
+    "status": "active",
+    "createdAt": "2026-01-25T11:00:00.000Z",
+    "updatedAt": "2026-01-25T11:30:00.000Z",
+    "user": {
+      "id": 2,
+      "username": "newuser",
+      "email": "newuser@example.com",
+      "role": "user",
+      "image": "default.png"
+    }
+  }
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreich genehmigt
+- `400 Bad Request` - Ungültige Status-Transition
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung (nicht Owner/Admin)
+- `404 Not Found` - Membership nicht gefunden
+
+---
+
+### **PUT** `/memberships/:membershipId/reject`
+
+Lehnt eine Beitrittsanfrage ab (authentifiziert, nur Owner/Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `membershipId` (string) - Membership ID
+
+#### **Response (JSON)**
+
+```json
+{
+  "membership": {
+    "id": "uuid-v4",
+    "userId": 2,
+    "championshipId": "championship-uuid",
+    "status": "rejected",
+    "createdAt": "2026-01-25T11:00:00.000Z",
+    "updatedAt": "2026-01-25T11:30:00.000Z",
+    "user": {
+      "id": 2,
+      "username": "newuser",
+      "email": "newuser@example.com",
+      "role": "user",
+      "image": "default.png"
+    }
+  }
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreich abgelehnt
+- `400 Bad Request` - Ungültige Status-Transition
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung (nicht Owner/Admin)
+- `404 Not Found` - Membership nicht gefunden
+
+**Hinweis:** User kann nach Ablehnung erneut einen Beitritt anfragen (Status wird wieder auf `pending` gesetzt).
+
+---
+
+### **DELETE** `/memberships/:membershipId`
+
+Entfernt eine Membership (authentifiziert, nur Owner/Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Params**
+- `membershipId` (string) - Membership ID
+
+#### **Status Codes**
+- `204 No Content` - Erfolgreich entfernt
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung (nicht Owner/Admin)
+- `404 Not Found` - Membership nicht gefunden
+
+---
+
+### **GET** `/user/memberships`
+
+Ruft alle eigenen Memberships ab (authentifiziert).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Response (JSON)**
+
+```json
+{
+  "memberships": [
+    {
+      "id": "uuid-v4",
+      "userId": 1,
+      "championshipId": "championship-uuid-1",
+      "status": "active",
+      "createdAt": "2026-01-25T10:00:00.000Z",
+      "updatedAt": "2026-01-25T10:00:00.000Z",
+      "championship": {
+        "id": "championship-uuid-1",
+        "name": "WM 2026",
+        "description": "Fußball-Weltmeisterschaft 2026",
+        "image": "/uploads/championships/wm2026.png",
+        "isPublic": true,
+        "isActive": true,
+        "createdByUserId": "admin-uuid",
+        "createdAt": "2026-01-20T10:00:00.000Z",
+        "updatedAt": "2026-01-20T10:00:00.000Z"
+      }
+    }
+  ]
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreich
+- `401 Unauthorized` - Nicht authentifiziert
+
+---
+
 ## Championship API
 
 ### **POST** `/championships`

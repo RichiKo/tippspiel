@@ -16,7 +16,4 @@ export class CreateChampionshipDto {
 
   @IsBoolean()
   isActive: boolean;
-
-  @IsString()
-  createdByUserId: string;
 }

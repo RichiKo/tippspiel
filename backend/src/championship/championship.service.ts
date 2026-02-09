@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChampionshipEntity } from './championship.entity';
 import { TeamEntity } from '../team/team.entity';
 import { CreateChampionshipDto } from './dto/create-championship.dto';
 import { UpdateChampionshipDto } from './dto/update-championship.dto';
+import { MembershipService } from '../membership/membership.service';
 
 @Injectable()
 export class ChampionshipService {
@@ -13,6 +14,8 @@ export class ChampionshipService {
     private readonly championshipRepository: Repository<ChampionshipEntity>,
     @InjectRepository(TeamEntity)
     private readonly teamRepository: Repository<TeamEntity>,
+    @Inject(forwardRef(() => MembershipService))
+    private readonly membershipService: MembershipService,
   ) {}
 
   async findAll(): Promise<ChampionshipEntity[]> {
@@ -30,9 +33,20 @@ export class ChampionshipService {
     return championship;
   }
 
-  async create(createDto: CreateChampionshipDto): Promise<ChampionshipEntity> {
-    const championship = this.championshipRepository.create(createDto);
-    return this.championshipRepository.save(championship);
+  async create(
+    createDto: CreateChampionshipDto,
+    userId: number,
+  ): Promise<ChampionshipEntity> {
+    const championship = this.championshipRepository.create({
+      ...createDto,
+      createdByUserId: userId.toString(),
+    });
+    const saved = await this.championshipRepository.save(championship);
+
+    // Auto-join owner as ACTIVE member
+    await this.membershipService.joinChampionship(userId, saved.id);
+
+    return saved;
   }
 
   async update(

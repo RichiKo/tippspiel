@@ -58,6 +58,17 @@
       />
     </div>
 
+    @if (championshipId()) {
+      <div class="participants-section">
+        <h3>Teilnehmer verwalten</h3>
+        <app-member-selector
+          [championshipId]="championshipId()!"
+          [showActiveMembers]="true"
+          [disabled]="isLoading()"
+        />
+      </div>
+    }
+
     <div class="form-row">
       <label>
         <input

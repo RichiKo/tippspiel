@@ -5,8 +5,10 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
 import { UserRole } from './user-rolle.enum';
+import { MembershipEntity } from '../membership/membership.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -31,6 +33,9 @@ export class UserEntity {
 
   @Column({ select: false })
   password: string;
+
+  @OneToMany(() => MembershipEntity, (membership) => membership.user)
+  memberships: MembershipEntity[];
 
   @BeforeInsert()
   @BeforeUpdate()

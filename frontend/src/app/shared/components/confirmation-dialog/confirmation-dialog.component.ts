@@ -14,6 +14,7 @@ export class ConfirmationDialogComponent {
   confirmLabel = input<string>('Ja');
   cancelLabel = input<string>('Abbrechen');
   visible = input<boolean>(false);
+  showCancelButton = input<boolean>(true);
 
   confirmed = output<void>();
   cancelled = output<void>();

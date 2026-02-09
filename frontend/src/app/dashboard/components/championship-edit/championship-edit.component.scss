@@ -30,6 +30,19 @@
   margin: 1.5rem 0;
 }
 
+.participants-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #111827;
+  }
+}
+
 .form-row {
   display: flex;
   gap: 1.5rem;

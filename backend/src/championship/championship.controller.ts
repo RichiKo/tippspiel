@@ -8,12 +8,15 @@ import {
   Param,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ChampionshipService } from './championship.service';
 import { CreateChampionshipDto } from './dto/create-championship.dto';
 import { UpdateChampionshipDto } from './dto/update-championship.dto';
 import { ChampionshipEntity } from './championship.entity';
 import { TeamEntity } from '../team/team.entity';
+import { AuthGuard } from '../guards/auth.guard';
+import { User } from '../user/decoratos/user.decorator';
 
 @Controller('championships')
 export class ChampionshipController {
@@ -30,11 +33,13 @@ export class ChampionshipController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
   async create(
     @Body() createChampionshipDto: CreateChampionshipDto,
+    @User('id') userId: number,
   ): Promise<ChampionshipEntity> {
-    return this.championshipService.create(createChampionshipDto);
+    return this.championshipService.create(createChampionshipDto, userId);
   }
 
   @Put(':id')
