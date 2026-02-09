@@ -85,6 +85,14 @@ export class BonusController {
     return this.bonusService.getAllPicks(id, undefined, true);
   }
 
+  @Get('bonus-rules/:id/evaluation-result')
+  @UseGuards(AuthGuard, BonusAdminGuard)
+  async getEvaluationResult(
+    @Param('id') id: string,
+  ): Promise<{ championTeamId?: string; finalistTeamIds: string[] }> {
+    return this.bonusService.getEvaluationResult(id);
+  }
+
   // ========== User Endpoints ==========
 
   @Get('championships/:championshipId/bonus-rules/active')
