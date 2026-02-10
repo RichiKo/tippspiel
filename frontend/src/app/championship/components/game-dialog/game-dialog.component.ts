@@ -18,7 +18,9 @@ import { Team } from '../../../teams/types/team.interface';
             <select [(ngModel)]="homeTeamId" name="homeTeamId" required>
               <option value="">-- Wähle Team --</option>
               @for (team of teams(); track team.id) {
-                <option [value]="team.id">{{ team.name }}</option>
+                <option [value]="team.id" [disabled]="isTeamDisabled(team.id, 'home')">
+                  {{ team.name }}{{ isTeamDisabled(team.id, 'home') ? ' (ausgestiegen)' : '' }}
+                </option>
               }
             </select>
           </div>
@@ -28,7 +30,9 @@ import { Team } from '../../../teams/types/team.interface';
             <select [(ngModel)]="awayTeamId" name="awayTeamId" required>
               <option value="">-- Wähle Team --</option>
               @for (team of teams(); track team.id) {
-                <option [value]="team.id">{{ team.name }}</option>
+                <option [value]="team.id" [disabled]="isTeamDisabled(team.id, 'away')">
+                  {{ team.name }}{{ isTeamDisabled(team.id, 'away') ? ' (ausgestiegen)' : '' }}
+                </option>
               }
             </select>
           </div>
@@ -220,6 +224,7 @@ export class GameDialogComponent {
   gameId = input<string | null>(null);
   gameData = input<Game | null>(null);
   teams = input<Team[]>([]);
+  eliminatedTeamIds = input<string[]>([]);
 
   confirmed = output<CreateGameDto | UpdateGameDto | UpdateGameResultDto>();
   cancelled = output<void>();
@@ -247,6 +252,15 @@ export class GameDialogComponent {
 
   isValid() {
     return this.homeTeamId && this.awayTeamId && this.kickoffTime && this.homeTeamId !== this.awayTeamId;
+  }
+
+  isTeamDisabled(teamId: string, side: 'home' | 'away') {
+    const isEliminated = this.eliminatedTeamIds().includes(teamId);
+    if (!isEliminated) {
+      return false;
+    }
+
+    return side === 'home' ? this.homeTeamId !== teamId : this.awayTeamId !== teamId;
   }
 
   onSubmit() {

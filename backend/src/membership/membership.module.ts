@@ -21,6 +21,6 @@ import { RankingModule } from '../ranking/ranking.module';
   ],
   providers: [MembershipService, ChampionshipOwnerGuard],
   controllers: [MembershipController],
-  exports: [MembershipService],
+  exports: [MembershipService, ChampionshipOwnerGuard],
 })
 export class MembershipModule {}

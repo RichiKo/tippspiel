@@ -3,6 +3,7 @@ import {
   NotFoundException,
   Inject,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -111,6 +112,9 @@ export class ChampionshipService {
     }
 
     championship.teams = championship.teams?.filter((t) => t.id !== teamId);
+    championship.eliminatedTeamIds = (
+      championship.eliminatedTeamIds || []
+    ).filter((id) => id !== teamId);
     await this.championshipRepository.save(championship);
 
     return this.findOne(championshipId);
@@ -119,5 +123,74 @@ export class ChampionshipService {
   async getTeams(championshipId: string): Promise<TeamEntity[]> {
     const championship = await this.findOne(championshipId);
     return championship.teams || [];
+  }
+
+  async getEliminatedTeams(championshipId: string): Promise<{
+    championshipId: string;
+    eliminatedTeamIds: string[];
+  }> {
+    const championship = await this.findOne(championshipId);
+    return {
+      championshipId,
+      eliminatedTeamIds: championship.eliminatedTeamIds || [],
+    };
+  }
+
+  async updateEliminatedTeams(
+    championshipId: string,
+    teamIds: string[],
+    isEliminated: boolean,
+  ): Promise<{
+    championshipId: string;
+    eliminatedTeamIds: string[];
+  }> {
+    const championship = await this.championshipRepository.findOne({
+      where: { id: championshipId },
+      relations: ['teams'],
+    });
+    if (!championship) {
+      throw new NotFoundException('Championship not found');
+    }
+
+    const normalizedTeamIds = Array.from(new Set(teamIds));
+    const championshipTeamIds = new Set(
+      (championship.teams || []).map((team) => team.id),
+    );
+    const invalidTeamIds = normalizedTeamIds.filter(
+      (teamId) => !championshipTeamIds.has(teamId),
+    );
+
+    if (invalidTeamIds.length > 0) {
+      throw new BadRequestException(
+        `Teams are not assigned to this championship: ${invalidTeamIds.join(', ')}`,
+      );
+    }
+
+    const currentEliminated = new Set(championship.eliminatedTeamIds || []);
+
+    if (isEliminated) {
+      normalizedTeamIds.forEach((teamId) => currentEliminated.add(teamId));
+    } else {
+      normalizedTeamIds.forEach((teamId) => currentEliminated.delete(teamId));
+    }
+
+    championship.eliminatedTeamIds = Array.from(currentEliminated);
+    await this.championshipRepository.save(championship);
+
+    return {
+      championshipId,
+      eliminatedTeamIds: championship.eliminatedTeamIds,
+    };
+  }
+
+  async updateSingleEliminatedTeam(
+    championshipId: string,
+    teamId: string,
+    isEliminated: boolean,
+  ): Promise<{
+    championshipId: string;
+    eliminatedTeamIds: string[];
+  }> {
+    return this.updateEliminatedTeams(championshipId, [teamId], isEliminated);
   }
 }

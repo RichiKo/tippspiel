@@ -10,6 +10,8 @@ import { MemberSelectorComponent } from '../../../shared/components/member-selec
 import { BonusAdminComponent } from '../../../bonus/components/bonus-admin/bonus-admin.component';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { TeamService } from '../../../teams/services/team.service';
+import { Team } from '../../../teams/types/team.interface';
 
 @Component({
   selector: 'app-championship-edit',
@@ -31,6 +33,7 @@ export class ChampionshipEditComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly championshipService = inject(ChampionshipService);
+  private readonly teamService = inject(TeamService);
 
   readonly championshipId = signal<string | null>(null);
   readonly isLoading = signal(false);
@@ -38,7 +41,19 @@ export class ChampionshipEditComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly selectedTeamIds = signal<string[]>([]);
   readonly initialTeamIds = signal<string[]>([]);
-  readonly availableTeams = signal<any[]>([]);
+  readonly selectedEliminatedTeamIds = signal<string[]>([]);
+  readonly selectedBulkTeamIds = signal<string[]>([]);
+  readonly isUpdatingEliminated = signal(false);
+  readonly allTeams = signal<Team[]>([]);
+  readonly selectedTeams = computed(() => {
+    const selectedIds = this.selectedTeamIds();
+    return this.allTeams().filter((team) => selectedIds.includes(team.id));
+  });
+  readonly availableTeams = computed(() => this.selectedTeams());
+  readonly persistedSelectedTeams = computed(() => {
+    const persistedIds = new Set(this.initialTeamIds());
+    return this.selectedTeams().filter((team) => persistedIds.has(team.id));
+  });
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(64)]],
@@ -53,6 +68,8 @@ export class ChampionshipEditComponent implements OnInit {
   );
 
   ngOnInit() {
+    this.loadAllTeams();
+
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.router.navigate(['/dashboard']);
@@ -61,6 +78,17 @@ export class ChampionshipEditComponent implements OnInit {
 
     this.championshipId.set(id);
     this.loadChampionship(id);
+  }
+
+  private loadAllTeams() {
+    this.teamService.getAllTeams().subscribe({
+      next: (teams) => {
+        this.allTeams.set(teams);
+      },
+      error: () => {
+        this.errorMessage.set('Teams konnten nicht geladen werden.');
+      },
+    });
   }
 
   private loadChampionship(id: string) {
@@ -83,8 +111,21 @@ export class ChampionshipEditComponent implements OnInit {
             const teamIds = teams.map((t) => t.id);
             this.selectedTeamIds.set(teamIds);
             this.initialTeamIds.set(teamIds);
-            this.availableTeams.set(teams);
-            this.isLoading.set(false);
+            this.championshipService.getEliminatedTeams(id).subscribe({
+              next: (eliminated) => {
+                const allowedIds = new Set(teamIds);
+                this.selectedEliminatedTeamIds.set(
+                  (eliminated.eliminatedTeamIds || []).filter((teamId) =>
+                    allowedIds.has(teamId)
+                  )
+                );
+                this.isLoading.set(false);
+              },
+              error: () => {
+                this.selectedEliminatedTeamIds.set([]);
+                this.isLoading.set(false);
+              },
+            });
           },
           error: () => {
             this.isLoading.set(false);
@@ -104,6 +145,84 @@ export class ChampionshipEditComponent implements OnInit {
 
   onTeamRemoved(teamId: string): void {
     this.selectedTeamIds.update((ids) => ids.filter((id) => id !== teamId));
+    this.selectedEliminatedTeamIds.update((ids) =>
+      ids.filter((id) => id !== teamId)
+    );
+    this.selectedBulkTeamIds.update((ids) => ids.filter((id) => id !== teamId));
+  }
+
+  isTeamEliminated(teamId: string): boolean {
+    return this.selectedEliminatedTeamIds().includes(teamId);
+  }
+
+  isTeamMarkedForBulk(teamId: string): boolean {
+    return this.selectedBulkTeamIds().includes(teamId);
+  }
+
+  onBulkTeamSelectionChange(teamId: string, checked: boolean): void {
+    if (checked) {
+      this.selectedBulkTeamIds.update((ids) =>
+        ids.includes(teamId) ? ids : [...ids, teamId]
+      );
+      return;
+    }
+
+    this.selectedBulkTeamIds.update((ids) => ids.filter((id) => id !== teamId));
+  }
+
+  onToggleEliminated(teamId: string, isEliminated: boolean): void {
+    const championshipId = this.championshipId();
+    if (!championshipId || this.isUpdatingEliminated()) {
+      return;
+    }
+
+    this.isUpdatingEliminated.set(true);
+    this.errorMessage.set(null);
+
+    this.championshipService
+      .updateSingleEliminatedTeam(championshipId, teamId, { isEliminated })
+      .subscribe({
+        next: (response) => {
+          this.selectedEliminatedTeamIds.set(response.eliminatedTeamIds || []);
+          this.isUpdatingEliminated.set(false);
+        },
+        error: () => {
+          this.errorMessage.set(
+            'Ausgestiegen-Markierung konnte nicht aktualisiert werden.'
+          );
+          this.isUpdatingEliminated.set(false);
+        },
+      });
+  }
+
+  onApplyBulkEliminated(isEliminated: boolean): void {
+    const championshipId = this.championshipId();
+    const teamIds = this.selectedBulkTeamIds();
+    if (!championshipId || teamIds.length === 0 || this.isUpdatingEliminated()) {
+      return;
+    }
+
+    this.isUpdatingEliminated.set(true);
+    this.errorMessage.set(null);
+
+    this.championshipService
+      .updateEliminatedTeams(championshipId, {
+        teamIds,
+        isEliminated,
+      })
+      .subscribe({
+        next: (response) => {
+          this.selectedEliminatedTeamIds.set(response.eliminatedTeamIds || []);
+          this.selectedBulkTeamIds.set([]);
+          this.isUpdatingEliminated.set(false);
+        },
+        error: () => {
+          this.errorMessage.set(
+            'Bulk-Aktualisierung der Ausgestiegen-Markierung fehlgeschlagen.'
+          );
+          this.isUpdatingEliminated.set(false);
+        },
+      });
   }
 
   onSubmit() {

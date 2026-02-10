@@ -4,6 +4,20 @@ import { Observable } from 'rxjs';
 import { Championship } from '../types/championship.interface';
 import { Team } from '../../teams/types/team.interface';
 
+export interface UpdateEliminatedTeamsDto {
+  teamIds: string[];
+  isEliminated: boolean;
+}
+
+export interface UpdateSingleEliminatedTeamDto {
+  isEliminated: boolean;
+}
+
+export interface EliminatedTeamsResponse {
+  championshipId: string;
+  eliminatedTeamIds: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChampionshipService {
   private readonly http = inject(HttpClient);
@@ -56,5 +70,32 @@ export class ChampionshipService {
 
   getChampionshipTeams(championshipId: string): Observable<Team[]> {
     return this.http.get<Team[]>(`${this.apiUrl}/${championshipId}/teams`);
+  }
+
+  getEliminatedTeams(championshipId: string): Observable<EliminatedTeamsResponse> {
+    return this.http.get<EliminatedTeamsResponse>(
+      `${this.apiUrl}/${championshipId}/eliminated-teams`
+    );
+  }
+
+  updateEliminatedTeams(
+    championshipId: string,
+    payload: UpdateEliminatedTeamsDto
+  ): Observable<EliminatedTeamsResponse> {
+    return this.http.patch<EliminatedTeamsResponse>(
+      `${this.apiUrl}/${championshipId}/eliminated-teams`,
+      payload
+    );
+  }
+
+  updateSingleEliminatedTeam(
+    championshipId: string,
+    teamId: string,
+    payload: UpdateSingleEliminatedTeamDto
+  ): Observable<EliminatedTeamsResponse> {
+    return this.http.patch<EliminatedTeamsResponse>(
+      `${this.apiUrl}/${championshipId}/eliminated-teams/${teamId}`,
+      payload
+    );
   }
 }

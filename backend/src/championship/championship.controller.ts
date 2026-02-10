@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   UsePipes,
@@ -17,6 +18,9 @@ import { ChampionshipEntity } from './championship.entity';
 import { TeamEntity } from '../team/team.entity';
 import { AuthGuard } from '../guards/auth.guard';
 import { User } from '../user/decoratos/user.decorator';
+import { ChampionshipOwnerGuard } from '../membership/guards/championship-owner.guard';
+import { UpdateEliminatedTeamsDto } from './dto/update-eliminated-teams.dto';
+import { UpdateSingleEliminatedTeamDto } from './dto/update-single-eliminated-team.dto';
 
 @Controller('championships')
 export class ChampionshipController {
@@ -43,6 +47,7 @@ export class ChampionshipController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
   @UsePipes(new ValidationPipe())
   async update(
     @Param('id') id: string,
@@ -52,11 +57,13 @@ export class ChampionshipController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
   async remove(@Param('id') id: string): Promise<void> {
     return this.championshipService.remove(id);
   }
 
   @Post(':id/teams/:teamId')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
   async addTeam(
     @Param('id') championshipId: string,
     @Param('teamId') teamId: string,
@@ -65,6 +72,7 @@ export class ChampionshipController {
   }
 
   @Delete(':id/teams/:teamId')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
   async removeTeam(
     @Param('id') championshipId: string,
     @Param('teamId') teamId: string,
@@ -75,5 +83,48 @@ export class ChampionshipController {
   @Get(':id/teams')
   async getTeams(@Param('id') championshipId: string): Promise<TeamEntity[]> {
     return this.championshipService.getTeams(championshipId);
+  }
+
+  @Get(':id/eliminated-teams')
+  async getEliminatedTeams(@Param('id') championshipId: string): Promise<{
+    championshipId: string;
+    eliminatedTeamIds: string[];
+  }> {
+    return this.championshipService.getEliminatedTeams(championshipId);
+  }
+
+  @Patch(':id/eliminated-teams')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
+  @UsePipes(new ValidationPipe())
+  async updateEliminatedTeams(
+    @Param('id') championshipId: string,
+    @Body() dto: UpdateEliminatedTeamsDto,
+  ): Promise<{
+    championshipId: string;
+    eliminatedTeamIds: string[];
+  }> {
+    return this.championshipService.updateEliminatedTeams(
+      championshipId,
+      dto.teamIds,
+      dto.isEliminated,
+    );
+  }
+
+  @Patch(':id/eliminated-teams/:teamId')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
+  @UsePipes(new ValidationPipe())
+  async updateSingleEliminatedTeam(
+    @Param('id') championshipId: string,
+    @Param('teamId') teamId: string,
+    @Body() dto: UpdateSingleEliminatedTeamDto,
+  ): Promise<{
+    championshipId: string;
+    eliminatedTeamIds: string[];
+  }> {
+    return this.championshipService.updateSingleEliminatedTeam(
+      championshipId,
+      teamId,
+      dto.isEliminated,
+    );
   }
 }

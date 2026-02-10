@@ -63,6 +63,9 @@ export class ChampionshipDetailComponent {
 
   readonly currentUser = this.persistingService.currentUser;
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
+  readonly eliminatedTeamIds = computed(
+    () => this.championship()?.eliminatedTeamIds ?? [],
+  );
 
   readonly groupedGames = computed(() => {
     const games = this.games();

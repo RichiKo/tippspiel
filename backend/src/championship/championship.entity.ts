@@ -31,6 +31,9 @@ export class ChampionshipEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column('simple-array', { default: '' })
+  eliminatedTeamIds: string[];
+
   @Column()
   createdByUserId: string;
 

@@ -58,6 +58,64 @@
       />
     </div>
 
+    <div class="eliminated-teams-section">
+      <h3>Ausgestiegene Teams</h3>
+      <p class="section-hint">
+        Markiere Teams als ausgestiegen, damit sie in Bonus/Spiel-Auswahl gesperrt sind.
+      </p>
+
+      @if (persistedSelectedTeams().length === 0) {
+        <p class="empty-hint">Noch keine Teams für diese Championship ausgewählt.</p>
+      } @else {
+        <div class="bulk-actions">
+          <button
+            type="button"
+            class="bulk-btn danger"
+            (click)="onApplyBulkEliminated(true)"
+            [disabled]="selectedBulkTeamIds().length === 0 || isUpdatingEliminated()"
+          >
+            Markierte als ausgestiegen
+          </button>
+          <button
+            type="button"
+            class="bulk-btn"
+            (click)="onApplyBulkEliminated(false)"
+            [disabled]="selectedBulkTeamIds().length === 0 || isUpdatingEliminated()"
+          >
+            Markierung aufheben
+          </button>
+        </div>
+
+        <div class="eliminated-team-list">
+          @for (team of persistedSelectedTeams(); track team.id) {
+            <div class="eliminated-team-row">
+              <label class="bulk-check">
+                <input
+                  type="checkbox"
+                  [checked]="isTeamMarkedForBulk(team.id)"
+                  (change)="onBulkTeamSelectionChange(team.id, $any($event.target).checked)"
+                  [disabled]="isUpdatingEliminated()"
+                />
+              </label>
+              <div class="team-meta">
+                <img [src]="team.logoUrl" [alt]="team.name" class="team-logo" />
+                <span class="team-name">{{ team.name }}</span>
+              </div>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  [checked]="isTeamEliminated(team.id)"
+                  (change)="onToggleEliminated(team.id, $any($event.target).checked)"
+                  [disabled]="isUpdatingEliminated()"
+                />
+                <span>Ausgestiegen</span>
+              </label>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
     @if (championshipId()) {
       <div class="participants-section">
         <h3>Teilnehmer verwalten</h3>

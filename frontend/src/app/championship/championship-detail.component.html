@@ -39,6 +39,7 @@
       <app-bonus-pick-form
         [championshipId]="championshipId"
         [availableTeams]="teams()"
+        [eliminatedTeamIds]="eliminatedTeamIds()"
       />
     </div>
 
@@ -117,6 +118,7 @@
     [gameId]="selectedGame()?.id ?? null"
     [gameData]="selectedGame()"
     [teams]="teams()"
+    [eliminatedTeamIds]="eliminatedTeamIds()"
     (confirmed)="onGameDialogConfirmed($event)"
     (cancelled)="onGameDialogCancelled()"
   />

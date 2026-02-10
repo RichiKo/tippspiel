@@ -5,10 +5,15 @@ import { TeamEntity } from '../team/team.entity';
 import { ChampionshipService } from './championship.service';
 import { ChampionshipController } from './championship.controller';
 import { MembershipModule } from '../membership/membership.module';
+import { MembershipEntity } from '../membership/membership.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ChampionshipEntity, TeamEntity]),
+    TypeOrmModule.forFeature([
+      ChampionshipEntity,
+      TeamEntity,
+      MembershipEntity,
+    ]),
     forwardRef(() => MembershipModule),
   ],
   controllers: [ChampionshipController],

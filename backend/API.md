@@ -622,6 +622,7 @@ Ruft Championship-Details ab.
   "description": "Fußball-Weltmeisterschaft 2026",
   "isPublic": true,
   "isActive": true,
+  "eliminatedTeamIds": ["team-uuid-1", "team-uuid-2"],
   "entryFee": 10,
   "prizePool": 100,
   "prizeDistribution": "1st: 60%, 2nd: 30%, 3rd: 10%",
@@ -694,6 +695,96 @@ Authorization: Bearer <token>
 
 #### **Status Codes**
 - `200 OK` - Championship gelöscht
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung
+- `404 Not Found` - Championship existiert nicht
+
+---
+
+### **GET** `/championships/:id/eliminated-teams`
+
+Liefert alle als ausgestiegen markierten Teams einer Championship.
+
+#### **Response (JSON)**
+
+```json
+{
+  "championshipId": "championship-uuid",
+  "eliminatedTeamIds": ["team-uuid-1", "team-uuid-2"]
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Abfrage
+- `404 Not Found` - Championship existiert nicht
+
+---
+
+### **PATCH** `/championships/:id/eliminated-teams`
+
+Setzt oder entfernt die Ausgestiegen-Markierung für mehrere Teams (authentifiziert, nur Creator oder Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Request Body (JSON)**
+
+```json
+{
+  "teamIds": ["team-uuid-1", "team-uuid-2"],
+  "isEliminated": true
+}
+```
+
+#### **Response (JSON)**
+
+```json
+{
+  "championshipId": "championship-uuid",
+  "eliminatedTeamIds": ["team-uuid-1", "team-uuid-2"]
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Aktualisierung
+- `400 Bad Request` - Team gehört nicht zur Championship oder ungültige Eingabe
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - Keine Berechtigung
+- `404 Not Found` - Championship existiert nicht
+
+---
+
+### **PATCH** `/championships/:id/eliminated-teams/:teamId`
+
+Setzt oder entfernt die Ausgestiegen-Markierung für ein einzelnes Team (authentifiziert, nur Creator oder Admin).
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Request Body (JSON)**
+
+```json
+{
+  "isEliminated": false
+}
+```
+
+#### **Response (JSON)**
+
+```json
+{
+  "championshipId": "championship-uuid",
+  "eliminatedTeamIds": ["team-uuid-2"]
+}
+```
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Aktualisierung
+- `400 Bad Request` - Team gehört nicht zur Championship oder ungültige Eingabe
 - `401 Unauthorized` - Nicht authentifiziert
 - `403 Forbidden` - Keine Berechtigung
 - `404 Not Found` - Championship existiert nicht

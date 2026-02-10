@@ -5,6 +5,7 @@ export interface Championship {
   image: string;
   isPublic: boolean;
   isActive: boolean;
+  eliminatedTeamIds?: string[];
   createdByUserId: string;
   createdAt: Date;
   updatedAt: Date;
