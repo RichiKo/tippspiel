@@ -26,7 +26,7 @@
       } @else {
       <div class="team-list">
         @for (team of selectedTeams(); track team.id) {
-        <div class="team-item selected">
+        <div class="team-item selected" [class.eliminated]="!isTeamActive(team.id)">
           <img
             [src]="team.logoUrl"
             [alt]="team.name"
@@ -37,6 +37,17 @@
             <div class="team-name">{{ team.name }}</div>
             <div class="team-short">{{ team.shortName }}</div>
           </div>
+          @if (showActiveCheckbox()) {
+          <label class="active-toggle">
+            <input
+              type="checkbox"
+              [checked]="isTeamActive(team.id)"
+              (change)="onActiveChange(team.id, $any($event.target).checked)"
+              [disabled]="disabled()"
+            />
+            <span>Aktiv</span>
+          </label>
+          }
           <button
             type="button"
             class="remove-btn"

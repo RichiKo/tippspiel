@@ -24,10 +24,13 @@ export class TeamSelectorComponent {
   // Inputs
   selectedTeamIds = input<string[]>([]);
   disabled = input<boolean>(false);
+  showActiveCheckbox = input<boolean>(false);
+  eliminatedTeamIds = input<string[]>([]);
 
   // Outputs
   teamAdded = output<string>();
   teamRemoved = output<string>();
+  teamActiveChanged = output<{ teamId: string; isActive: boolean }>();
 
   // State
   readonly allTeams = signal<Team[]>([]);
@@ -86,6 +89,16 @@ export class TeamSelectorComponent {
   onRemoveTeam(teamId: string) {
     if (!this.disabled()) {
       this.teamRemoved.emit(teamId);
+    }
+  }
+
+  isTeamActive(teamId: string): boolean {
+    return !this.eliminatedTeamIds().includes(teamId);
+  }
+
+  onActiveChange(teamId: string, checked: boolean) {
+    if (!this.disabled()) {
+      this.teamActiveChanged.emit({ teamId, isActive: checked });
     }
   }
 }

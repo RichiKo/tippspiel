@@ -2,9 +2,9 @@
   <h2>Championship bearbeiten</h2>
 
   @if (errorMessage()) {
-  <div class="error-banner">
-    {{ errorMessage() }}
-  </div>
+    <div class="error-banner">
+      {{ errorMessage() }}
+    </div>
   }
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
@@ -19,9 +19,10 @@
         [disabled]="isLoading()"
       />
       @if (submitted() && form.controls.name.errors?.["required"]) {
-      <div class="error">Name ist erforderlich.</div>
-      } @if (form.controls.name.errors?.["maxlength"]) {
-      <div class="error">Maximal 64 Zeichen.</div>
+        <div class="error">Name ist erforderlich.</div>
+      }
+      @if (form.controls.name.errors?.["maxlength"]) {
+        <div class="error">Maximal 64 Zeichen.</div>
       }
     </div>
 
@@ -34,7 +35,7 @@
         [disabled]="isLoading()"
       ></textarea>
       @if (form.controls.description.errors?.["maxlength"]) {
-      <div class="error">Maximal 256 Zeichen.</div>
+        <div class="error">Maximal 256 Zeichen.</div>
       }
     </div>
 
@@ -46,79 +47,23 @@
       (uploadError)="onUploadError($event)"
     />
     @if (submitted() && form.controls.image.errors?.["required"]) {
-    <div class="error">Bild ist erforderlich.</div>
+      <div class="error">Bild ist erforderlich.</div>
     }
 
     <div class="team-selector-section">
       <app-team-selector
         [selectedTeamIds]="selectedTeamIds()"
-        [disabled]="isLoading()"
+        [disabled]="isLoading() || isUpdatingEliminated()"
+        [showActiveCheckbox]="true"
+        [eliminatedTeamIds]="selectedEliminatedTeamIds()"
         (teamAdded)="onTeamAdded($event)"
         (teamRemoved)="onTeamRemoved($event)"
+        (teamActiveChanged)="onTeamActiveChanged($event)"
       />
-    </div>
-
-    <div class="eliminated-teams-section">
-      <h3>Ausgestiegene Teams</h3>
-      <p class="section-hint">
-        Markiere Teams als ausgestiegen, damit sie in Bonus/Spiel-Auswahl gesperrt sind.
-      </p>
-
-      @if (persistedSelectedTeams().length === 0) {
-        <p class="empty-hint">Noch keine Teams für diese Championship ausgewählt.</p>
-      } @else {
-        <div class="bulk-actions">
-          <button
-            type="button"
-            class="bulk-btn danger"
-            (click)="onApplyBulkEliminated(true)"
-            [disabled]="selectedBulkTeamIds().length === 0 || isUpdatingEliminated()"
-          >
-            Markierte als ausgestiegen
-          </button>
-          <button
-            type="button"
-            class="bulk-btn"
-            (click)="onApplyBulkEliminated(false)"
-            [disabled]="selectedBulkTeamIds().length === 0 || isUpdatingEliminated()"
-          >
-            Markierung aufheben
-          </button>
-        </div>
-
-        <div class="eliminated-team-list">
-          @for (team of persistedSelectedTeams(); track team.id) {
-            <div class="eliminated-team-row">
-              <label class="bulk-check">
-                <input
-                  type="checkbox"
-                  [checked]="isTeamMarkedForBulk(team.id)"
-                  (change)="onBulkTeamSelectionChange(team.id, $any($event.target).checked)"
-                  [disabled]="isUpdatingEliminated()"
-                />
-              </label>
-              <div class="team-meta">
-                <img [src]="team.logoUrl" [alt]="team.name" class="team-logo" />
-                <span class="team-name">{{ team.name }}</span>
-              </div>
-              <label class="toggle">
-                <input
-                  type="checkbox"
-                  [checked]="isTeamEliminated(team.id)"
-                  (change)="onToggleEliminated(team.id, $any($event.target).checked)"
-                  [disabled]="isUpdatingEliminated()"
-                />
-                <span>Ausgestiegen</span>
-              </label>
-            </div>
-          }
-        </div>
-      }
     </div>
 
     @if (championshipId()) {
       <div class="participants-section">
-        <h3>Teilnehmer verwalten</h3>
         <app-member-selector
           [championshipId]="championshipId()!"
           [showActiveMembers]="true"
@@ -127,7 +72,6 @@
       </div>
 
       <div class="bonus-section">
-        <h3>Bonus-Regeln verwalten</h3>
         <app-bonus-admin
           [championshipId]="championshipId()!"
           [availableTeams]="availableTeams()"

@@ -42,7 +42,6 @@ export class ChampionshipEditComponent implements OnInit {
   readonly selectedTeamIds = signal<string[]>([]);
   readonly initialTeamIds = signal<string[]>([]);
   readonly selectedEliminatedTeamIds = signal<string[]>([]);
-  readonly selectedBulkTeamIds = signal<string[]>([]);
   readonly isUpdatingEliminated = signal(false);
   readonly allTeams = signal<Team[]>([]);
   readonly selectedTeams = computed(() => {
@@ -50,10 +49,6 @@ export class ChampionshipEditComponent implements OnInit {
     return this.allTeams().filter((team) => selectedIds.includes(team.id));
   });
   readonly availableTeams = computed(() => this.selectedTeams());
-  readonly persistedSelectedTeams = computed(() => {
-    const persistedIds = new Set(this.initialTeamIds());
-    return this.selectedTeams().filter((team) => persistedIds.has(team.id));
-  });
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(64)]],
@@ -148,29 +143,9 @@ export class ChampionshipEditComponent implements OnInit {
     this.selectedEliminatedTeamIds.update((ids) =>
       ids.filter((id) => id !== teamId)
     );
-    this.selectedBulkTeamIds.update((ids) => ids.filter((id) => id !== teamId));
   }
 
-  isTeamEliminated(teamId: string): boolean {
-    return this.selectedEliminatedTeamIds().includes(teamId);
-  }
-
-  isTeamMarkedForBulk(teamId: string): boolean {
-    return this.selectedBulkTeamIds().includes(teamId);
-  }
-
-  onBulkTeamSelectionChange(teamId: string, checked: boolean): void {
-    if (checked) {
-      this.selectedBulkTeamIds.update((ids) =>
-        ids.includes(teamId) ? ids : [...ids, teamId]
-      );
-      return;
-    }
-
-    this.selectedBulkTeamIds.update((ids) => ids.filter((id) => id !== teamId));
-  }
-
-  onToggleEliminated(teamId: string, isEliminated: boolean): void {
+  onTeamActiveChanged(payload: { teamId: string; isActive: boolean }): void {
     const championshipId = this.championshipId();
     if (!championshipId || this.isUpdatingEliminated()) {
       return;
@@ -180,7 +155,9 @@ export class ChampionshipEditComponent implements OnInit {
     this.errorMessage.set(null);
 
     this.championshipService
-      .updateSingleEliminatedTeam(championshipId, teamId, { isEliminated })
+      .updateSingleEliminatedTeam(championshipId, payload.teamId, {
+        isEliminated: !payload.isActive,
+      })
       .subscribe({
         next: (response) => {
           this.selectedEliminatedTeamIds.set(response.eliminatedTeamIds || []);
@@ -189,36 +166,6 @@ export class ChampionshipEditComponent implements OnInit {
         error: () => {
           this.errorMessage.set(
             'Ausgestiegen-Markierung konnte nicht aktualisiert werden.'
-          );
-          this.isUpdatingEliminated.set(false);
-        },
-      });
-  }
-
-  onApplyBulkEliminated(isEliminated: boolean): void {
-    const championshipId = this.championshipId();
-    const teamIds = this.selectedBulkTeamIds();
-    if (!championshipId || teamIds.length === 0 || this.isUpdatingEliminated()) {
-      return;
-    }
-
-    this.isUpdatingEliminated.set(true);
-    this.errorMessage.set(null);
-
-    this.championshipService
-      .updateEliminatedTeams(championshipId, {
-        teamIds,
-        isEliminated,
-      })
-      .subscribe({
-        next: (response) => {
-          this.selectedEliminatedTeamIds.set(response.eliminatedTeamIds || []);
-          this.selectedBulkTeamIds.set([]);
-          this.isUpdatingEliminated.set(false);
-        },
-        error: () => {
-          this.errorMessage.set(
-            'Bulk-Aktualisierung der Ausgestiegen-Markierung fehlgeschlagen.'
           );
           this.isUpdatingEliminated.set(false);
         },
