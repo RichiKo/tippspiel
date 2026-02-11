@@ -15,6 +15,6 @@ RUN printf "registry=https://registry.npmjs.org/\nalways-auth=false\n" > /tmp/.n
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/uploads ./uploads
+RUN mkdir -p ./uploads/teams ./uploads/users ./uploads/championships
 EXPOSE 3000
 CMD ["node", "dist/main"]
