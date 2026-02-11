@@ -7,7 +7,7 @@ import { CurrentUserResponse } from '../../shared/types/current-user.interface';
   providedIn: 'root',
 })
 export class AuthService {
-  baseUrl: string = 'http://localhost:3000/users';
+  baseUrl: string = '/api/users';
 
   http = inject(HttpClient);
 
