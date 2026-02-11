@@ -21,6 +21,31 @@ Diese Datei beschreibt den aktuellen Produktionsbetrieb auf dem Hetzner-Server f
 - Backend Env: `/root/tippspiel/backend/.env.production`
 - Compose Env: `/root/tippspiel/.env`
 
+## DB-Zugriff mit DBeaver (SSH-Tunnel)
+Direkter Zugriff auf Postgres von extern ist nicht freigegeben. Zugriff erfolgt ueber SSH-Tunnel.
+
+1. Tunnel auf lokalem Rechner starten:
+```bash
+ssh -N -L 5433:127.0.0.1:5432 root@46.225.77.15
+```
+Terminal offen lassen, solange DBeaver verbunden bleiben soll.
+
+2. DBeaver-Verbindung:
+- Host: `127.0.0.1`
+- Port: `5433`
+- Database: `tippspiel_prod`
+- Username: `postgres`
+- Password: `POSTGRES_PASSWORD` aus `/root/tippspiel/.env`
+
+3. CLI-Test (lokal, mit aktivem Tunnel):
+```bash
+PGPASSWORD='DEIN_PASSWORT' psql -h 127.0.0.1 -p 5433 -U postgres -d tippspiel_prod -c '\\conninfo'
+```
+
+Hinweise:
+- Bei `password authentication failed` stimmt Passwort nicht mit laufender DB ueberein.
+- Zuerst Passwort in DB setzen (`ALTER USER ... PASSWORD ...`), dann denselben Wert in `/root/tippspiel/.env` pflegen.
+
 ## Backup (Postgres)
 ### Cron-Job
 ```bash
