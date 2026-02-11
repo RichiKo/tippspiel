@@ -9,5 +9,5 @@ export const ormConfig: TypeOrmModuleOptions = {
   database: process.env.DATABASE_NAME ?? 'tippspiel',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
-  synchronize: false,
+  synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',
 };
