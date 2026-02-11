@@ -1,0 +1,89 @@
+<div class="bonus-pick-form">
+  @if (isLoading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Lade Bonus-Regeln...</p>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <p>{{ errorMessage() }}</p>
+    </div>
+  }
+
+  @if (activeBonusRules().length === 0 && !isLoading()) {
+    <div class="no-bonus-rules">
+      <p>Aktuell gibt es keine aktiven Bonus-Regeln für diese Championship.</p>
+    </div>
+  }
+
+  @for (rule of activeBonusRules(); track rule.id) {
+    <div class="bonus-rule-card">
+      <div class="bonus-rule-header">
+        <h3>{{ rule.name }}</h3>
+        <div class="deadline-info" [class.expired]="!isBeforeDeadline(rule)">
+          <span class="clock-icon">🕐</span>
+          <span class="deadline-text">{{ getTimeUntilDeadline(rule) }}</span>
+        </div>
+      </div>
+
+      <div class="bonus-rule-details">
+        <div class="detail-item">
+          <span class="label">Typ:</span>
+          <span class="value">
+            @if (rule.type === BonusRuleType.CHAMPION) {
+              Champion
+            } @else {
+              Champion + Finalist
+            }
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Punkte:</span>
+          <span class="value">{{ getConfigPoints(rule) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Deadline:</span>
+          <span class="value">{{ rule.deadline | date: 'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div class="team-selection">
+        <label class="selection-label">Wähle dein Team:</label>
+        <select
+          class="team-select"
+          [value]="getSelectedTeamId(rule.id) || ''"
+          (change)="onTeamSelect(rule, $any($event.target).value)"
+          [disabled]="!isBeforeDeadline(rule) || isLoading()"
+        >
+          <option value="" disabled>-- Team auswählen --</option>
+          @for (team of availableTeams(); track team.id) {
+            <option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
+              {{ team.name }}{{ isEliminatedTeam(team.id) ? ' (ausgestiegen)' : '' }}
+            </option>
+          }
+        </select>
+
+        @if (getSelectedTeamId(rule.id)) {
+          <div class="selected-team-display">
+            @for (team of availableTeams(); track team.id) {
+              @if (team.id === getSelectedTeamId(rule.id)) {
+                <img [src]="team.logoUrl" [alt]="team.name" class="team-logo" />
+                <span class="team-name">{{ team.name }}</span>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      @if (!isBeforeDeadline(rule)) {
+        <div class="expired-notice">
+          <span class="info-icon">ℹ️</span>
+          <p>Die Deadline für diesen Bonus ist abgelaufen. Keine Änderungen mehr möglich.</p>
+        </div>
+      }
+    </div>
+  }
+</div>

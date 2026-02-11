@@ -1,0 +1,89 @@
+<div class="bonus-picks-table">
+  <h3 class="table-title">Alle Tipps: {{ bonusRuleName() }}</h3>
+
+  @if (isLoading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Lade Tipps...</p>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <p>{{ errorMessage() }}</p>
+    </div>
+  }
+
+  @if (!isLoading() && !errorMessage() && allPicks().length === 0) {
+    <div class="no-picks">
+      <p>Es wurden noch keine Tipps abgegeben.</p>
+    </div>
+  }
+
+  @if (!isLoading() && !errorMessage() && allPicks().length > 0) {
+    <div class="picks-summary">
+      <h4>Zusammenfassung</h4>
+      <div class="summary-grid">
+        @for (teamData of getUniqueTeams(); track teamData.teamId) {
+          <div class="summary-item">
+            <span class="team-name">{{ teamData.teamName }}</span>
+            <span class="team-count">{{ teamData.count }} Tipp(s)</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="picks-table-container">
+      <table class="picks-table">
+        <thead>
+          <tr>
+            <th>Benutzer</th>
+            <th>Gewähltes Team</th>
+            <th>Zeitpunkt</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pick of allPicks(); track pick.id) {
+            <tr>
+              <td class="user-cell">
+                @if (pick.user) {
+                  <div class="user-info">
+                    <img
+                      [src]="pick.user.image"
+                      [alt]="pick.user.username"
+                      class="user-avatar"
+                    />
+                    <div class="user-details">
+                      <span class="username">{{ pick.user.username }}</span>
+                      <span class="email">{{ pick.user.email }}</span>
+                    </div>
+                  </div>
+                }
+              </td>
+              <td class="team-cell">
+                @if (pick.team) {
+                  <div class="team-info">
+                    <img
+                      [src]="pick.team.logoUrl"
+                      [alt]="pick.team.name"
+                      class="team-logo"
+                    />
+                    <span class="team-name">{{ pick.team.name }}</span>
+                  </div>
+                }
+              </td>
+              <td class="date-cell">
+                {{ pick.createdAt | date: 'dd.MM.yyyy HH:mm' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="picks-stats">
+      <span class="stats-text">Gesamt: {{ allPicks().length }} Tipp(s)</span>
+    </div>
+  }
+</div>

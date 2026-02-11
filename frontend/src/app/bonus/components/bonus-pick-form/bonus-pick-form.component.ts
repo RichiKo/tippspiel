@@ -1,0 +1,148 @@
+import { Component, input, signal, computed, inject, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { BonusService } from '../../services/bonus.service';
+import {
+  BonusRule,
+  BonusRuleType,
+  BonusPick,
+  ChampionConfig,
+  ChampionFinalistConfig,
+} from '../../types/bonus.interface';
+
+interface TeamOption {
+  id: string;
+  name: string;
+  logoUrl: string;
+}
+
+@Component({
+  selector: 'app-bonus-pick-form',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './bonus-pick-form.component.html',
+  styleUrls: ['./bonus-pick-form.component.scss'],
+})
+export class BonusPickFormComponent {
+  private readonly bonusService = inject(BonusService);
+
+  championshipId = input.required<string>();
+  availableTeams = input.required<TeamOption[]>();
+  eliminatedTeamIds = input<string[]>([]);
+
+  activeBonusRules = signal<BonusRule[]>([]);
+  myPicks = signal<Map<string, BonusPick>>(new Map());
+  isLoading = signal<boolean>(false);
+  errorMessage = signal<string | null>(null);
+
+  BonusRuleType = BonusRuleType;
+
+  constructor() {
+    effect(
+      () => {
+        const champId = this.championshipId();
+        if (champId) {
+          this.loadActiveBonusRules();
+        }
+      }
+    );
+  }
+
+  isBeforeDeadline(rule: BonusRule): boolean {
+    return new Date(rule.deadline) > new Date();
+  }
+
+  getTimeUntilDeadline(rule: BonusRule): string {
+    const now = new Date().getTime();
+    const deadline = new Date(rule.deadline).getTime();
+    const diff = deadline - now;
+
+    if (diff <= 0) return 'Abgelaufen';
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  }
+
+  getConfigPoints(rule: BonusRule): string {
+    if (rule.type === BonusRuleType.CHAMPION) {
+      const config = rule.config as ChampionConfig;
+      return `${config.championPoints} Punkte`;
+    } else {
+      const config = rule.config as ChampionFinalistConfig;
+      return `Champion: ${config.championPoints}P | Finalist: ${config.finalistPoints}P`;
+    }
+  }
+
+  getSelectedTeamId(ruleId: string): string | null {
+    return this.myPicks().get(ruleId)?.teamId || null;
+  }
+
+  isEliminatedTeam(teamId: string): boolean {
+    return this.eliminatedTeamIds().includes(teamId);
+  }
+
+  private loadActiveBonusRules(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.bonusService.getActiveBonusRules(this.championshipId()).subscribe({
+      next: (rules) => {
+        this.activeBonusRules.set(rules);
+        // Load existing picks for each rule
+        rules.forEach((rule) => this.loadMyPick(rule.id));
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading bonus rules:', error);
+        this.errorMessage.set(
+          'Fehler beim Laden der Bonus-Regeln. Bitte versuche es später erneut.',
+        );
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  private loadMyPick(bonusRuleId: string): void {
+    this.bonusService.getMyPick(bonusRuleId).subscribe({
+      next: (pick) => {
+        if (pick) {
+          const currentPicks = this.myPicks();
+          currentPicks.set(bonusRuleId, pick);
+          this.myPicks.set(new Map(currentPicks));
+        }
+      },
+      error: (error) => {
+        console.error(`Error loading pick for rule ${bonusRuleId}:`, error);
+      },
+    });
+  }
+
+  onTeamSelect(bonusRule: BonusRule, teamId: string): void {
+    if (!this.isBeforeDeadline(bonusRule)) {
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.bonusService.createOrUpdatePick(bonusRule.id, { teamId }).subscribe({
+      next: (pick) => {
+        const currentPicks = this.myPicks();
+        currentPicks.set(bonusRule.id, pick);
+        this.myPicks.set(new Map(currentPicks));
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error saving pick:', error);
+        this.errorMessage.set(
+          'Fehler beim Speichern deiner Auswahl. Bitte versuche es erneut.',
+        );
+        this.isLoading.set(false);
+      },
+    });
+  }
+}

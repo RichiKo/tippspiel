@@ -2,13 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
 
+export interface UploadedFile {
+  filename: string;
+  originalname: string;
+  mimetype: string;
+  size: number;
+}
+
 @Injectable()
 export class UploadService {
   private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
   private readonly maxSizeBytes = 2 * 1024 * 1024; // 2MB
 
-  validateFile(file: Express.Multer.File): void {
+  validateFile(file: UploadedFile): void {
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
       throw new Error('Ungültiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP');
     }

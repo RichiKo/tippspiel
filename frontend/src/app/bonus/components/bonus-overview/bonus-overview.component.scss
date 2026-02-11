@@ -1,0 +1,244 @@
+.bonus-overview-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+
+  .loading,
+  .error {
+    text-align: center;
+    padding: 24px;
+    font-size: 16px;
+  }
+
+  .error {
+    color: #e53935;
+  }
+
+  .overview-header {
+    margin-bottom: 32px;
+
+    h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: #666;
+    }
+
+    .back-btn {
+      background-color: #3f51b5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #303f9f;
+      }
+
+      &:active {
+        background-color: #283593;
+      }
+    }
+  }
+
+  .no-bonus {
+    text-align: center;
+    padding: 3rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .bonus-overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+
+    thead {
+      background-color: #f5f5f5;
+
+      th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+
+        &.user-column {
+          min-width: 200px;
+          position: sticky;
+          left: 0;
+          background-color: #f5f5f5;
+          z-index: 10;
+        }
+
+        &.bonus-column {
+          text-align: center;
+          min-width: 180px;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #fafafa;
+        }
+
+        td {
+          padding: 16px;
+          font-size: 14px;
+
+          &.user-cell {
+            position: sticky;
+            left: 0;
+            background-color: white;
+            z-index: 5;
+
+            .user-info {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .user-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #e0e0e0;
+              }
+
+              .username {
+                font-weight: 500;
+                color: #333;
+              }
+            }
+          }
+
+          &.pick-cell {
+            text-align: center;
+
+            .team-display {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+
+              .team-logo {
+                width: 32px;
+                height: 32px;
+                object-fit: contain;
+              }
+
+              .team-name {
+                font-weight: 500;
+                color: #333;
+              }
+            }
+
+            .no-pick {
+              color: #ccc;
+              font-size: 18px;
+            }
+
+            &.eliminated-pick {
+              background-color: #d50000;
+
+              .team-name {
+                color: #fff;
+                text-decoration: line-through;
+              }
+            }
+          }
+
+          &.empty-row {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+          }
+        }
+
+        &:hover td.user-cell {
+          background-color: #fafafa;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .bonus-overview-container {
+    padding: 16px;
+
+    .overview-header {
+      h2 {
+        font-size: 24px;
+      }
+
+      h3 {
+        font-size: 18px;
+      }
+    }
+
+    .bonus-overview-table {
+      font-size: 12px;
+
+      thead th,
+      tbody td {
+        padding: 12px 8px;
+      }
+
+      .user-cell .user-info {
+        gap: 8px;
+
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+        }
+
+        .username {
+          font-size: 13px;
+        }
+      }
+
+      .pick-cell .team-display {
+        flex-direction: column;
+        gap: 4px;
+
+        .team-logo {
+          width: 28px;
+          height: 28px;
+        }
+
+        .team-name {
+          font-size: 11px;
+        }
+      }
+    }
+  }
+}

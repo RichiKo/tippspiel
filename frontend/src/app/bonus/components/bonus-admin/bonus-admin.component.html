@@ -1,0 +1,394 @@
+<div class="bonus-admin">
+  <div class="admin-header">
+    <h2>Bonus-Regeln Verwaltung</h2>
+    <button
+      type="button"
+      class="btn-create"
+      (click)="showCreateForm.set(!showCreateForm())"
+      [disabled]="isLoading()"
+    >
+      @if (!showCreateForm()) {
+        + Neue Bonus-Regel
+      } @else {
+        Abbrechen
+      }
+    </button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="success-message">
+      <span class="success-icon">✓</span>
+      <p>{{ successMessage() }}</p>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <div class="error-content">
+        <strong>Fehler:</strong>
+        <p>{{ errorMessage() }}</p>
+      </div>
+    </div>
+  }
+
+  @if (showCreateForm() || showEditForm()) {
+    <div class="create-form-container">
+      <h3>{{ showEditForm() ? 'Bonus-Regel bearbeiten' : 'Neue Bonus-Regel erstellen' }}</h3>
+      <form [formGroup]="createForm" (ngSubmit)="showEditForm() ? onUpdateBonus() : onCreateBonus()">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Typ</label>
+            <select formControlName="type" class="form-control">
+              <option [value]="BonusRuleType.CHAMPION">Champion</option>
+              <option [value]="BonusRuleType.CHAMPION_FINALIST">Champion + Finalist</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="z.B. Bundesliga Champion 2024/25"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Deadline</label>
+            <input
+              type="datetime-local"
+              formControlName="deadline"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Champion-Punkte</label>
+            <input
+              type="number"
+              formControlName="championPoints"
+              min="1"
+              class="form-control"
+            />
+          </div>
+
+          @if (createForm.value.type === BonusRuleType.CHAMPION_FINALIST) {
+            <div class="form-group">
+              <label>Finalist-Punkte</label>
+              <input
+                type="number"
+                formControlName="finalistPoints"
+                min="1"
+                class="form-control"
+              />
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="onCancelForm()"
+            [disabled]="isLoading()"
+          >
+            Abbrechen
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="createForm.invalid || isLoading()"
+          >
+            {{ showEditForm() ? 'Speichern' : 'Erstellen' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Lade...</p>
+    </div>
+  }
+
+  <div class="rules-list">
+    @if (bonusRules().length === 0 && !isLoading()) {
+      <div class="no-rules">
+        <p>Keine Bonus-Regeln gefunden.</p>
+      </div>
+    }
+
+    @for (rule of bonusRules(); track rule.id) {
+      <div class="rule-card">
+        <div class="rule-header">
+          <div class="rule-title">
+            <h3>{{ rule.name }}</h3>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(rule.status)">
+              {{ getStatusLabel(rule.status) }}
+            </span>
+          </div>
+          <div class="rule-actions">
+            @if (rule.status === BonusRuleStatus.DRAFT) {
+              <button
+                type="button"
+                class="btn-action btn-edit"
+                (click)="onEditRule(rule)"
+                [disabled]="isLoading()"
+              >
+                Bearbeiten
+              </button>
+              <button
+                type="button"
+                class="btn-action btn-publish"
+                (click)="onPublishRule(rule)"
+                [disabled]="isLoading()"
+              >
+                Veröffentlichen
+              </button>
+              <button
+                type="button"
+                class="btn-action btn-delete"
+                (click)="onDeleteRule(rule)"
+                [disabled]="isLoading()"
+              >
+                Löschen
+              </button>
+            }
+            @if (
+              rule.status === BonusRuleStatus.PUBLISHED ||
+              rule.status === BonusRuleStatus.LOCKED ||
+              rule.status === BonusRuleStatus.PARTIALLY_EVALUATED
+            ) {
+              @if (isBeforeDeadline(rule)) {
+                <button
+                  type="button"
+                  class="btn-action btn-edit"
+                  (click)="onEditRule(rule)"
+                  [disabled]="isLoading()"
+                >
+                  Bearbeiten
+                </button>
+              }
+              <button
+                type="button"
+                class="btn-action btn-evaluate"
+                (click)="onOpenEvaluateDialog(rule)"
+                [disabled]="isLoading()"
+              >
+                {{ rule.status === BonusRuleStatus.PARTIALLY_EVALUATED ? 'Champion auswerten' : 'Auswerten' }}
+              </button>
+              <button
+                type="button"
+                class="btn-action btn-delete"
+                (click)="onDeleteRule(rule)"
+                [disabled]="isLoading()"
+              >
+                Löschen
+              </button>
+            }
+            @if (rule.status === BonusRuleStatus.EVALUATED) {
+              <button
+                type="button"
+                class="btn-action btn-edit"
+                (click)="onEditRule(rule)"
+                [disabled]="isLoading()"
+              >
+                Bearbeiten
+              </button>
+              <button
+                type="button"
+                class="btn-action btn-evaluate"
+                (click)="onOpenEvaluateDialog(rule)"
+                [disabled]="isLoading()"
+              >
+                Erneut auswerten
+              </button>
+              <button
+                type="button"
+                class="btn-action btn-delete"
+                (click)="onDeleteRule(rule)"
+                [disabled]="isLoading()"
+              >
+                Löschen
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="rule-details">
+          <div class="detail">
+            <span class="label">Typ:</span>
+            <span>{{ getTypeLabel(rule.type) }}</span>
+          </div>
+          <div class="detail">
+            <span class="label">Deadline:</span>
+            <span>{{ rule.deadline | date: 'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail">
+            <span class="label">Picks:</span>
+            <span>{{ rule.picks?.length || 0 }}</span>
+          </div>
+          @if (rule.status === BonusRuleStatus.EVALUATED) {
+            <div class="detail">
+              <span class="label">Ausgewertet:</span>
+              <span>{{ rule.evaluations?.length || 0 }} Punkte vergeben</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (showEvaluateDialog() && currentEvaluatingRule()) {
+    <div class="dialog-overlay" (click)="closeEvaluateDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h3>Bonus auswerten: {{ currentEvaluatingRule()!.name }}</h3>
+          <button
+            type="button"
+            class="close-btn"
+            (click)="closeEvaluateDialog()"
+          >
+            ×
+          </button>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            <span class="error-icon">⚠️</span>
+            <div class="error-content">
+              <strong>Fehler:</strong>
+              <p>{{ errorMessage() }}</p>
+            </div>
+          </div>
+        }
+
+        <form [formGroup]="evaluateForm" (ngSubmit)="onEvaluateBonus()">
+          <div class="evaluate-grid">
+            @if (currentEvaluatingRule()!.type === BonusRuleType.CHAMPION_FINALIST) {
+              @if (evaluationPhase() === 'none') {
+                <div class="form-group">
+                  <label>Finalist 1</label>
+                  <select formControlName="finalistTeam1Id" class="form-select">
+                    <option value="">-- Team auswählen --</option>
+                    @for (team of availableTeams(); track team.id) {
+                      <option [value]="team.id">{{ team.name }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Finalist 2</label>
+                  <select formControlName="finalistTeam2Id" class="form-select">
+                    <option value="">-- Team auswählen --</option>
+                    @for (team of availableTeams(); track team.id) {
+                      <option [value]="team.id">{{ team.name }}</option>
+                    }
+                  </select>
+                </div>
+              } @else {
+                <div class="form-group">
+                  <label>Finalist 1 (fixiert)</label>
+                  <select
+                    formControlName="finalistTeam1Id"
+                    class="form-select"
+                    [disabled]="true"
+                  >
+                    @for (team of availableTeams(); track team.id) {
+                      <option [value]="team.id">{{ team.name }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Finalist 2 (fixiert)</label>
+                  <select
+                    formControlName="finalistTeam2Id"
+                    class="form-select"
+                    [disabled]="true"
+                  >
+                    @for (team of availableTeams(); track team.id) {
+                      <option [value]="team.id">{{ team.name }}</option>
+                    }
+                  </select>
+                </div>
+              }
+
+              @if (evaluationPhase() !== 'none') {
+                <div class="form-group">
+                  <label>Champion-Team</label>
+                  <select formControlName="championTeamId" class="form-select">
+                    <option value="">-- Team auswählen --</option>
+                    @for (team of getChampionOptions(); track team.id) {
+                      <option [value]="team.id">{{ team.name }}</option>
+                    }
+                  </select>
+                </div>
+              }
+            } @else {
+              <div class="form-group">
+                <label>Champion-Team</label>
+                <select formControlName="championTeamId" class="form-select">
+                  <option value="">-- Team auswählen --</option>
+                  @for (team of availableTeams(); track team.id) {
+                    <option [value]="team.id">{{ team.name }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+
+          <div class="dialog-actions">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeEvaluateDialog()"
+              [disabled]="isLoading()"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              class="btn-submit"
+              [disabled]="evaluateForm.invalid || isLoading()"
+            >
+              @if (currentEvaluatingRule()!.type === BonusRuleType.CHAMPION_FINALIST && evaluationPhase() === 'none') {
+                Finalisten auswerten
+              } @else if (currentEvaluatingRule()!.type === BonusRuleType.CHAMPION_FINALIST) {
+                Champion auswerten
+              } @else {
+                Auswerten
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <app-confirmation-dialog
+    [visible]="!!publishRuleToConfirm()"
+    [title]="'Bonus-Regel veröffentlichen'"
+    [message]="getPublishConfirmMessage()"
+    [confirmLabel]="'Veröffentlichen'"
+    [cancelLabel]="'Abbrechen'"
+    (confirmed)="onPublishConfirmed()"
+    (cancelled)="onPublishCancelled()"
+  />
+
+  <app-confirmation-dialog
+    [visible]="!!deleteRuleToConfirm()"
+    [title]="'Bonus-Regel löschen'"
+    [message]="getDeleteConfirmMessage()"
+    [confirmLabel]="'Löschen'"
+    [cancelLabel]="'Abbrechen'"
+    (confirmed)="onDeleteConfirmed()"
+    (cancelled)="onDeleteCancelled()"
+  />
+</div>

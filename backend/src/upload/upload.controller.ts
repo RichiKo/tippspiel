@@ -8,7 +8,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'node:path';
-import { UploadService } from './upload.service';
+import { UploadedFile as UploadedFileModel, UploadService } from './upload.service';
 
 @Controller('upload')
 export class UploadController {
@@ -45,7 +45,7 @@ export class UploadController {
       },
     }),
   )
-  uploadTeamLogo(@UploadedFile() file: Express.Multer.File) {
+  uploadTeamLogo(@UploadedFile() file: UploadedFileModel) {
     if (!file) {
       throw new BadRequestException('Keine Datei hochgeladen');
     }
@@ -90,7 +90,7 @@ export class UploadController {
       },
     }),
   )
-  uploadUserImage(@UploadedFile() file: Express.Multer.File) {
+  uploadUserImage(@UploadedFile() file: UploadedFileModel) {
     if (!file) {
       throw new BadRequestException('Keine Datei hochgeladen');
     }
@@ -135,7 +135,7 @@ export class UploadController {
       },
     }),
   )
-  uploadChampionshipImage(@UploadedFile() file: Express.Multer.File) {
+  uploadChampionshipImage(@UploadedFile() file: UploadedFileModel) {
     if (!file) {
       throw new BadRequestException('Keine Datei hochgeladen');
     }

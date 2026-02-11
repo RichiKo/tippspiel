@@ -1,0 +1,92 @@
+<div class="member-selector">
+  <div class="selector-header">
+    <h3>Teilnehmer verwalten</h3>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-message">{{ errorMessage() }}</div>
+  }
+
+  <div class="selector-content">
+    <!-- Active Members (optional) -->
+    @if (showActiveMembers()) {
+      <div class="active-section">
+        <h4>Aktive Teilnehmer ({{ activeMembers().length }})</h4>
+        @if (activeMembers().length === 0) {
+          <div class="empty-state">Keine aktiven Teilnehmer</div>
+        } @else {
+          <div class="member-list">
+            @for (membership of activeMembers(); track membership.id) {
+              <div class="member-item active">
+                <img
+                  [src]="getUserImage(membership)"
+                  [alt]="membership.user?.username"
+                  class="user-avatar"
+                />
+                <div class="user-info">
+                  <div class="user-name">{{ membership.user?.username }}</div>
+                  <div class="user-email">{{ membership.user?.email }}</div>
+                </div>
+                <button
+                  type="button"
+                  class="remove-btn"
+                  (click)="onRemove(membership.id)"
+                  [disabled]="disabled() || isProcessing() === membership.id"
+                  title="Entfernen"
+                >
+                  ✕
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Pending Requests -->
+    <div class="pending-section">
+      <h4>Anfragen ({{ pendingRequests().length }})</h4>
+      @if (isLoading()) {
+        <div class="loading">Lade Anfragen...</div>
+      } @else if (pendingRequests().length === 0) {
+        <div class="empty-state">Keine offenen Anfragen</div>
+      } @else {
+        <div class="member-list">
+          @for (membership of pendingRequests(); track membership.id) {
+            <div class="member-item pending">
+              <img
+                [src]="getUserImage(membership)"
+                [alt]="membership.user?.username"
+                class="user-avatar"
+              />
+              <div class="user-info">
+                <div class="user-name">{{ membership.user?.username }}</div>
+                <div class="user-email">{{ membership.user?.email }}</div>
+              </div>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="approve-btn"
+                  (click)="onApprove(membership.id)"
+                  [disabled]="disabled() || isProcessing() === membership.id"
+                  title="Genehmigen"
+                >
+                  ✅
+                </button>
+                <button
+                  type="button"
+                  class="reject-btn"
+                  (click)="onReject(membership.id)"
+                  [disabled]="disabled() || isProcessing() === membership.id"
+                  title="Ablehnen"
+                >
+                  ❌
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
