@@ -1,29 +1,64 @@
-<div class="auth-container mat-elevation-z4">
-  <div class="soccer-header">
-    <mat-icon class="soccer-icon">sports_soccer</mat-icon>
-    <h1>Willkommen beim Tippspiel!</h1>
-    <p>Logge dich ein, um deine Tipps abzugeben.</p>
-  </div>
-  <form [formGroup]="form" (ngSubmit)="onLogin()">
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>E-Mail</mat-label>
-      <input matInput formControlName="email" type="email" required />
-    </mat-form-field>
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Passwort</mat-label>
-      <input matInput formControlName="password" type="password" required />
-    </mat-form-field>
+<form class="auth-form" [formGroup]="form" (ngSubmit)="onLogin()">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>E-Mail</mat-label>
+    <input matInput formControlName="email" type="email" autocomplete="email" />
+    @if (shouldShowError('email')) {
+      <mat-error>
+        {{
+          form.controls.email.hasError('required')
+            ? 'E-Mail ist erforderlich.'
+            : 'Bitte gib eine gueltige E-Mail ein.'
+        }}
+      </mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Passwort</mat-label>
+    <input
+      matInput
+      formControlName="password"
+      [type]="showPassword ? 'text' : 'password'"
+      autocomplete="current-password"
+    />
     <button
-      mat-raised-button
-      color="primary"
-      class="full-width soccer-btn"
-      type="submit"
+      type="button"
+      mat-icon-button
+      matSuffix
+      [attr.aria-label]="showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'"
+      (click)="showPassword = !showPassword"
     >
-      <mat-icon>login</mat-icon> Einloggen
+      <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
-    <div class="register-link">
-      Noch kein Account?
-      <a routerLink="/register">Jetzt registrieren</a>
-    </div>
-  </form>
-</div>
+    @if (shouldShowError('password')) {
+      <mat-error>
+        {{
+          form.controls.password.hasError('required')
+            ? 'Passwort ist erforderlich.'
+            : 'Mindestens 6 Zeichen erforderlich.'
+        }}
+      </mat-error>
+    }
+  </mat-form-field>
+
+  @if (authError) {
+    <p class="auth-error">{{ authError }}</p>
+  }
+
+  <button
+    mat-flat-button
+    class="full-width auth-submit"
+    type="submit"
+    [disabled]="isSubmitting"
+  >
+    <mat-icon>login</mat-icon>
+    {{ isSubmitting ? 'Bitte warten...' : 'Einloggen' }}
+  </button>
+
+  <p class="auth-meta">
+    Noch kein Account?
+    <button type="button" class="switch-link" (click)="toRegister()">
+      Jetzt registrieren
+    </button>
+  </p>
+</form>

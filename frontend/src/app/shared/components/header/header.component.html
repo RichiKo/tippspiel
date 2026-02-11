@@ -14,21 +14,56 @@
             @if (currentUser()!.image) {
               <img [src]="currentUser()!.image" [alt]="currentUser()!.username" />
             } @else {
-              <span class="avatar-placeholder">{{ currentUser()!.username.charAt(0).toUpperCase() }}</span>
+              <span class="avatar-placeholder">{{
+                currentUser()!.username.charAt(0).toUpperCase()
+              }}</span>
             }
           </div>
           <span class="username">{{ currentUser()!.username }}</span>
         </div>
 
-        <button class="settings-btn" (click)="navigateToSettings()" title="Einstellungen">
-          <span>⚙️</span>
+        <button
+          class="settings-btn desktop-only"
+          (click)="navigateToSettings()"
+          title="Einstellungen"
+          aria-label="Einstellungen"
+        >
+          <span>⚙</span>
         </button>
 
-        <button class="logout-btn" (click)="onLogoutClick()">
+        <button class="logout-btn desktop-only" (click)="onLogoutClick()">
           Abmelden
+        </button>
+
+        <button
+          type="button"
+          class="mobile-menu-toggle mobile-only"
+          (click)="onMobileMenuToggle()"
+          [attr.aria-expanded]="isMobileMenuOpen()"
+          aria-label="Menü öffnen"
+        >
+          ⋮
         </button>
       </div>
     </div>
+
+    @if (isMobileMenuOpen()) {
+      <button
+        type="button"
+        class="mobile-menu-backdrop mobile-only"
+        aria-label="Menü schließen"
+        (click)="onMobileMenuClose()"
+      ></button>
+
+      <div class="mobile-menu mobile-only">
+        <button type="button" class="mobile-menu-item" (click)="navigateToSettings()">
+          Einstellungen
+        </button>
+        <button type="button" class="mobile-menu-item danger" (click)="onLogoutClick()">
+          Abmelden
+        </button>
+      </div>
+    }
   }
 
   <app-confirmation-dialog

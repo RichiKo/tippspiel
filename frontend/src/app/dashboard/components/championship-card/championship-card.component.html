@@ -1,43 +1,46 @@
 <div class="championship-card" (click)="onCardClick()">
-  <img
-    class="championship-image"
-    [src]="championship()?.image"
-    [alt]="championship()?.name"
-  />
+  <div class="card-image-wrap">
+    <img
+      class="championship-image"
+      [src]="championship()?.image"
+      [alt]="championship()?.name"
+    />
+  </div>
   <div class="championship-content">
     <h2>{{ championship()?.name }}</h2>
     @if (championship()?.description) {
-      <p>{{ championship()?.description }}</p>
+      <p class="championship-description">{{ championship()?.description }}</p>
     }
+
     <div class="championship-meta">
       <span
-        >Status:
-        <strong>{{
-          championship()?.isActive ? "Aktiv" : "Inaktiv"
-        }}</strong></span
+        class="meta-pill"
+        [class.meta-pill--active]="championship()?.isActive"
+        [class.meta-pill--inactive]="!championship()?.isActive"
       >
+        {{ championship()?.isActive ? 'Aktiv' : 'Inaktiv' }}
+      </span>
       @if (championship()?.isPublic) {
-        <span>Öffentlich</span>
+        <span class="meta-pill">Öffentlich</span>
       }
       @if (!championship()?.isPublic) {
-        <span>Privat</span>
+        <span class="meta-pill">Privat</span>
       }
     </div>
 
-    <!-- Membership Status Badge -->
     @if (membershipStatus() === MembershipStatus.PENDING) {
       <div class="membership-status pending">
-        <span class="status-icon">⏳</span>
+        <span class="status-icon" aria-hidden="true">⏳</span>
         <span class="status-text">Deine Anfrage wurde noch nicht freigegeben</span>
       </div>
     }
     @if (membershipStatus() === MembershipStatus.REJECTED) {
       <div class="membership-status rejected">
-        <span class="status-icon">❌</span>
+        <span class="status-icon" aria-hidden="true">❌</span>
         <span class="status-text">Beitritt abgelehnt</span>
-        <button 
-          type="button" 
-          class="retry-btn" 
+        <button
+          type="button"
+          class="retry-btn"
           (click)="onReRequestClick($event)"
           [disabled]="isJoining()"
         >
@@ -45,6 +48,7 @@
         </button>
       </div>
     }
+
     @if (isAdmin()) {
       <div class="championship-actions" (click)="$event.stopPropagation()">
         <a
@@ -59,7 +63,7 @@
       </div>
     }
   </div>
-  <!-- Delete Dialog -->
+
   <app-confirmation-dialog
     [visible]="showDeleteDialog()"
     [title]="'Löschen bestätigen'"
@@ -74,7 +78,6 @@
     (cancelled)="handleDeleteCancel()"
   />
 
-  <!-- Join Confirm Dialog -->
   <app-confirmation-dialog
     [visible]="showJoinConfirmDialog()"
     [title]="championship()?.isPublic ? 'Mitspielen?' : 'Beitritt anfragen?'"

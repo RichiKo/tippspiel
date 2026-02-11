@@ -1,22 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Rajdhani:wght@600;700&display=swap");
+
+:root {
+  --ts-primary-900: #064e3b;
+  --ts-primary-700: #0f766e;
+  --ts-primary-600: #0e7a55;
+  --ts-primary-500: #10b981;
+  --ts-accent-500: #16a34a;
+  --ts-accent-600: #15803d;
+  --ts-bg: #f3f5f7;
+  --ts-surface: #ffffff;
+  --ts-surface-muted: #eef2f1;
+  --ts-border: #d6dce1;
+  --ts-text-primary: #1f2937;
+  --ts-text-secondary: #4b5563;
+  --ts-text-disabled: #9ca3af;
+  --ts-success: #22c55e;
+  --ts-error: #dc2626;
+  --ts-warning: #f59e0b;
+  --ts-focus-ring: #34d399;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
-  font-family: "Inter", Arial, sans-serif;
-  background: #fafbfc;
-  color: #222;
+  min-height: 100%;
+}
+
+body {
   margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.2rem;
-}
-
-img {
-  display: block;
-  max-width: 100%;
-  height: auto;
+  font-family: "Manrope", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--ts-bg);
+  color: var(--ts-text-primary);
 }
 
 h1,
@@ -25,11 +42,14 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Inter", Arial, sans-serif;
-  font-weight: 700;
   margin-top: 0;
+  font-family: "Rajdhani", "Barlow Condensed", "Segoe UI", "Helvetica Neue", Arial,
+    sans-serif;
+  font-weight: 700;
 }
 
-* {
-  box-sizing: border-box;
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }

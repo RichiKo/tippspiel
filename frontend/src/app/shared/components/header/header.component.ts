@@ -15,9 +15,11 @@ export class HeaderComponent {
   private readonly persistingService = inject(PersistingService);
 
   readonly currentUser = this.persistingService.currentUser;
-  showLogoutConfirm = signal(false);
+  readonly showLogoutConfirm = signal(false);
+  readonly isMobileMenuOpen = signal(false);
 
   onLogoutClick(): void {
+    this.isMobileMenuOpen.set(false);
     this.showLogoutConfirm.set(true);
   }
 
@@ -32,10 +34,20 @@ export class HeaderComponent {
   }
 
   navigateToSettings(): void {
+    this.isMobileMenuOpen.set(false);
     this.router.navigate(['/settings']);
   }
 
   navigateToDashboard(): void {
+    this.isMobileMenuOpen.set(false);
     this.router.navigate(['/dashboard']);
+  }
+
+  onMobileMenuToggle(): void {
+    this.isMobileMenuOpen.update((value) => !value);
+  }
+
+  onMobileMenuClose(): void {
+    this.isMobileMenuOpen.set(false);
   }
 }

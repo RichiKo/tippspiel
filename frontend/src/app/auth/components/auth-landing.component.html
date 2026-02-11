@@ -1,32 +1,63 @@
-<div class="auth-landing-bg">
-  <div class="auth-landing-header">
-    <mat-icon class="auth-landing-ball">sports_soccer</mat-icon>
-    <h1>Champions League Tippspiel</h1>
-    <p>Tippe mit deinen Freunden, sammle Punkte und gewinne!</p>
+<div class="auth-page">
+  <section class="auth-hero">
+    <div class="auth-hero__badge">
+      <mat-icon>sports_soccer</mat-icon>
+      <span>Tippspiel</span>
+    </div>
+    <h1>Tipp, Punkte, Tabelle. Alles an einem Ort.</h1>
+    <p>
+      Das digitale Fussball-Tippspiel fuer Liga, Freunde und Community.
+      Uebersichtlich auf Desktop und schnell auf Mobile.
+    </p>
+    <div class="auth-hero__stats">
+      <div class="stat-card">
+        <strong>Live</strong>
+        <span>Spieltag-Rankings</span>
+      </div>
+      <div class="stat-card">
+        <strong>100%</strong>
+        <span>Tipps vor Anpfiff gesichert</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <header class="auth-panel__header">
+      <h2>{{ showLogin ? 'Willkommen zurueck' : 'Neues Konto erstellen' }}</h2>
+      <p>
+        {{
+          showLogin
+            ? 'Melde dich an und gib deine Tipps fuer den naechsten Spieltag ab.'
+            : 'Registriere dich in weniger als einer Minute.'
+        }}
+      </p>
+    </header>
+
+    <div class="auth-switch" role="tablist" aria-label="Anmeldung oder Registrierung">
+      <button
+        type="button"
+        class="auth-switch__button"
+        [class.is-active]="showLogin"
+        (click)="switchToLogin()"
+      >
+        Login
+      </button>
+      <button
+        type="button"
+        class="auth-switch__button"
+        [class.is-active]="!showLogin"
+        (click)="switchToRegister()"
+      >
+        Registrierung
+      </button>
+    </div>
+
+    <div class="auth-form-host">
+      @if (showLogin) {
+        <ts-login (switchMode)="switchToRegister()"></ts-login>
+      } @else {
+        <ts-register (switchMode)="switchToLogin()"></ts-register>
+      }
+    </div>
+  </section>
   </div>
-  <div class="auth-landing-switch">
-    <button
-      mat-stroked-button
-      color="primary"
-      [disabled]="showLogin"
-      (click)="switchToLogin()"
-    >
-      Login
-    </button>
-    <button
-      mat-stroked-button
-      color="accent"
-      [disabled]="!showLogin"
-      (click)="switchToRegister()"
-    >
-      Registrieren
-    </button>
-  </div>
-  <div class="auth-landing-form">
-    @if (showLogin) {
-    <ts-login></ts-login>
-    } @else {
-    <ts-register></ts-register>
-    }
-  </div>
-</div>

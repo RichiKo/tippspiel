@@ -15,26 +15,34 @@ import { PersistingService } from '../auth/services/persisisting.service';
 export class DashboardComponent {
   private readonly championshipService = inject(ChampionshipService);
   private readonly persistingService = inject(PersistingService);
-  
+
   championships = signal<Championship[]>([]);
+  readonly isLoading = signal(true);
+  readonly loadError = signal<string | null>(null);
   readonly isAdmin = computed(
     () => this.persistingService.currentUser()?.role === 'admin'
   );
+  readonly hasChampionships = computed(() => this.championships().length > 0);
 
   constructor() {
-    console.log('DashboardComponent constructor');
     this.loadChampionships();
   }
 
-  loadChampionships() {
+  loadChampionships(): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
+
     this.championshipService.getAllChampionships().subscribe({
       next: (data) => {
-        console.log('championships', data);
         this.championships.set(data);
+        this.isLoading.set(false);
       },
-      error: (err) => {
-        // Fehlerbehandlung, z.B. Notification
+      error: () => {
         this.championships.set([]);
+        this.loadError.set(
+          'Championships konnten nicht geladen werden. Bitte erneut versuchen.'
+        );
+        this.isLoading.set(false);
       },
     });
   }

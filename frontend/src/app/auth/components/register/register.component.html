@@ -1,33 +1,122 @@
-<div class="auth-container mat-elevation-z4">
-  <div class="soccer-header">
-    <mat-icon class="soccer-icon">emoji_events</mat-icon>
-    <h1>Registriere dich fürs Tippspiel!</h1>
-    <p>Erstelle deinen Account und tippe mit.</p>
-  </div>
-  <form [formGroup]="form" (ngSubmit)="onRegister()">
-    <mat-form-field appearance="fill" class="full-width">
+<form class="auth-form" [formGroup]="form" (ngSubmit)="onRegister()">
+  <div class="field-grid">
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Benutzername</mat-label>
-      <input matInput formControlName="username" required />
+      <input matInput formControlName="username" autocomplete="username" />
+      @if (shouldShowError('username')) {
+        <mat-error>
+          {{
+            form.controls.username.hasError('required')
+              ? 'Benutzername ist erforderlich.'
+              : 'Mindestens 3 Zeichen erforderlich.'
+          }}
+        </mat-error>
+      }
     </mat-form-field>
-    <mat-form-field appearance="fill" class="full-width">
+
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>E-Mail</mat-label>
-      <input matInput formControlName="email" type="email" required />
+      <input matInput formControlName="email" type="email" autocomplete="email" />
+      @if (shouldShowError('email')) {
+        <mat-error>
+          {{
+            form.controls.email.hasError('required')
+              ? 'E-Mail ist erforderlich.'
+              : 'Bitte gib eine gueltige E-Mail ein.'
+          }}
+        </mat-error>
+      }
     </mat-form-field>
-    <mat-form-field appearance="fill" class="full-width">
+
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Passwort</mat-label>
-      <input matInput formControlName="password" type="password" required />
+      <input
+        matInput
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+        autocomplete="new-password"
+      />
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        [attr.aria-label]="showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'"
+        (click)="showPassword = !showPassword"
+      >
+        <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (shouldShowError('password')) {
+        <mat-error>
+          {{
+            form.controls.password.hasError('required')
+              ? 'Passwort ist erforderlich.'
+              : 'Mindestens 8 Zeichen erforderlich.'
+          }}
+        </mat-error>
+      }
     </mat-form-field>
-    <button
-      mat-raised-button
-      color="primary"
-      class="full-width soccer-btn"
-      type="submit"
-    >
-      <mat-icon>person_add</mat-icon> Registrieren
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Passwort bestaetigen</mat-label>
+      <input
+        matInput
+        formControlName="confirmPassword"
+        [type]="showConfirmPassword ? 'text' : 'password'"
+        autocomplete="new-password"
+      />
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        [attr.aria-label]="
+          showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'
+        "
+        (click)="showConfirmPassword = !showConfirmPassword"
+      >
+        <mat-icon>{{
+          showConfirmPassword ? 'visibility_off' : 'visibility'
+        }}</mat-icon>
+      </button>
+      @if (shouldShowError('confirmPassword')) {
+        <mat-error>Bitte bestaetige dein Passwort.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="strength-meter" [attr.data-score]="passwordStrength">
+    <span [class.is-active]="passwordStrength >= 1"></span>
+    <span [class.is-active]="passwordStrength >= 2"></span>
+    <span [class.is-active]="passwordStrength >= 3"></span>
+    <span [class.is-active]="passwordStrength >= 4"></span>
+  </div>
+
+  @if (passwordMismatchError) {
+    <p class="auth-error">{{ passwordMismatchError }}</p>
+  }
+
+  @if (authError) {
+    <p class="auth-error">{{ authError }}</p>
+  }
+
+  <button
+    mat-flat-button
+    class="full-width auth-submit"
+    type="submit"
+    [disabled]="isSubmitting"
+  >
+    <mat-icon>person_add</mat-icon>
+    {{ isSubmitting ? 'Bitte warten...' : 'Registrieren' }}
+  </button>
+
+  <div class="login-link">
+    Schon einen Account?
+    <button type="button" class="switch-link" (click)="toLogin()">
+      Jetzt einloggen
     </button>
-    <div class="login-link">
-      Schon einen Account?
-      <a routerLink="/login">Jetzt einloggen</a>
-    </div>
-  </form>
-</div>
+  </div>
+
+  <p class="auth-note">
+    Mit der Registrierung bestaetigst du, dass du Tipps nur vor Spielbeginn
+    abgibst.
+  </p>
+</form>
