@@ -20,7 +20,9 @@
     "db:create": "npm run typeorm -- migration:generate --dataSource=./src/ormconfig/datasource.ts",
     "db:generate": "npm run typeorm -- migration:run --dataSource=./src/ormconfig/datasource.ts",
     "db:revert": "npm run typeorm -- migration:revert --dataSource=./src/ormconfig/datasource.ts",
-    "db:drop": "npm run typeorm -- schema:drop --dataSource=./src/ormconfig/datasource.ts"
+    "db:drop": "npm run typeorm -- schema:drop --dataSource=./src/ormconfig/datasource.ts",
+    "db:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/ormconfig/datasource.js",
+    "db:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d ./dist/ormconfig/datasource.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

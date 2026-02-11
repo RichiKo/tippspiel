@@ -75,6 +75,64 @@ free -h
 uptime
 ```
 
+## Baseline-Strategie fuer Migrationen (einmalig)
+Nutzen, wenn Tabellen initial mit `TYPEORM_SYNCHRONIZE=true` erstellt wurden.
+
+Ziel:
+- Bestehendes Schema behalten
+- Migrationshistorie als "bereits ausgefuehrt" markieren
+- Danach nur noch `db:run:prod` nutzen
+
+Schritte:
+1. Sicherstellen, dass `TYPEORM_SYNCHRONIZE=false` in `backend/.env.production` steht.
+2. Ein frisches Backup ziehen.
+3. In der DB die TypeORM-Migrationstabelle befuellen:
+
+```bash
+cd /root/tippspiel
+docker compose exec -T postgres psql -U postgres -d tippspiel_prod <<'SQL'
+CREATE TABLE IF NOT EXISTS "migrations" (
+  "id" SERIAL PRIMARY KEY,
+  "timestamp" bigint NOT NULL,
+  "name" character varying NOT NULL
+);
+
+INSERT INTO "migrations" ("timestamp","name") VALUES
+(1739907893835,'CreateUsersTable1739907893835'),
+(1739978213001,'CreateRoleField1739978213001'),
+(1740000000000,'CreateChampionshipsTable1740000000000'),
+(1740100000000,'CreateTeamsTable1740100000000'),
+(1740200000000,'CreateRoundsTable1740200000000'),
+(1740200100000,'AddEndDateToRounds1740200100000'),
+(1740300000000,'CreateGamesTable1740300000000'),
+(1740400000000,'CreateTipsTable1740400000000'),
+(1740500000000,'CreateRankingsTable1740500000000'),
+(1740600000000,'MakeTipGoalsNullable1740600000000'),
+(1740700000000,'AddTotalPointsToRankings1740700000000'),
+(1740700000001,'RecalculateTotalPoints1740700000001'),
+(1740800000000,'CreateMembershipsTable1740800000000'),
+(1741000000000,'CreateBonusRulesTable1741000000000'),
+(1741000000001,'CreateBonusPicksTable1741000000001'),
+(1741000000002,'CreateBonusEvaluationsTable1741000000002'),
+(1741000000003,'AddBonusPointsToRankings1741000000003'),
+(1741100000000,'AddEliminatedTeamsToChampionships1741100000000')
+ON CONFLICT DO NOTHING;
+SQL
+```
+
+4. Danach Migration-Status pruefen:
+```bash
+cd /root/tippspiel
+docker compose exec -T postgres psql -U postgres -d tippspiel_prod -c 'SELECT "timestamp","name" FROM "migrations" ORDER BY "timestamp";'
+```
+
+5. Ab jetzt bei neuen Releases:
+```bash
+cd /root/tippspiel
+docker compose up -d --build
+docker compose exec -T backend npm run db:run:prod
+```
+
 ## Deployment-Update (Standardablauf)
 ```bash
 cd /root/tippspiel
@@ -82,6 +140,16 @@ git pull
 docker compose up -d --build
 docker compose ps
 ```
+
+Bei neuer Migration:
+```bash
+cd /root/tippspiel
+docker compose exec -T backend npm run db:run:prod
+```
+
+Wichtig:
+- Nur ausfuehren, wenn die Produktionsdatenbank auf Migrationsbetrieb basiert.
+- Falls die DB initial mit `TYPEORM_SYNCHRONIZE=true` erstellt wurde, erst Baseline-Strategie klaeren (sonst koennen Initial-Migrationen mit "table already exists" fehlschlagen).
 
 ## Incident-Checkliste
 Wenn Seite nicht erreichbar ist:
