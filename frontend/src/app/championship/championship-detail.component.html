@@ -63,28 +63,30 @@
       </section>
     }
 
+    @if (isMobileView() && rounds().length > 0) {
+      <button
+        type="button"
+        class="round-drawer-fab"
+        aria-controls="mobile-round-drawer"
+        [attr.aria-expanded]="isRoundDrawerOpen()"
+        (click)="toggleRoundDrawer()"
+      >
+        <span aria-hidden="true">☰</span>
+      </button>
+    }
+
     <div class="championship-content">
       @if (isMobileView()) {
         <div class="mobile-round-switcher">
-          <div class="round-select-wrap">
-            <label class="round-select-label" for="round-select">Spieltag</label>
-            @if (rounds().length > 0) {
-              <select
-                id="round-select"
-                class="round-select"
-                [value]="selectedRoundId()"
-                (change)="onRoundSelectById($any($event.target).value)"
-              >
-                @for (round of rounds(); track round.id) {
-                  <option [value]="round.id">
-                    {{ round.name }} - {{ formatRoundDate(round) }}
-                  </option>
-                }
-              </select>
-            } @else {
-              <p class="mobile-no-rounds">Keine Spieltage vorhanden</p>
+          @if (rounds().length > 0) {
+            @if (selectedRound(); as round) {
+              <p class="mobile-selected-round">
+                Aktiver Spieltag: <strong>{{ round.name }} - {{ formatRoundDate(round) }}</strong>
+              </p>
             }
-          </div>
+          } @else {
+            <p class="mobile-no-rounds">Keine Spieltage vorhanden</p>
+          }
 
           @if (isAdmin()) {
             <button class="create-round-btn" (click)="onCreateRound()">
@@ -157,6 +159,64 @@
         }
       </main>
     </div>
+
+    @if (isMobileView()) {
+      <div
+        class="round-drawer-overlay"
+        [class.open]="isRoundDrawerOpen()"
+        [attr.aria-hidden]="!isRoundDrawerOpen()"
+        (click)="onRoundDrawerBackdropClick()"
+      ></div>
+
+      <aside
+        id="mobile-round-drawer"
+        class="round-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Spieltage Auswahl"
+        [class.open]="isRoundDrawerOpen()"
+        [class.is-dragging]="isDrawerDragging"
+        [attr.aria-hidden]="!isRoundDrawerOpen()"
+        [style.transform]="getRoundDrawerTransform()"
+      >
+        <header
+          class="round-drawer-header"
+          (touchstart)="onDrawerTouchStart($event)"
+          (touchmove)="onDrawerTouchMove($event)"
+          (touchend)="onDrawerTouchEnd()"
+          (touchcancel)="onDrawerTouchEnd()"
+        >
+          <div class="round-drawer-title">
+            <span class="round-drawer-title-icon" aria-hidden="true">⚽</span>
+            <span>Spieltage</span>
+          </div>
+          <button
+            type="button"
+            class="round-drawer-close"
+            aria-label="Spieltage schließen"
+            (click)="closeRoundDrawer()"
+          >
+            X
+          </button>
+        </header>
+
+        <div class="round-drawer-list">
+          @for (round of rounds(); track round.id) {
+            <button
+              type="button"
+              class="round-drawer-item"
+              [class.active]="selectedRound()?.id === round.id"
+              (click)="selectRoundFromDrawer(round)"
+            >
+              <span class="round-drawer-item-name">{{ round.name }}</span>
+              <small class="round-drawer-item-date">{{ formatRoundDate(round) }}</small>
+            </button>
+          } @empty {
+            <p class="round-drawer-empty">Keine Spieltage vorhanden</p>
+          }
+        </div>
+      </aside>
+    }
   }
   
   <app-round-dialog

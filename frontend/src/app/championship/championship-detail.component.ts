@@ -1,4 +1,11 @@
-import { Component, HostListener, signal, computed, inject } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnDestroy,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Championship } from '../dashboard/types/championship.interface';
@@ -37,7 +44,7 @@ import { BonusService } from '../bonus/services/bonus.service';
   templateUrl: './championship-detail.component.html',
   styleUrl: './championship-detail.component.scss',
 })
-export class ChampionshipDetailComponent {
+export class ChampionshipDetailComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly championshipService = inject(ChampionshipService);
@@ -65,6 +72,13 @@ export class ChampionshipDetailComponent {
   isMobileView = signal(false);
   isBonusExpanded = signal(true);
   hasActiveBonusRules = signal(false);
+  isRoundDrawerOpen = signal(false);
+  roundDrawerDragOffset = signal(0);
+
+  isDrawerDragging = false;
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private bodyOverflowBeforeDrawer: string | null = null;
 
   readonly currentUser = this.persistingService.currentUser;
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
@@ -99,7 +113,6 @@ export class ChampionshipDetailComponent {
         ),
       }));
   });
-  readonly selectedRoundId = computed(() => this.selectedRound()?.id ?? '');
 
   championshipId = '';
 
@@ -124,13 +137,132 @@ export class ChampionshipDetailComponent {
     this.updateViewportState();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  onRoundDrawerKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.isRoundDrawerOpen()) {
+      this.closeRoundDrawer();
+    }
+  }
+
   private updateViewportState(): void {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const wasMobile = this.isMobileView();
     this.isMobileView.set(isMobile);
     if (wasMobile !== isMobile) {
       this.isBonusExpanded.set(!isMobile);
+      if (!isMobile) {
+        this.closeRoundDrawer();
+      }
     }
+  }
+
+  openRoundDrawer(): void {
+    if (!this.isMobileView()) {
+      return;
+    }
+
+    this.roundDrawerDragOffset.set(0);
+    this.isDrawerDragging = false;
+    this.isRoundDrawerOpen.set(true);
+    this.setBodyScrollLocked(true);
+  }
+
+  closeRoundDrawer(): void {
+    this.roundDrawerDragOffset.set(0);
+    this.isDrawerDragging = false;
+    this.isRoundDrawerOpen.set(false);
+    this.setBodyScrollLocked(false);
+  }
+
+  toggleRoundDrawer(): void {
+    if (this.isRoundDrawerOpen()) {
+      this.closeRoundDrawer();
+      return;
+    }
+
+    this.openRoundDrawer();
+  }
+
+  onRoundDrawerBackdropClick(): void {
+    this.closeRoundDrawer();
+  }
+
+  selectRoundFromDrawer(round: Round): void {
+    this.selectRound(round);
+    this.closeRoundDrawer();
+  }
+
+  onDrawerTouchStart(event: TouchEvent): void {
+    if (!this.isRoundDrawerOpen()) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+    this.roundDrawerDragOffset.set(0);
+    this.isDrawerDragging = true;
+  }
+
+  onDrawerTouchMove(event: TouchEvent): void {
+    if (!this.isDrawerDragging || !this.isRoundDrawerOpen()) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    const deltaX = touch.clientX - this.touchStartX;
+    const deltaY = touch.clientY - this.touchStartY;
+
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      return;
+    }
+
+    if (deltaX >= 0) {
+      this.roundDrawerDragOffset.set(0);
+      return;
+    }
+
+    event.preventDefault();
+    const maxOffset = this.getRoundDrawerWidthPx();
+    this.roundDrawerDragOffset.set(Math.min(Math.abs(deltaX), maxOffset));
+  }
+
+  onDrawerTouchEnd(): void {
+    if (!this.isDrawerDragging) {
+      return;
+    }
+
+    const currentOffset = this.roundDrawerDragOffset();
+    const closeThreshold = Math.max(72, this.getRoundDrawerWidthPx() * 0.25);
+    this.isDrawerDragging = false;
+
+    if (currentOffset >= closeThreshold) {
+      this.closeRoundDrawer();
+      return;
+    }
+
+    this.roundDrawerDragOffset.set(0);
+  }
+
+  getRoundDrawerTransform(): string {
+    if (!this.isRoundDrawerOpen()) {
+      return 'translateX(-100%)';
+    }
+
+    const offset = Math.max(0, this.roundDrawerDragOffset());
+    return `translateX(-${offset}px)`;
+  }
+
+  ngOnDestroy(): void {
+    this.setBodyScrollLocked(false);
   }
 
   private loadTeams() {
@@ -191,14 +323,6 @@ export class ChampionshipDetailComponent {
   selectRound(round: Round) {
     this.selectedRound.set(round);
     this.loadGames(round.id);
-  }
-
-  onRoundSelectById(roundId: string): void {
-    const round = this.rounds().find((item) => item.id === roundId);
-    if (!round) {
-      return;
-    }
-    this.selectRound(round);
   }
 
   toggleBonusSection(): void {
@@ -469,5 +593,34 @@ export class ChampionshipDetailComponent {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
+  }
+
+  private setBodyScrollLocked(locked: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    if (locked) {
+      if (this.bodyOverflowBeforeDrawer === null) {
+        this.bodyOverflowBeforeDrawer = document.body.style.overflow;
+      }
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    if (this.bodyOverflowBeforeDrawer !== null) {
+      document.body.style.overflow = this.bodyOverflowBeforeDrawer;
+      this.bodyOverflowBeforeDrawer = null;
+    }
+  }
+
+  private getRoundDrawerWidthPx(): number {
+    if (typeof window === 'undefined') {
+      return 260;
+    }
+
+    const viewportWidth = window.innerWidth;
+    const preferredWidth = viewportWidth * 0.7;
+    return Math.min(380, Math.max(260, preferredWidth));
   }
 }
