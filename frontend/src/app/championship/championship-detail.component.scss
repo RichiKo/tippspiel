@@ -261,6 +261,61 @@
   font-size: clamp(1.6rem, 3vw, 2.1rem);
 }
 
+.spieltag-view-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 16px;
+}
+
+.spieltag-view-toggle button {
+  min-height: 42px;
+  border: 1px solid var(--ts-border);
+  border-radius: 10px;
+  background: var(--ts-surface-muted);
+  color: var(--ts-text-secondary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 10px;
+  transition: all 0.2s;
+}
+
+.spieltag-view-toggle button:hover {
+  border-color: #b8c2cc;
+  color: var(--ts-text-primary);
+}
+
+.spieltag-view-toggle button.is-active {
+  border-color: #1976d2;
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.spieltag-view-toggle button:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
+}
+
+.finished-view-shell {
+  margin-bottom: 20px;
+}
+
+.open-games-section {
+  border-top: 1px solid var(--ts-border);
+  padding-top: 16px;
+}
+
+.open-games-title {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ts-text-primary);
+}
+
 .add-game-btn {
   min-height: 44px;
   padding: 10px 16px;
@@ -615,6 +670,32 @@ app-game-card:last-child {
 
   .games-header .add-game-btn {
     width: 100%;
+  }
+
+  .spieltag-view-toggle {
+    width: 100%;
+    max-width: none;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .spieltag-view-toggle button {
+    min-height: 38px;
+    font-size: 0.66rem;
+    padding: 6px 4px;
+  }
+
+  .finished-view-shell {
+    margin-bottom: 14px;
+  }
+
+  .open-games-section {
+    padding-top: 12px;
+  }
+
+  .open-games-title {
+    font-size: 1rem;
+    margin-bottom: 8px;
   }
 
   .game-date-header {

@@ -132,28 +132,97 @@
             }
           </div>
 
-          <div class="games-list">
-            @for (group of groupedGames(); track group.date) {
-              <div class="game-group">
-                <h3 class="game-date-header">{{ formatGameDateHeader(group.date) }}</h3>
-                @for (game of group.games; track game.id) {
-                  <app-game-card
-                    [game]="game"
-                    [tip]="userTips().get(game.id)"
-                    [gameTips]="gameTips().get(game.id) || []"
-                    [currentUserId]="currentUser()?.id || 0"
-                    [isAdmin]="isAdmin()"
-                    [championshipId]="championshipId"
-                    (tipChanged)="onTipChanged($event)"
-                    (editGame)="onEditGame($event)"
-                    (deleteGame)="onDeleteGameClick($event)"
-                  />
-                }
-              </div>
-            } @empty {
-              <p class="no-games">Keine Spiele vorhanden</p>
+          <div class="spieltag-view-toggle" role="tablist" aria-label="Spieltag Ansichten">
+            <button
+              type="button"
+              role="tab"
+              data-testid="view-toggle-my"
+              [attr.aria-selected]="selectedView() === 'myGames'"
+              [class.is-active]="selectedView() === 'myGames'"
+              (click)="setSelectedView('myGames')"
+            >
+              Meine Spiele
+            </button>
+            <button
+              type="button"
+              role="tab"
+              data-testid="view-toggle-all"
+              [attr.aria-selected]="selectedView() === 'allGames'"
+              [class.is-active]="selectedView() === 'allGames'"
+              (click)="setSelectedView('allGames')"
+            >
+              Alle Tipps
+            </button>
+            <button
+              type="button"
+              role="tab"
+              data-testid="view-toggle-table"
+              [attr.aria-selected]="selectedView() === 'table'"
+              [class.is-active]="selectedView() === 'table'"
+              (click)="setSelectedView('table')"
+            >
+              Spieltags-Tabelle
+            </button>
+          </div>
+
+          <div class="finished-view-shell">
+            @if (selectedView() === 'myGames') {
+              <app-finished-games-my-view
+                data-testid="view-my"
+                [entries]="myFinishedEntries()"
+              />
+            }
+
+            @if (selectedView() === 'allGames') {
+              <app-finished-games-all-view
+                data-testid="view-all"
+                [groupedGames]="finishedGamesGroupedByDate()"
+                [userTipsMap]="userTips()"
+                [gameTipsMap]="gameTips()"
+                [currentUserId]="currentUser()?.id || 0"
+                [isAdmin]="isAdmin()"
+                [championshipId]="championshipId"
+                (tipChanged)="onTipChanged($event)"
+                (editGame)="onEditGame($event)"
+                (deleteGame)="onDeleteGameClick($event)"
+              />
+            }
+
+            @if (selectedView() === 'table') {
+              <app-spieltags-ranking-table
+                data-testid="view-table"
+                [rows]="spieltagRankingRows()"
+                [evaluatedGamesCount]="finishedGames().length"
+                [currentUserId]="currentUser()?.id ?? null"
+              />
             }
           </div>
+
+          <section class="open-games-section">
+            <h3 class="open-games-title">Offene Spiele</h3>
+            <div class="games-list">
+              @for (group of openGamesGroupedByDate(); track group.date) {
+                <div class="game-group">
+                  <h3 class="game-date-header">{{ formatGameDateHeader(group.date) }}</h3>
+                  @for (game of group.games; track game.id) {
+                    <app-game-card
+                      [game]="game"
+                      [tip]="userTips().get(game.id)"
+                      [gameTips]="gameTips().get(game.id) || []"
+                      [currentUserId]="currentUser()?.id || 0"
+                      [isAdmin]="isAdmin()"
+                      [championshipId]="championshipId"
+                      (tipChanged)="onTipChanged($event)"
+                      (editGame)="onEditGame($event)"
+                      (deleteGame)="onDeleteGameClick($event)"
+                    />
+                  }
+                </div>
+              } @empty {
+                <p class="no-games">Keine offenen Spiele vorhanden</p>
+              }
+            </div>
+          </section>
         } @else {
           <p class="no-selection">Wähle einen Spieltag aus</p>
         }

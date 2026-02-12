@@ -22,6 +22,7 @@ import { ChampionshipService } from '../dashboard/services/championship.service'
 import { RoundService } from './services/round.service';
 import { GameService } from './services/game.service';
 import { TipService } from './services/tip.service';
+import { RankingService } from './services/ranking.service';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { RoundDialogComponent } from './components/round-dialog/round-dialog.component';
@@ -29,6 +30,17 @@ import { GameDialogComponent } from './components/game-dialog/game-dialog.compon
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { BonusPickFormComponent } from '../bonus/components/bonus-pick-form/bonus-pick-form.component';
 import { BonusService } from '../bonus/services/bonus.service';
+import { FinishedGamesMyViewComponent } from './components/finished-games-my-view/finished-games-my-view.component';
+import { FinishedGamesAllViewComponent } from './components/finished-games-all-view/finished-games-all-view.component';
+import { SpieltagsRankingTableComponent } from './components/spieltags-ranking-table/spieltags-ranking-table.component';
+import {
+  RankingParticipant,
+  SpieltagViewMode,
+  buildMyFinishedEntries,
+  buildSpieltagRankingRows,
+  groupGamesByDate,
+  isFinishedGame,
+} from './utils/spieltag-views.util';
 
 @Component({
   selector: 'app-championship-detail',
@@ -40,6 +52,9 @@ import { BonusService } from '../bonus/services/bonus.service';
     GameDialogComponent,
     ConfirmationDialogComponent,
     BonusPickFormComponent,
+    FinishedGamesMyViewComponent,
+    FinishedGamesAllViewComponent,
+    SpieltagsRankingTableComponent,
   ],
   templateUrl: './championship-detail.component.html',
   styleUrl: './championship-detail.component.scss',
@@ -51,6 +66,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
   private readonly roundService = inject(RoundService);
   private readonly gameService = inject(GameService);
   private readonly tipService = inject(TipService);
+  private readonly rankingService = inject(RankingService);
   private readonly persistingService = inject(PersistingService);
   private readonly bonusService = inject(BonusService);
 
@@ -72,6 +88,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
   isMobileView = signal(false);
   isBonusExpanded = signal(true);
   hasActiveBonusRules = signal(false);
+  selectedView = signal<SpieltagViewMode>('myGames');
+  rankingParticipants = signal<RankingParticipant[]>([]);
   isRoundDrawerOpen = signal(false);
   roundDrawerDragOffset = signal(0);
 
@@ -86,33 +104,45 @@ export class ChampionshipDetailComponent implements OnDestroy {
     () => this.championship()?.eliminatedTeamIds ?? [],
   );
 
-  readonly groupedGames = computed(() => {
-    const games = this.games();
-    const grouped = new Map<string, { date: Date; games: Game[] }>();
+  readonly finishedGames = computed(() =>
+    this.games()
+      .filter((game) => isFinishedGame(game))
+      .sort(
+        (a, b) =>
+          new Date(a.kickoffTime).getTime() -
+          new Date(b.kickoffTime).getTime(),
+      ),
+  );
 
-    games.forEach((game) => {
-      const kickoffDate = new Date(game.kickoffTime);
-      // Use date string as key (without time)
-      const dateKey = kickoffDate.toDateString();
+  readonly openGames = computed(() =>
+    this.games()
+      .filter((game) => !isFinishedGame(game))
+      .sort(
+        (a, b) =>
+          new Date(a.kickoffTime).getTime() -
+          new Date(b.kickoffTime).getTime(),
+      ),
+  );
 
-      if (!grouped.has(dateKey)) {
-        grouped.set(dateKey, { date: kickoffDate, games: [] });
-      }
-      grouped.get(dateKey)!.games.push(game);
-    });
+  readonly finishedGamesGroupedByDate = computed(() =>
+    groupGamesByDate(this.finishedGames()),
+  );
 
-    // Sort groups by date ascending
-    return Array.from(grouped.values())
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .map((group) => ({
-        date: group.date,
-        games: group.games.sort(
-          (a, b) =>
-            new Date(a.kickoffTime).getTime() -
-            new Date(b.kickoffTime).getTime(),
-        ),
-      }));
-  });
+  readonly openGamesGroupedByDate = computed(() =>
+    groupGamesByDate(this.openGames()),
+  );
+
+  readonly myFinishedEntries = computed(() =>
+    buildMyFinishedEntries(this.finishedGames(), this.userTips()),
+  );
+
+  readonly spieltagRankingRows = computed(() =>
+    buildSpieltagRankingRows(
+      this.finishedGames(),
+      this.gameTips(),
+      this.rankingParticipants(),
+    ),
+  );
 
   championshipId = '';
 
@@ -130,6 +160,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.loadRounds();
     this.loadTeams();
     this.loadActiveBonusRulesAvailability();
+    this.loadRankingParticipants();
   }
 
   @HostListener('window:resize')
@@ -329,6 +360,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.isBonusExpanded.update((value) => !value);
   }
 
+  setSelectedView(mode: SpieltagViewMode): void {
+    this.selectedView.set(mode);
+  }
+
   private loadGames(roundId: string) {
     this.gameService
       .getGamesByChampionship(this.championshipId, { roundId })
@@ -353,7 +388,9 @@ export class ChampionshipDetailComponent implements OnDestroy {
     const games = this.games();
     const now = new Date();
 
-    const startedGames = games.filter((g) => new Date(g.kickoffTime) <= now);
+    const startedGames = games.filter(
+      (g) => g.isClosed || new Date(g.kickoffTime) <= now,
+    );
 
     startedGames.forEach((game) => {
       this.tipService.getTipsForGame(game.id).subscribe({
@@ -388,6 +425,26 @@ export class ChampionshipDetailComponent implements OnDestroy {
           console.error('Tipps konnten nicht geladen werden', err);
         },
       });
+  }
+
+  private loadRankingParticipants(): void {
+    this.rankingService.getRankingByChampionship(this.championshipId).subscribe({
+      next: (rankings) => {
+        const map = new Map<number, RankingParticipant>();
+        for (const ranking of rankings) {
+          if (!map.has(ranking.userId)) {
+            map.set(ranking.userId, {
+              userId: ranking.userId,
+              username: ranking.user.username,
+            });
+          }
+        }
+        this.rankingParticipants.set(Array.from(map.values()));
+      },
+      error: () => {
+        this.rankingParticipants.set([]);
+      },
+    });
   }
 
   onTipChanged(tip: CreateTipDto) {
