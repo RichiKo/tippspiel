@@ -1,115 +1,168 @@
 .tips-table {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 1rem;
   margin-top: 1rem;
-  
-  h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.1rem;
-    color: #333;
+  border: 1px solid #e5e7eb;
+  overflow-x: auto;
+}
+
+.tips-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 480px;
+}
+
+.tips-table thead tr {
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tips-table thead th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 700;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.tips-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.tips-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.tips-table tbody tr.current-user {
+  background: rgba(52, 211, 153, 0.16);
+  font-weight: 700;
+}
+
+.tips-table tbody tr.current-user:hover {
+  background: rgba(52, 211, 153, 0.24);
+}
+
+.tips-table tbody td {
+  padding: 0.75rem;
+}
+
+.tips-table tbody td.username {
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.tips-table tbody td.tip-score {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.tips-table tbody td.tip-score .no-tip {
+  color: #9ca3af;
+}
+
+.tips-table tbody td.points {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.tips-table tbody td.outcome .outcome-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tips-table tbody td.outcome .outcome-badge.exact {
+  background: #4caf50;
+  color: #ffffff;
+}
+
+.tips-table tbody td.outcome .outcome-badge.goalDiff {
+  background: #2196f3;
+  color: #ffffff;
+}
+
+.tips-table tbody td.outcome .outcome-badge.tendency {
+  background: #ff9800;
+  color: #ffffff;
+}
+
+.tips-table tbody td.outcome .outcome-badge.missed {
+  background: #f44336;
+  color: #ffffff;
+}
+
+.tips-table tbody td.outcome .outcome-badge.notTipped {
+  background: #9e9e9e;
+  color: #ffffff;
+}
+
+.tips-table tbody td.outcome .outcome-badge.none {
+  background: #e0e0e0;
+  color: #666666;
+}
+
+@media (max-width: 767px) {
+  .tips-table {
+    padding: 0.42rem;
   }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    
-    thead {
-      tr {
-        border-bottom: 2px solid #e0e0e0;
-        
-        th {
-          padding: 0.75rem;
-          text-align: left;
-          font-weight: 600;
-          color: #666;
-          font-size: 0.9rem;
-        }
-      }
-    }
-    
-    tbody {
-      tr {
-        border-bottom: 1px solid #f0f0f0;
-        transition: background 0.2s;
-        
-        &:hover {
-          background: #f9f9f9;
-        }
-        
-        &.current-user {
-          background: #e3f2fd;
-          font-weight: 600;
-          
-          &:hover {
-            background: #bbdefb;
-          }
-        }
-        
-        td {
-          padding: 0.75rem;
-          
-          &.username {
-            font-size: 0.95rem;
-          }
-          
-          &.tip-score {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #333;
-            
-            .no-tip {
-              color: #999;
-            }
-          }
-          
-          &.points {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #1976d2;
-          }
-          
-          &.outcome {
-            .outcome-badge {
-              display: inline-block;
-              padding: 0.25rem 0.75rem;
-              border-radius: 12px;
-              font-size: 0.85rem;
-              font-weight: 500;
-              
-              &.exact {
-                background: #4caf50;
-                color: white;
-              }
-              
-              &.goalDiff {
-                background: #2196f3;
-                color: white;
-              }
-              
-              &.tendency {
-                background: #ff9800;
-                color: white;
-              }
-              
-              &.missed {
-                background: #f44336;
-                color: white;
-              }
-              
-              &.notTipped {
-                background: #9e9e9e;
-                color: white;
-              }
-              
-              &.none {
-                background: #e0e0e0;
-                color: #666;
-              }
-            }
-          }
-        }
-      }
-    }
+
+  .tips-table table {
+    min-width: 0;
+  }
+
+  .tips-table thead th,
+  .tips-table tbody td {
+    padding: 0.38rem;
+    font-size: 0.74rem;
+  }
+
+  .tips-table thead th:nth-child(1),
+  .tips-table tbody td:nth-child(1) {
+    width: 40%;
+  }
+
+  .tips-table thead th:nth-child(2),
+  .tips-table tbody td:nth-child(2) {
+    width: 20%;
+  }
+
+  .tips-table thead th:nth-child(3),
+  .tips-table tbody td:nth-child(3) {
+    width: 15%;
+  }
+
+  .tips-table thead th:nth-child(4),
+  .tips-table tbody td:nth-child(4) {
+    width: 25%;
+  }
+
+  .tips-table tbody td.username {
+    font-size: 0.74rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tips-table tbody td.tip-score {
+    font-size: 0.76rem;
+  }
+
+  .tips-table tbody td.points {
+    font-size: 0.8rem;
+  }
+
+  .tips-table tbody td.outcome .outcome-badge {
+    font-size: 0.68rem;
+    padding: 0.18rem 0.45rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

@@ -5,11 +5,13 @@
     </span>
     @if (isAdmin()) {
       <div class="admin-actions">
-        <button class="edit-game-btn" (click)="onEditGame()">
-          Bearbeiten
+        <button class="edit-game-btn" (click)="onEditGame()" aria-label="Spiel bearbeiten" title="Bearbeiten">
+          <span class="btn-icon" aria-hidden="true">✎</span>
+          <span class="btn-text">Bearbeiten</span>
         </button>
-        <button class="delete-game-btn" (click)="onDeleteGame()">
-          Löschen
+        <button class="delete-game-btn" (click)="onDeleteGame()" aria-label="Spiel löschen" title="Löschen">
+          <span class="btn-icon" aria-hidden="true">🗑</span>
+          <span class="btn-text">Löschen</span>
         </button>
       </div>
     }
@@ -18,8 +20,8 @@
   <div class="game-info">
     <div class="team home-team">
       @if (game().homeTeam) {
-        <img [src]="game().homeTeam?.logoUrl" [alt]="game().homeTeam?.name" />
         <span>{{ game().homeTeam?.name }}</span>
+        <img [src]="game().homeTeam?.logoUrl" [alt]="game().homeTeam?.name" />
       } @else {
         <span>Team {{ game().homeTeamId }}</span>
       }

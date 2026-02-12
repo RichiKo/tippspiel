@@ -12,7 +12,7 @@
           @if (champ.description) {
             <p>{{ champ.description }}</p>
           }
-          <div class="action-links">
+          <div class="action-links action-links-scroll">
             <a [routerLink]="['/championship', championshipId, 'ranking']" class="ranking-link">
               📊 Prüf-Kalkulation
             </a>
@@ -35,37 +35,89 @@
       }
     </header>
 
-    <div class="bonus-section-full">
-      <app-bonus-pick-form
-        [championshipId]="championshipId"
-        [availableTeams]="teams()"
-        [eliminatedTeamIds]="eliminatedTeamIds()"
-      />
-    </div>
-
-    <div class="championship-content">
-      <aside class="rounds-sidebar">
-        @if (isAdmin()) {
-          <button class="create-round-btn" (click)="onCreateRound()">
-            + Neuer Spieltag
-          </button>
-        }
-
-        <div class="rounds-list">
-          @for (round of rounds(); track round.id) {
-            <div
-              class="round-item"
-              [class.selected]="selectedRound()?.id === round.id"
-              (click)="selectRound(round)"
+    @if (hasActiveBonusRules()) {
+      <section class="bonus-section-full">
+        <div class="bonus-section-header">
+          <h2>Bonus-Regeln</h2>
+          @if (isMobileView()) {
+            <button
+              type="button"
+              class="bonus-toggle-btn"
+              (click)="toggleBonusSection()"
+              [attr.aria-expanded]="isBonusExpanded()"
             >
-              <span class="round-name">{{ round.name }}</span>
-              <small class="round-date">{{ formatRoundDate(round) }}</small>
-            </div>
-          } @empty {
-            <p class="no-rounds">Keine Spieltage vorhanden</p>
+              {{ isBonusExpanded() ? 'Ausblenden' : 'Anzeigen' }}
+            </button>
           }
         </div>
-      </aside>
+
+        @if (isBonusExpanded()) {
+          <div class="bonus-section-content">
+            <app-bonus-pick-form
+              [championshipId]="championshipId"
+              [availableTeams]="teams()"
+              [eliminatedTeamIds]="eliminatedTeamIds()"
+            />
+          </div>
+        }
+      </section>
+    }
+
+    <div class="championship-content">
+      @if (isMobileView()) {
+        <div class="mobile-round-switcher">
+          <div class="round-select-wrap">
+            <label class="round-select-label" for="round-select">Spieltag</label>
+            @if (rounds().length > 0) {
+              <select
+                id="round-select"
+                class="round-select"
+                [value]="selectedRoundId()"
+                (change)="onRoundSelectById($any($event.target).value)"
+              >
+                @for (round of rounds(); track round.id) {
+                  <option [value]="round.id">
+                    {{ round.name }} - {{ formatRoundDate(round) }}
+                  </option>
+                }
+              </select>
+            } @else {
+              <p class="mobile-no-rounds">Keine Spieltage vorhanden</p>
+            }
+          </div>
+
+          @if (isAdmin()) {
+            <button class="create-round-btn" (click)="onCreateRound()">
+              + Neuer Spieltag
+            </button>
+          }
+        </div>
+      }
+
+      @if (!isMobileView()) {
+        <aside class="rounds-sidebar">
+          @if (isAdmin()) {
+            <button class="create-round-btn" (click)="onCreateRound()">
+              + Neuer Spieltag
+            </button>
+          }
+
+          <div class="rounds-list">
+            @for (round of rounds(); track round.id) {
+              <div
+                class="round-item"
+                [class.selected]="selectedRound()?.id === round.id"
+                (click)="selectRound(round)"
+              >
+                <span class="round-name">{{ round.name }}</span>
+                <small class="round-date">{{ formatRoundDate(round) }}</small>
+              </div>
+            } @empty {
+              <p class="no-rounds">Keine Spieltage vorhanden</p>
+            }
+          </div>
+        </aside>
+      }
 
       <main class="games-section">
         @if (selectedRound(); as round) {

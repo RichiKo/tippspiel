@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, HostListener, signal, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Championship } from '../dashboard/types/championship.interface';
@@ -21,6 +21,7 @@ import { RoundDialogComponent } from './components/round-dialog/round-dialog.com
 import { GameDialogComponent } from './components/game-dialog/game-dialog.component';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { BonusPickFormComponent } from '../bonus/components/bonus-pick-form/bonus-pick-form.component';
+import { BonusService } from '../bonus/services/bonus.service';
 
 @Component({
   selector: 'app-championship-detail',
@@ -44,6 +45,7 @@ export class ChampionshipDetailComponent {
   private readonly gameService = inject(GameService);
   private readonly tipService = inject(TipService);
   private readonly persistingService = inject(PersistingService);
+  private readonly bonusService = inject(BonusService);
 
   championship = signal<Championship | null>(null);
   rounds = signal<Round[]>([]);
@@ -60,6 +62,9 @@ export class ChampionshipDetailComponent {
   selectedGame = signal<Game | null>(null);
   showDeleteConfirm = signal(false);
   gameToDelete = signal<string | null>(null);
+  isMobileView = signal(false);
+  isBonusExpanded = signal(true);
+  hasActiveBonusRules = signal(false);
 
   readonly currentUser = this.persistingService.currentUser;
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
@@ -94,10 +99,13 @@ export class ChampionshipDetailComponent {
         ),
       }));
   });
+  readonly selectedRoundId = computed(() => this.selectedRound()?.id ?? '');
 
   championshipId = '';
 
   constructor() {
+    this.updateViewportState();
+
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.router.navigate(['/dashboard']);
@@ -108,6 +116,21 @@ export class ChampionshipDetailComponent {
     this.loadChampionship();
     this.loadRounds();
     this.loadTeams();
+    this.loadActiveBonusRulesAvailability();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateViewportState();
+  }
+
+  private updateViewportState(): void {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const wasMobile = this.isMobileView();
+    this.isMobileView.set(isMobile);
+    if (wasMobile !== isMobile) {
+      this.isBonusExpanded.set(!isMobile);
+    }
   }
 
   private loadTeams() {
@@ -121,6 +144,17 @@ export class ChampionshipDetailComponent {
           console.error('Teams konnten nicht geladen werden');
         },
       });
+  }
+
+  private loadActiveBonusRulesAvailability(): void {
+    this.bonusService.getActiveBonusRules(this.championshipId).subscribe({
+      next: (rules) => {
+        this.hasActiveBonusRules.set(rules.length > 0);
+      },
+      error: () => {
+        this.hasActiveBonusRules.set(false);
+      },
+    });
   }
 
   private loadChampionship() {
@@ -157,6 +191,18 @@ export class ChampionshipDetailComponent {
   selectRound(round: Round) {
     this.selectedRound.set(round);
     this.loadGames(round.id);
+  }
+
+  onRoundSelectById(roundId: string): void {
+    const round = this.rounds().find((item) => item.id === roundId);
+    if (!round) {
+      return;
+    }
+    this.selectRound(round);
+  }
+
+  toggleBonusSection(): void {
+    this.isBonusExpanded.update((value) => !value);
   }
 
   private loadGames(roundId: string) {

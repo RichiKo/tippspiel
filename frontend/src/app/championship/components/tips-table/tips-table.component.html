@@ -11,16 +11,16 @@
     <tbody>
       @for (tip of sortedTips(); track tip.id) {
         <tr [class.current-user]="isCurrentUser(tip.userId)">
-          <td class="username">{{ tip.user?.username || "Unbekannt" }}</td>
-          <td class="tip-score">
+          <td class="username" data-label="Teilnehmer">{{ tip.user?.username || "Unbekannt" }}</td>
+          <td class="tip-score" data-label="Tipp">
             @if (tip.homeTeamGoals !== null && tip.awayTeamGoals !== null) {
               {{ tip.homeTeamGoals }} : {{ tip.awayTeamGoals }}
             } @else {
               <span class="no-tip">-</span>
             }
           </td>
-          <td class="points">{{ isClosed() ? (tip.points ?? 0) : "-" }}</td>
-          <td class="outcome">
+          <td class="points" data-label="Punkte">{{ isClosed() ? (tip.points ?? 0) : "-" }}</td>
+          <td class="outcome" data-label="Ergebnis">
             <span
               [class]="
                 'outcome-badge ' +
