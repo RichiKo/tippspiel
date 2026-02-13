@@ -1,0 +1,67 @@
+<div class="my-finished-view">
+  @if (groupedEntries().length > 0) {
+    @for (group of groupedEntries(); track group.kickoffTime.toISOString()) {
+      <section class="my-kickoff-group">
+        <div class="my-item-head">
+          <p class="my-kickoff">Anstoß: {{ formatKickoff(group.kickoffTime) }}</p>
+        </div>
+
+        <div class="my-list">
+          @for (entry of group.entries; track entry.gameId) {
+            <article class="my-item-row">
+              <div class="my-game-row">
+                <div class="my-team my-team-home">
+                  <span class="my-team-name" [title]="entry.homeTeamName">{{
+                    entry.homeTeamName
+                  }}</span>
+                  @if (entry.homeTeamLogoUrl) {
+                    <img
+                      [src]="entry.homeTeamLogoUrl"
+                      [alt]="entry.homeTeamName"
+                      class="my-team-logo"
+                    />
+                  } @else {
+                    <span class="my-team-fallback">{{
+                      getTeamInitials(entry.homeTeamName)
+                    }}</span>
+                  }
+                </div>
+
+                <div class="my-center">
+                  <span class="my-final" title="Endstand">{{
+                    entry.finalScore
+                  }}</span>
+                  <span class="my-tip" title="Dein Tipp"
+                    >Tipp: {{ entry.userTip }}</span
+                  >
+                  <span class="my-points" title="Punkte"
+                    >{{ entry.points }} P</span
+                  >
+                </div>
+
+                <div class="my-team my-team-away">
+                  @if (entry.awayTeamLogoUrl) {
+                    <img
+                      [src]="entry.awayTeamLogoUrl"
+                      [alt]="entry.awayTeamName"
+                      class="my-team-logo"
+                    />
+                  } @else {
+                    <span class="my-team-fallback">{{
+                      getTeamInitials(entry.awayTeamName)
+                    }}</span>
+                  }
+                  <span class="my-team-name" [title]="entry.awayTeamName">{{
+                    entry.awayTeamName
+                  }}</span>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    <p class="my-empty">Noch keine gewerteten Spiele.</p>
+  }
+</div>

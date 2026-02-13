@@ -1,0 +1,40 @@
+<div class="spieltags-table-view">
+  <p class="table-meta">{{ evaluatedGamesCount() }} gewertete Spiele</p>
+
+  @if (rows().length > 0) {
+    <div class="table-wrapper">
+      <table class="spieltags-table">
+        <thead>
+          <tr>
+            <th class="rank-col">Platz</th>
+            <th>Teilnehmer</th>
+            <th class="num-col">Punkte (Spiele)</th>
+            <th class="num-col">Gesamt</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.userId; let i = $index) {
+            <tr [class.current-user]="isCurrentUser(row.userId)" [class.top-three]="i < 3">
+              <td class="rank-col">
+                @if (i === 0) {
+                  🥇
+                } @else if (i === 1) {
+                  🥈
+                } @else if (i === 2) {
+                  🥉
+                } @else {
+                  {{ row.place }}
+                }
+              </td>
+              <td class="name-col" [title]="row.username">{{ row.username }}</td>
+              <td class="num-col">{{ row.gamePoints }}</td>
+              <td class="num-col total-col">{{ row.total }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="table-empty">Noch keine gewerteten Spiele.</p>
+  }
+</div>

@@ -1,0 +1,24 @@
+<div class="finished-all-view">
+  @if (groupedGames().length > 0) {
+    @for (group of groupedGames(); track group.kickoffTime.toISOString()) {
+      <div class="game-group">
+        <h3 class="game-date-header">{{ formatKickoffHeader(group.kickoffTime) }}</h3>
+        @for (game of group.games; track game.id) {
+          <app-game-card
+            [game]="game"
+            [tip]="userTipsMap().get(game.id)"
+            [gameTips]="gameTipsMap().get(game.id) || []"
+            [currentUserId]="currentUserId()"
+            [isAdmin]="isAdmin()"
+            [championshipId]="championshipId()"
+            (tipChanged)="onTipChanged($event)"
+            (editGame)="onEditGame($event)"
+            (deleteGame)="onDeleteGame($event)"
+          />
+        }
+      </div>
+    }
+  } @else {
+    <p class="finished-empty">Noch keine gewerteten Spiele.</p>
+  }
+</div>

@@ -1,0 +1,46 @@
+.finished-all-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.game-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-date-header {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e3f2fd;
+}
+
+app-game-card {
+  display: block;
+  margin-bottom: 12px;
+}
+
+app-game-card:last-child {
+  margin-bottom: 0;
+}
+
+.finished-empty {
+  margin: 0;
+  border: 1px dashed var(--ts-border);
+  border-radius: 12px;
+  background: var(--ts-surface-muted);
+  color: var(--ts-text-secondary);
+  padding: 20px 14px;
+  text-align: center;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .game-date-header {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+}
