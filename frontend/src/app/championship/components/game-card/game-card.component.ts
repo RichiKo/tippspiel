@@ -92,12 +92,6 @@ export class GameCardComponent {
     this.isEditMode.set(true);
   }
 
-  cancelEdit() {
-    this.isEditMode.set(false);
-    this.homeGoals.set(null);
-    this.awayGoals.set(null);
-  }
-
   onEditGame() {
     this.editGame.emit(this.game());
   }

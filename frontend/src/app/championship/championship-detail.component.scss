@@ -37,9 +37,14 @@
   background: linear-gradient(128deg, #0b2d24 0%, #0f5f4c 56%, #10b981 100%);
   box-shadow: 0 14px 34px rgba(6, 78, 59, 0.2);
   padding: 26px;
+  display: block;
+}
+
+.championship-heading-row {
   display: flex;
+  align-items: flex-start;
   gap: 24px;
-  align-items: center;
+  margin-bottom: 10px;
 }
 
 .championship-header::after {
@@ -70,7 +75,7 @@
   z-index: 1;
 }
 
-.championship-info h1 {
+.championship-title {
   margin: 0 0 8px;
   font-size: clamp(2.1rem, 3.8vw, 3.2rem);
   line-height: 1.02;
@@ -98,17 +103,17 @@
 
   display: inline-flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: 52px;
+  text-align: center;
+  gap: 8px;
+  min-height: 62px;
   min-width: 172px;
-  padding: 9px 14px 9px 16px;
+  padding: 11px 14px;
   border-radius: 12px;
   border: 1px solid rgba(220, 252, 231, 0.3);
   color: #ecfdf5;
   text-decoration: none;
-  white-space: nowrap;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.34), rgba(6, 78, 59, 0.38));
   box-shadow: 0 6px 18px rgba(2, 44, 34, 0.2);
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -117,25 +122,12 @@
     box-shadow 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.action-links a::before {
-  content: '';
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--action-accent);
-  box-shadow: 0 0 0 3px rgba(236, 253, 245, 0.12);
-}
-
-.action-link__kicker {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(236, 253, 245, 0.74);
+.action-link__icon {
+  color: var(--action-accent);
 }
 
 .action-link__label {
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -154,6 +146,18 @@
 
 .admin-link {
   --action-accent: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.5);
+  background: linear-gradient(135deg, rgba(127, 29, 29, 0.46), rgba(146, 64, 14, 0.44));
+}
+
+.admin-link .action-link__label {
+  color: #fef3c7;
+}
+
+.admin-link:hover {
+  border-color: rgba(251, 191, 36, 0.75);
+  background: linear-gradient(135deg, rgba(127, 29, 29, 0.58), rgba(146, 64, 14, 0.56));
+  box-shadow: 0 10px 20px rgba(127, 29, 29, 0.34);
 }
 
 .action-links a:hover {
@@ -165,7 +169,6 @@
 
 .action-links a:focus-visible,
 .create-round-btn:focus-visible,
-.add-game-btn:focus-visible,
 .round-drawer-fab:focus-visible,
 .round-drawer-close:focus-visible,
 .round-drawer-item:focus-visible,
@@ -387,26 +390,6 @@
   color: var(--ts-text-primary);
 }
 
-.add-game-btn {
-  min-height: 44px;
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.add-game-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
-}
-
 .games-list {
   display: flex;
   flex-direction: column;
@@ -470,11 +453,13 @@ app-game-card:last-child {
   }
 
   .championship-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
     padding: 16px;
     border-radius: 16px;
+  }
+
+  .championship-heading-row {
+    gap: 14px;
+    margin-bottom: 8px;
   }
 
   .championship-image {
@@ -500,11 +485,7 @@ app-game-card:last-child {
     white-space: normal;
   }
 
-  .action-links-scroll a::before {
-    margin-bottom: 2px;
-  }
-
-  .championship-info h1 {
+  .championship-title {
     font-size: clamp(1.95rem, 9vw, 2.7rem);
     line-height: 1.06;
     margin-bottom: 6px;
@@ -822,7 +803,6 @@ app-game-card:last-child {
 @media (prefers-reduced-motion: reduce) {
   .action-links a,
   .create-round-btn,
-  .add-game-btn,
   .round-drawer,
   .round-drawer-overlay,
   .round-item,

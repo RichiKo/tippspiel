@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 import { Championship } from '../dashboard/types/championship.interface';
 import { Round, CreateRoundDto } from './types/round.interface';
 import {
@@ -42,11 +43,13 @@ import {
   groupGamesByKickoff,
   isFinishedGame,
 } from './utils/spieltag-views.util';
+import { UI_ICONS, UiButtonComponent } from '../ui-lib/public-api';
 
 @Component({
   selector: 'app-championship-detail',
   imports: [
     CommonModule,
+    LucideAngularModule,
     RouterModule,
     GameCardComponent,
     RoundDialogComponent,
@@ -56,6 +59,7 @@ import {
     FinishedGamesMyViewComponent,
     FinishedGamesAllViewComponent,
     SpieltagsRankingTableComponent,
+    UiButtonComponent,
   ],
   templateUrl: './championship-detail.component.html',
   styleUrl: './championship-detail.component.scss',
@@ -101,6 +105,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
 
   readonly currentUser = this.persistingService.currentUser;
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
+  readonly icons = UI_ICONS;
   readonly eliminatedTeamIds = computed(
     () => this.championship()?.eliminatedTeamIds ?? [],
   );

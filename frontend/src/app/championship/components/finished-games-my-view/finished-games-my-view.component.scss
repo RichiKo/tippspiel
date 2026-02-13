@@ -109,7 +109,7 @@
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
-  min-width: 94px;
+  min-width: 84px;
 }
 
 .my-final {
@@ -125,8 +125,20 @@
 }
 
 .my-points {
-  color: #166534;
+  color: #334155;
   font-weight: 700;
+}
+
+.my-points--high {
+  color: #166534;
+}
+
+.my-points--mid {
+  color: #b45309;
+}
+
+.my-points--zero {
+  color: #64748b;
 }
 
 .my-empty {
@@ -175,5 +187,32 @@
 
   .my-final {
     font-size: 1.1rem;
+  }
+
+  .my-center {
+    min-width: 74px;
+  }
+}
+
+@media (max-width: 430px) {
+  .my-game-row {
+    gap: 6px;
+  }
+
+  .my-team {
+    gap: 4px;
+  }
+
+  .my-team-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.1;
+    max-height: 2.2em;
+  }
+
+  .my-center {
+    min-width: 68px;
   }
 }

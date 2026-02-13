@@ -137,6 +137,15 @@ describe('RankingComponent', () => {
     expect(firstRowText).toContain('Du');
   });
 
+  it('should not render bonus and total columns', () => {
+    const headerText = (
+      fixture.nativeElement.querySelector('thead') as HTMLElement
+    ).textContent;
+
+    expect(headerText).not.toContain('Bonus');
+    expect(headerText).not.toContain('Gesamt');
+  });
+
   it('should navigate back when header back button is clicked', () => {
     const backButton = fixture.nativeElement.querySelector(
       '.ui-page-header__back button',

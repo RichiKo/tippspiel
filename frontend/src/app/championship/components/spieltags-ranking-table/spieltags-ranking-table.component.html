@@ -9,7 +9,6 @@
             <th class="rank-col">Platz</th>
             <th>Teilnehmer</th>
             <th class="num-col">Punkte (Spiele)</th>
-            <th class="num-col">Gesamt</th>
           </tr>
         </thead>
         <tbody>
@@ -27,7 +26,6 @@
               </td>
               <td class="name-col" [title]="row.username">{{ row.username }}</td>
               <td class="num-col">{{ row.gamePoints }}</td>
-              <td class="num-col total-col">{{ row.total }}</td>
             </tr>
           }
         </tbody>

@@ -6,24 +6,41 @@
   } @else {
     <header class="championship-header">
       @if (championship(); as champ) {
-        <img [src]="champ.image" [alt]="champ.name" class="championship-image" />
+        <div class="championship-heading-row">
+          <img [src]="champ.image" [alt]="champ.name" class="championship-image" />
+          <h1 class="championship-title">{{ champ.name }}</h1>
+        </div>
         <div class="championship-info">
-          <h1>{{ champ.name }}</h1>
           @if (champ.description) {
             <p>{{ champ.description }}</p>
           }
 
           <div class="action-links action-links-scroll">
             <a [routerLink]="['/championship', championshipId, 'ranking']" class="ranking-link">
-              <span class="action-link__kicker">Analyse</span>
+              <lucide-icon
+                [img]="icons.calculator"
+                [size]="18"
+                class="action-link__icon"
+                aria-hidden="true"
+              ></lucide-icon>
               <span class="action-link__label">Prüf-Kalkulation</span>
             </a>
             <a [routerLink]="['/championship', championshipId, 'standings']" class="standings-link">
-              <span class="action-link__kicker">Tabelle</span>
+              <lucide-icon
+                [img]="icons.table"
+                [size]="18"
+                class="action-link__icon"
+                aria-hidden="true"
+              ></lucide-icon>
               <span class="action-link__label">Ergebnis-Tabelle</span>
             </a>
             <a [routerLink]="['/championship', championshipId, 'bonus-overview']" class="bonus-link">
-              <span class="action-link__kicker">Bonus</span>
+              <lucide-icon
+                [img]="icons.award"
+                [size]="18"
+                class="action-link__icon"
+                aria-hidden="true"
+              ></lucide-icon>
               <span class="action-link__label">Bonus-Übersicht</span>
             </a>
             @if (isAdmin()) {
@@ -31,7 +48,12 @@
                 [routerLink]="['/dashboard/championship', championshipId, 'edit']"
                 class="admin-link"
               >
-                <span class="action-link__kicker">Admin</span>
+                <lucide-icon
+                  [img]="icons.shield"
+                  [size]="18"
+                  class="action-link__icon"
+                  aria-hidden="true"
+                ></lucide-icon>
                 <span class="action-link__label">Championship bearbeiten</span>
               </a>
             }
@@ -132,9 +154,9 @@
           <div class="games-header">
             <h2>{{ round.name }}</h2>
             @if (isAdmin()) {
-              <button type="button" class="add-game-btn" (click)="onAddGame()">
+              <ui-button type="button" class="add-game-btn" size="lg" (click)="onAddGame()">
                 + Spiel hinzufügen
-              </button>
+              </ui-button>
             }
           </div>
 

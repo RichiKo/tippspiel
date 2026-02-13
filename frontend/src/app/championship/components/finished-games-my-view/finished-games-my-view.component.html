@@ -34,7 +34,12 @@
                   <span class="my-tip" title="Dein Tipp"
                     >Tipp: {{ entry.userTip }}</span
                   >
-                  <span class="my-points" title="Punkte"
+                  <span
+                    class="my-points"
+                    [class.my-points--zero]="entry.points === 0"
+                    [class.my-points--mid]="entry.points > 0 && entry.points < 3"
+                    [class.my-points--high]="entry.points >= 3"
+                    title="Punkte"
                     >{{ entry.points }} P</span
                   >
                 </div>

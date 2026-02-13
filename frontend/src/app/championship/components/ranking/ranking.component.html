@@ -44,13 +44,6 @@
                 <th>Differenz (2P)</th>
                 <th>Tendenz (1P)</th>
                 <th>Missed (0P)</th>
-                <th class="bonus-col">Bonus</th>
-                <th class="total-col">
-                  <span class="total-col-label">
-                    <lucide-icon [img]="icons.trophy" [size]="14" aria-hidden="true"></lucide-icon>
-                    Gesamt
-                  </span>
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -71,23 +64,13 @@
                     <ui-badge tone="success" appearance="soft">{{ ranking.exactHits }}</ui-badge>
                   </td>
                   <td>
-                    <ui-badge tone="warning" appearance="soft">{{ ranking.goalDiffHits }}</ui-badge>
+                    <ui-badge tone="info" appearance="soft">{{ ranking.goalDiffHits }}</ui-badge>
                   </td>
                   <td>
-                    <ui-badge tone="info" appearance="soft">{{ ranking.tendencyHits }}</ui-badge>
+                    <ui-badge tone="warning" appearance="soft">{{ ranking.tendencyHits }}</ui-badge>
                   </td>
                   <td>
                     <ui-badge tone="danger" appearance="soft">{{ ranking.missedTips }}</ui-badge>
-                  </td>
-                  <td class="bonus">
-                    @if (ranking.bonusPoints > 0) {
-                      <ui-badge tone="info" appearance="solid">+{{ ranking.bonusPoints }}</ui-badge>
-                    } @else {
-                      <ui-badge tone="neutral" appearance="soft">-</ui-badge>
-                    }
-                  </td>
-                  <td class="total-points">
-                    <ui-badge tone="success" appearance="solid">{{ ranking.totalPoints }}</ui-badge>
                   </td>
                 </tr>
               }

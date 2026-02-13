@@ -1,37 +1,48 @@
 <div class="tips-table">
-  <table>
-    <thead>
-      <tr>
-        <th>Teilnehmer</th>
-        <th>Tipp</th>
-        <th>Punkte</th>
-        <th>Ergebnis</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (tip of sortedTips(); track tip.id) {
-        <tr [class.current-user]="isCurrentUser(tip.userId)">
-          <td class="username" data-label="Teilnehmer">{{ tip.user?.username || "Unbekannt" }}</td>
-          <td class="tip-score" data-label="Tipp">
-            @if (tip.homeTeamGoals !== null && tip.awayTeamGoals !== null) {
-              {{ tip.homeTeamGoals }} : {{ tip.awayTeamGoals }}
-            } @else {
-              <span class="no-tip">-</span>
-            }
-          </td>
-          <td class="points" data-label="Punkte">{{ isClosed() ? (tip.points ?? 0) : "-" }}</td>
-          <td class="outcome" data-label="Ergebnis">
-            <span
-              [class]="
-                'outcome-badge ' +
-                (isClosed() ? getOutcomeClass(tip.outcomeType) : 'none')
-              "
-            >
-              {{ isClosed() ? getOutcomeLabel(tip.outcomeType) : "-" }}
-            </span>
-          </td>
+  <div class="tips-table__scroll">
+    <table class="tips-table__table">
+      <thead>
+        <tr>
+          <th>Teilnehmer</th>
+          <th>Tipp</th>
+          <th>Punkte</th>
+          <th>Ergebnis</th>
         </tr>
-      }
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        @for (tip of sortedTips(); track tip.id) {
+          <tr [class.current-user]="isCurrentUser(tip.userId)">
+            <td class="username" data-label="Teilnehmer">
+              {{ tip.user?.username || 'Unbekannt' }}
+            </td>
+            <td class="tip-score" data-label="Tipp">
+              @if (tip.homeTeamGoals !== null && tip.awayTeamGoals !== null) {
+                {{ tip.homeTeamGoals }} : {{ tip.awayTeamGoals }}
+              } @else {
+                <span class="no-tip">-</span>
+              }
+            </td>
+            <td class="points" data-label="Punkte">
+              @if (isClosed()) {
+                <ui-badge [tone]="getPointsTone(tip.points ?? 0)" appearance="soft">
+                  {{ tip.points ?? 0 }}
+                </ui-badge>
+              } @else {
+                <ui-badge tone="neutral" appearance="soft">-</ui-badge>
+              }
+            </td>
+            <td class="outcome" data-label="Ergebnis">
+              @if (isClosed()) {
+                <ui-badge [tone]="getOutcomeTone(tip.outcomeType)" appearance="soft">
+                  {{ getOutcomeLabel(tip.outcomeType) }}
+                </ui-badge>
+              } @else {
+                <ui-badge tone="neutral" appearance="soft">Offen</ui-badge>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -1,168 +1,176 @@
 .tips-table {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-top: 1rem;
-  border: 1px solid #e5e7eb;
+  margin-top: var(--ts-space-4);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  background: var(--ts-surface);
+  overflow: hidden;
+}
+
+.tips-table__scroll {
   overflow-x: auto;
 }
 
-.tips-table table {
+.tips-table__table {
   width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  min-width: 480px;
+  min-width: 520px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.tips-table thead tr {
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.tips-table thead th {
-  padding: 0.75rem;
+.tips-table__table thead th {
+  padding: 10px 12px;
   text-align: left;
-  font-weight: 700;
-  color: #4b5563;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3f5568;
+  background: #f4f7f9;
+  border-bottom: 1px solid #dbe3ea;
+}
+
+.tips-table__table thead th:not(:first-child) {
+  text-align: center;
+}
+
+.tips-table__table tbody tr {
+  transition: background-color var(--ts-transition-fast);
+}
+
+.tips-table__table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+.tips-table__table tbody tr.current-user {
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.tips-table__table tbody tr.current-user:hover {
+  background: rgba(16, 185, 129, 0.18);
+}
+
+.tips-table__table tbody td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #e7edf2;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tips-table__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tips-table__table tbody td.username {
+  text-align: left;
   font-size: 0.9rem;
-}
-
-.tips-table tbody tr {
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
-}
-
-.tips-table tbody tr:hover {
-  background: #f9f9f9;
-}
-
-.tips-table tbody tr.current-user {
-  background: rgba(52, 211, 153, 0.16);
   font-weight: 700;
-}
-
-.tips-table tbody tr.current-user:hover {
-  background: rgba(52, 211, 153, 0.24);
-}
-
-.tips-table tbody td {
-  padding: 0.75rem;
-}
-
-.tips-table tbody td.username {
-  font-size: 0.95rem;
+  color: var(--ts-text-primary);
   overflow-wrap: anywhere;
 }
 
-.tips-table tbody td.tip-score {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.tips-table tbody td.tip-score .no-tip {
-  color: #9ca3af;
-}
-
-.tips-table tbody td.points {
-  font-size: 1.1rem;
+.tips-table__table tbody td.tip-score {
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #1976d2;
+  color: #0f172a;
 }
 
-.tips-table tbody td.outcome .outcome-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
+.tips-table__table tbody td.tip-score .no-tip {
+  color: #94a3b8;
+}
+
+.tips-table__table tbody td.points,
+.tips-table__table tbody td.outcome {
   white-space: nowrap;
-}
-
-.tips-table tbody td.outcome .outcome-badge.exact {
-  background: #4caf50;
-  color: #ffffff;
-}
-
-.tips-table tbody td.outcome .outcome-badge.goalDiff {
-  background: #2196f3;
-  color: #ffffff;
-}
-
-.tips-table tbody td.outcome .outcome-badge.tendency {
-  background: #ff9800;
-  color: #ffffff;
-}
-
-.tips-table tbody td.outcome .outcome-badge.missed {
-  background: #f44336;
-  color: #ffffff;
-}
-
-.tips-table tbody td.outcome .outcome-badge.notTipped {
-  background: #9e9e9e;
-  color: #ffffff;
-}
-
-.tips-table tbody td.outcome .outcome-badge.none {
-  background: #e0e0e0;
-  color: #666666;
 }
 
 @media (max-width: 767px) {
   .tips-table {
-    padding: 0.42rem;
+    margin-top: var(--ts-space-3);
   }
 
-  .tips-table table {
+  .tips-table__table {
+    min-width: 470px;
+  }
+
+  .tips-table__table thead th,
+  .tips-table__table tbody td {
+    padding: 9px 8px;
+  }
+
+  .tips-table__table thead th {
+    font-size: 0.62rem;
+  }
+
+  .tips-table__table tbody td.username {
+    font-size: 0.8rem;
+  }
+
+  .tips-table__table tbody td.tip-score {
+    font-size: 0.82rem;
+  }
+
+  .tips-table__table tbody td.points ui-badge,
+  .tips-table__table tbody td.outcome ui-badge {
+    transform: scale(0.95);
+    transform-origin: center;
+  }
+}
+
+@media (max-width: 430px) {
+  .tips-table__table {
     min-width: 0;
+    table-layout: fixed;
   }
 
-  .tips-table thead th,
-  .tips-table tbody td {
-    padding: 0.38rem;
-    font-size: 0.74rem;
+  .tips-table__table thead th,
+  .tips-table__table tbody td {
+    padding: 7px 5px;
   }
 
-  .tips-table thead th:nth-child(1),
-  .tips-table tbody td:nth-child(1) {
-    width: 40%;
+  .tips-table__table thead th {
+    font-size: 0.56rem;
+    letter-spacing: 0.05em;
   }
 
-  .tips-table thead th:nth-child(2),
-  .tips-table tbody td:nth-child(2) {
-    width: 20%;
-  }
-
-  .tips-table thead th:nth-child(3),
-  .tips-table tbody td:nth-child(3) {
-    width: 15%;
-  }
-
-  .tips-table thead th:nth-child(4),
-  .tips-table tbody td:nth-child(4) {
-    width: 25%;
-  }
-
-  .tips-table tbody td.username {
-    font-size: 0.74rem;
+  .tips-table__table tbody td.username {
+    font-size: 0.72rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .tips-table tbody td.tip-score {
-    font-size: 0.76rem;
+  .tips-table__table tbody td.tip-score {
+    font-size: 0.74rem;
   }
 
-  .tips-table tbody td.points {
-    font-size: 0.8rem;
+  .tips-table__table thead th:nth-child(1),
+  .tips-table__table tbody td:nth-child(1) {
+    width: 36%;
   }
 
-  .tips-table tbody td.outcome .outcome-badge {
-    font-size: 0.68rem;
-    padding: 0.18rem 0.45rem;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .tips-table__table thead th:nth-child(2),
+  .tips-table__table tbody td:nth-child(2) {
+    width: 17%;
+  }
+
+  .tips-table__table thead th:nth-child(3),
+  .tips-table__table tbody td:nth-child(3) {
+    width: 14%;
+  }
+
+  .tips-table__table thead th:nth-child(4),
+  .tips-table__table tbody td:nth-child(4) {
+    width: 33%;
+  }
+
+  .tips-table__table tbody td.points ui-badge,
+  .tips-table__table tbody td.outcome ui-badge {
+    transform: scale(0.84);
+    transform-origin: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tips-table__table tbody tr {
+    transition: none !important;
   }
 }
