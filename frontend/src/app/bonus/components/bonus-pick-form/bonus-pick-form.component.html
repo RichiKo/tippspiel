@@ -1,38 +1,53 @@
 <div class="bonus-pick-form">
-  @if (isLoading()) {
-    <div class="loading-spinner">
-      <div class="spinner"></div>
+  @if (isLoading() && activeBonusRules().length === 0) {
+    <div class="bonus-state-card bonus-state-card--loading">
+      <div class="spinner" aria-hidden="true"></div>
       <p>Lade Bonus-Regeln...</p>
     </div>
   }
 
   @if (errorMessage()) {
-    <div class="error-message">
-      <span class="error-icon">⚠️</span>
-      <p>{{ errorMessage() }}</p>
+    <div class="bonus-state-card bonus-state-card--error" role="alert">
+      <lucide-icon [img]="icons.circleX" [size]="18" aria-hidden="true"></lucide-icon>
+      <span>{{ errorMessage() }}</span>
     </div>
   }
 
   @if (activeBonusRules().length === 0 && !isLoading()) {
-    <div class="no-bonus-rules">
+    <div class="bonus-state-card bonus-state-card--empty">
+      <lucide-icon [img]="icons.award" [size]="18" aria-hidden="true"></lucide-icon>
       <p>Aktuell gibt es keine aktiven Bonus-Regeln für diese Championship.</p>
     </div>
   }
 
   @for (rule of activeBonusRules(); track rule.id) {
-    <div class="bonus-rule-card">
-      <div class="bonus-rule-header">
-        <h3>{{ rule.name }}</h3>
-        <div class="deadline-info" [class.expired]="!isBeforeDeadline(rule)">
-          <span class="clock-icon">🕐</span>
-          <span class="deadline-text">{{ getTimeUntilDeadline(rule) }}</span>
+    <section class="bonus-rule-card" [class.bonus-rule-card--expired]="!isBeforeDeadline(rule)">
+      <header class="bonus-rule-header">
+        <div class="bonus-rule-title">
+          <h3>{{ rule.name }}</h3>
+          <p class="bonus-rule-subtitle">
+            @if (rule.type === BonusRuleType.CHAMPION) {
+              Champion-Bonus
+            } @else {
+              Champion + Finalist
+            }
+          </p>
         </div>
-      </div>
 
-      <div class="bonus-rule-details">
+        <div class="deadline-pill" [class.deadline-pill--expired]="!isBeforeDeadline(rule)">
+          <lucide-icon
+            [img]="isBeforeDeadline(rule) ? icons.circleCheckBig : icons.circleX"
+            [size]="14"
+            aria-hidden="true"
+          ></lucide-icon>
+          <span>{{ getTimeUntilDeadline(rule) }}</span>
+        </div>
+      </header>
+
+      <div class="bonus-rule-meta">
         <div class="detail-item">
-          <span class="label">Typ:</span>
-          <span class="value">
+          <span class="label">Typ</span>
+          <span class="value value--strong">
             @if (rule.type === BonusRuleType.CHAMPION) {
               Champion
             } @else {
@@ -40,50 +55,67 @@
             }
           </span>
         </div>
+
         <div class="detail-item">
-          <span class="label">Punkte:</span>
+          <span class="label">Punkte</span>
           <span class="value">{{ getConfigPoints(rule) }}</span>
         </div>
+
         <div class="detail-item">
-          <span class="label">Deadline:</span>
+          <span class="label">Deadline</span>
           <span class="value">{{ rule.deadline | date: 'dd.MM.yyyy HH:mm' }}</span>
         </div>
       </div>
 
       <div class="team-selection">
-        <label class="selection-label">Wähle dein Team:</label>
-        <select
-          class="team-select"
-          [value]="getSelectedTeamId(rule.id) || ''"
-          (change)="onTeamSelect(rule, $any($event.target).value)"
-          [disabled]="!isBeforeDeadline(rule) || isLoading()"
-        >
-          <option value="" disabled>-- Team auswählen --</option>
-          @for (team of availableTeams(); track team.id) {
-            <option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
-              {{ team.name }}{{ isEliminatedTeam(team.id) ? ' (ausgestiegen)' : '' }}
-            </option>
-          }
-        </select>
-
-        @if (getSelectedTeamId(rule.id)) {
-          <div class="selected-team-display">
+        <label class="selection-label">Wähle dein Team</label>
+        @if (shouldShowSelect(rule.id)) {
+          <select
+            class="team-select"
+            [value]="getSelectedTeamId(rule.id) || ''"
+            (change)="onTeamSelect(rule, $any($event.target).value)"
+            [disabled]="!isBeforeDeadline(rule) || isLoading()"
+          >
+            <option value="" disabled>Team auswählen</option>
             @for (team of availableTeams(); track team.id) {
-              @if (team.id === getSelectedTeamId(rule.id)) {
-                <img [src]="team.logoUrl" [alt]="team.name" class="team-logo" />
-                <span class="team-name">{{ team.name }}</span>
-              }
+              <option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
+                {{ team.name }}{{ isEliminatedTeam(team.id) ? ' (ausgeschieden)' : '' }}
+              </option>
             }
-          </div>
+          </select>
+        } @else {
+          @if (getSelectedTeam(rule.id); as selectedTeam) {
+            <div class="selected-team-display">
+              <div class="selected-team-main">
+                <img [src]="selectedTeam.logoUrl" [alt]="selectedTeam.name" class="team-logo" />
+                <div class="selected-team-text">
+                  <span class="selected-team-label">Aktuelle Auswahl</span>
+                  <span class="team-name">{{ selectedTeam.name }}</span>
+                </div>
+              </div>
+
+              @if (isBeforeDeadline(rule)) {
+                <ui-button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  [disabled]="isLoading()"
+                  (click)="startUpdate(rule.id)"
+                >
+                  Aktualisieren
+                </ui-button>
+              }
+            </div>
+          }
         }
       </div>
 
       @if (!isBeforeDeadline(rule)) {
         <div class="expired-notice">
-          <span class="info-icon">ℹ️</span>
+          <lucide-icon [img]="icons.circleX" [size]="16" aria-hidden="true"></lucide-icon>
           <p>Die Deadline für diesen Bonus ist abgelaufen. Keine Änderungen mehr möglich.</p>
         </div>
       }
-    </div>
+    </section>
   }
 </div>

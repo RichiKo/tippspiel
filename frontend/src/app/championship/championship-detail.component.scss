@@ -374,6 +374,17 @@
   outline-offset: 2px;
 }
 
+.finished-games-section {
+  margin-bottom: 18px;
+}
+
+.finished-games-title {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ts-text-primary);
+}
+
 .finished-view-shell {
   margin-bottom: 20px;
 }
@@ -415,12 +426,28 @@ app-game-card:last-child {
   margin-bottom: 0;
 }
 
-.no-games,
+.section-inline-info,
 .no-selection {
   margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px dashed #d7e1e8;
+  background: #f7fafc;
+  color: var(--ts-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.section-inline-info--subtle {
+  margin-top: 8px;
+}
+
+.no-selection {
   text-align: center;
   padding: 28px 16px;
-  color: var(--ts-text-secondary);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 @media (max-width: 1279px) {
@@ -756,6 +783,11 @@ app-game-card:last-child {
     width: 100%;
   }
 
+  .finished-games-title {
+    font-size: 0.98rem;
+    margin-bottom: 8px;
+  }
+
   .spieltag-view-toggle {
     width: 100%;
     max-width: none;
@@ -785,6 +817,11 @@ app-game-card:last-child {
   .game-date-header {
     font-size: 0.95rem;
     margin-bottom: 8px;
+  }
+
+  .section-inline-info {
+    font-size: 0.84rem;
+    padding: 10px 12px;
   }
 }
 
