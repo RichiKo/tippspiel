@@ -176,7 +176,7 @@
             @if (selectedView() === 'allGames') {
               <app-finished-games-all-view
                 data-testid="view-all"
-                [groupedGames]="finishedGamesGroupedByDate()"
+                [groupedGames]="finishedGamesGroupedByKickoff()"
                 [userTipsMap]="userTips()"
                 [gameTipsMap]="gameTips()"
                 [currentUserId]="currentUser()?.id || 0"

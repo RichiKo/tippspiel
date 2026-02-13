@@ -39,6 +39,7 @@ import {
   buildMyFinishedEntries,
   buildSpieltagRankingRows,
   groupGamesByDate,
+  groupGamesByKickoff,
   isFinishedGame,
 } from './utils/spieltag-views.util';
 
@@ -124,8 +125,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
       ),
   );
 
-  readonly finishedGamesGroupedByDate = computed(() =>
-    groupGamesByDate(this.finishedGames()),
+  readonly finishedGamesGroupedByKickoff = computed(() =>
+    groupGamesByKickoff(this.finishedGames()),
   );
 
   readonly openGamesGroupedByDate = computed(() =>
