@@ -101,7 +101,7 @@ export class BonusOverviewComponent {
       },
     });
 
-    this.bonusService.getBonusRules(this.championshipId).subscribe({
+    this.bonusService.getBonusRulesForOverview(this.championshipId).subscribe({
       next: async (rules) => {
         this.bonusRules.set(rules);
 

@@ -27,7 +27,9 @@ describe('BonusOverviewComponent', () => {
   };
 
   const mockBonusService = {
-    getBonusRules: jasmine.createSpy('getBonusRules').and.returnValue(
+    getBonusRulesForOverview: jasmine
+      .createSpy('getBonusRulesForOverview')
+      .and.returnValue(
       of([
         {
           id: 'rule-1',

@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Brackets, LessThan, Repository } from 'typeorm';
 import { BonusRuleEntity } from './bonus-rule.entity';
 import { BonusPickEntity } from './bonus-pick.entity';
 import { BonusEvaluationEntity } from './bonus-evaluation.entity';
@@ -476,6 +476,35 @@ export class BonusService {
       relations: ['evaluations', 'evaluations.user'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async getBonusRulesForOverview(
+    championshipId: string,
+  ): Promise<BonusRuleEntity[]> {
+    const now = new Date();
+
+    return this.bonusRuleRepository
+      .createQueryBuilder('bonus_rule')
+      .where('bonus_rule.championshipId = :championshipId', { championshipId })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('bonus_rule.status IN (:...overviewStatuses)', {
+            overviewStatuses: [
+              BonusRuleStatus.LOCKED,
+              BonusRuleStatus.PARTIALLY_EVALUATED,
+              BonusRuleStatus.EVALUATED,
+            ],
+          }).orWhere(
+            '(bonus_rule.status = :publishedStatus AND bonus_rule.deadline <= :now)',
+            {
+              publishedStatus: BonusRuleStatus.PUBLISHED,
+              now,
+            },
+          );
+        }),
+      )
+      .orderBy('bonus_rule.createdAt', 'DESC')
+      .getMany();
   }
 
   private validateFinalistsInput(finalistTeamIds?: string[]): string[] {

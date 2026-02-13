@@ -116,4 +116,10 @@ export class BonusService {
       `${this.apiUrl}/championships/${championshipId}/bonus-rules/evaluated`,
     );
   }
+
+  getBonusRulesForOverview(championshipId: string): Observable<BonusRule[]> {
+    return this.http.get<BonusRule[]>(
+      `${this.apiUrl}/championships/${championshipId}/bonus-rules/overview`,
+    );
+  }
 }

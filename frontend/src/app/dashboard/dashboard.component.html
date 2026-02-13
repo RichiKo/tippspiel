@@ -39,7 +39,7 @@
     </section>
   } @else {
     <div class="championships-grid">
-      @for (championship of championships(); track championship.id) {
+      @for (championship of sortedChampionships(); track championship.id) {
         <app-championship-card [championship]="championship" />
       }
     </div>

@@ -1,4 +1,8 @@
-<div class="championship-card" (click)="onCardClick()">
+<div
+  class="championship-card"
+  [class.championship-card--inactive]="!championship()?.isActive"
+  (click)="onCardClick()"
+>
   <div class="card-image-wrap">
     <img
       class="championship-image"
@@ -27,6 +31,10 @@
         <span class="meta-pill">Privat</span>
       }
     </div>
+
+    @if (!championship()?.isActive) {
+      <p class="championship-ended-note">Championship beendet</p>
+    }
 
     @if (membershipStatus() === MembershipStatus.PENDING) {
       <div class="membership-status pending">

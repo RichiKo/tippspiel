@@ -23,6 +23,21 @@ export class DashboardComponent {
     () => this.persistingService.currentUser()?.role === 'admin'
   );
   readonly hasChampionships = computed(() => this.championships().length > 0);
+  readonly sortedChampionships = computed(() => {
+    return [...this.championships()].sort((a, b) => {
+      const priorityDiff = this.getTypePriority(a) - this.getTypePriority(b);
+      if (priorityDiff !== 0) {
+        return priorityDiff;
+      }
+
+      const createdAtDiff = this.toTimestamp(b.createdAt) - this.toTimestamp(a.createdAt);
+      if (createdAtDiff !== 0) {
+        return createdAtDiff;
+      }
+
+      return a.name.localeCompare(b.name, 'de');
+    });
+  });
 
   constructor() {
     this.loadChampionships();
@@ -45,5 +60,30 @@ export class DashboardComponent {
         this.isLoading.set(false);
       },
     });
+  }
+
+  private getTypePriority(championship: Championship): number {
+    if (championship.isActive && !championship.isPublic) {
+      return 0;
+    }
+
+    if (championship.isActive && championship.isPublic) {
+      return 1;
+    }
+
+    if (!championship.isActive && !championship.isPublic) {
+      return 2;
+    }
+
+    return 3;
+  }
+
+  private toTimestamp(value: Date | string): number {
+    if (value instanceof Date) {
+      return value.getTime();
+    }
+
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
   }
 }

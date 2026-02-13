@@ -147,4 +147,12 @@ export class BonusController {
   ): Promise<BonusRuleEntity[]> {
     return this.bonusService.getEvaluatedBonusRules(championshipId);
   }
+
+  @Get('championships/:championshipId/bonus-rules/overview')
+  @UseGuards(AuthGuard)
+  async getBonusRulesForOverview(
+    @Param('championshipId') championshipId: string,
+  ): Promise<BonusRuleEntity[]> {
+    return this.bonusService.getBonusRulesForOverview(championshipId);
+  }
 }

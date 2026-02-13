@@ -16,6 +16,24 @@
   box-shadow: 0 12px 28px rgba(31, 41, 55, 0.12);
 }
 
+.championship-card--inactive {
+  border-color: #c8d0d8;
+  background: #f7f9fb;
+}
+
+.championship-card--inactive .card-image-wrap {
+  background: #dde4ea;
+}
+
+.championship-card--inactive .championship-image {
+  filter: grayscale(1);
+  opacity: 0.92;
+}
+
+.championship-card--inactive .championship-content {
+  color: #1f2937;
+}
+
 .card-image-wrap {
   aspect-ratio: 16 / 9;
   background: var(--ts-surface-muted);
@@ -56,6 +74,14 @@
   flex-wrap: wrap;
 }
 
+.championship-ended-note {
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
 .meta-pill {
   border-radius: 999px;
   border: 1px solid var(--ts-border);
@@ -73,9 +99,9 @@
 }
 
 .meta-pill--inactive {
-  border-color: rgba(245, 158, 11, 0.45);
-  background: rgba(245, 158, 11, 0.14);
-  color: #9a3412;
+  border-color: #c2cbd4;
+  background: #edf1f4;
+  color: #4b5563;
 }
 
 .membership-status {

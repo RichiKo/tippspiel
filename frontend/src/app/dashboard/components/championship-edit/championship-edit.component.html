@@ -1,4 +1,13 @@
 <div class="championship-edit-container">
+  <button
+    type="button"
+    class="back-btn"
+    (click)="onCancel()"
+    [disabled]="isLoading()"
+  >
+    ← Zurück
+  </button>
+
   <h2>Championship bearbeiten</h2>
 
   @if (errorMessage()) {

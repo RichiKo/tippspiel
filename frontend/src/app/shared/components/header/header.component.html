@@ -1,9 +1,9 @@
 <header class="app-header">
-  @if (currentUser()) {
+  @if (currentUser(); as user) {
     <div class="header-content">
       <div class="header-left">
         <button class="logo-btn" (click)="navigateToDashboard()">
-          <span class="logo-icon">⚽</span>
+          <lucide-icon class="logo-icon" [img]="icons.trophy" [size]="20" aria-hidden="true" />
           <span class="logo-text">Tipp-Spiel</span>
         </button>
       </div>
@@ -11,15 +11,13 @@
       <div class="header-right">
         <div class="user-info">
           <div class="user-avatar">
-            @if (currentUser()!.image) {
-              <img [src]="currentUser()!.image" [alt]="currentUser()!.username" />
+            @if (user.image) {
+              <img [src]="user.image" [alt]="user.username" />
             } @else {
-              <span class="avatar-placeholder">{{
-                currentUser()!.username.charAt(0).toUpperCase()
-              }}</span>
+              <span class="avatar-placeholder">{{ user.username.charAt(0).toUpperCase() }}</span>
             }
           </div>
-          <span class="username">{{ currentUser()!.username }}</span>
+          <span class="username">{{ user.username }}</span>
         </div>
 
         <button
@@ -28,10 +26,11 @@
           title="Einstellungen"
           aria-label="Einstellungen"
         >
-          <span>⚙</span>
+          <lucide-icon [img]="icons.settings" [size]="18" aria-hidden="true" />
         </button>
 
         <button class="logout-btn desktop-only" (click)="onLogoutClick()">
+          <lucide-icon [img]="icons.logOut" [size]="16" aria-hidden="true" />
           Abmelden
         </button>
 
@@ -40,9 +39,9 @@
           class="mobile-menu-toggle mobile-only"
           (click)="onMobileMenuToggle()"
           [attr.aria-expanded]="isMobileMenuOpen()"
-          aria-label="Menü öffnen"
+          [attr.aria-label]="isMobileMenuOpen() ? 'Menü schließen' : 'Menü öffnen'"
         >
-          ⋮
+          <lucide-icon [img]="icons.ellipsisVertical" [size]="18" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -57,22 +56,25 @@
 
       <div class="mobile-menu mobile-only">
         <button type="button" class="mobile-menu-item" (click)="navigateToSettings()">
+          <lucide-icon [img]="icons.settings" [size]="16" aria-hidden="true" />
           Einstellungen
         </button>
         <button type="button" class="mobile-menu-item danger" (click)="onLogoutClick()">
+          <lucide-icon [img]="icons.logOut" [size]="16" aria-hidden="true" />
           Abmelden
         </button>
       </div>
     }
   }
 
-  <app-confirmation-dialog
-    [visible]="showLogoutConfirm()"
-    [title]="'Abmelden'"
-    [message]="'Möchtest du dich wirklich abmelden?'"
-    [confirmLabel]="'Abmelden'"
-    [cancelLabel]="'Abbrechen'"
-    (confirmed)="onLogoutConfirmed()"
-    (cancelled)="onLogoutCancelled()"
-  />
 </header>
+
+<app-confirmation-dialog
+  [visible]="showLogoutConfirm()"
+  [title]="'Abmelden'"
+  [message]="'Möchtest du dich wirklich abmelden?'"
+  [confirmLabel]="'Abmelden'"
+  [cancelLabel]="'Abbrechen'"
+  (confirmed)="onLogoutConfirmed()"
+  (cancelled)="onLogoutCancelled()"
+/>
