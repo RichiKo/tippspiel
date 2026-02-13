@@ -1,11 +1,26 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import { Team } from './types/team.interface';
 import { TeamService } from './services/team.service';
 import { ImageUploadComponent } from '../shared/components/image-upload/image-upload.component';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
+import {
+  UI_ICONS,
+  UiBadgeComponent,
+  UiButtonComponent,
+  UiCardComponent,
+  UiPageHeaderComponent,
+} from '../ui-lib/public-api';
 
 @Component({
   selector: 'app-teams',
@@ -13,14 +28,21 @@ import { ConfirmationDialogComponent } from '../shared/components/confirmation-d
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    LucideAngularModule,
     ImageUploadComponent,
     ConfirmationDialogComponent,
+    UiBadgeComponent,
+    UiButtonComponent,
+    UiCardComponent,
+    UiPageHeaderComponent,
   ],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamsComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
   private readonly teamService = inject(TeamService);
   private readonly persistingService = inject(PersistingService);
 
@@ -30,17 +52,17 @@ export class TeamsComponent {
   readonly submitted = signal(false);
   readonly uploadedLogoUrl = signal<string | null>(null);
 
-  // Edit-Funktionalität
   readonly editingTeamId = signal<string | null>(null);
   readonly editLogoUrl = signal<string | null>(null);
   readonly isSaving = signal(false);
 
-  // Delete-Dialog
   readonly showDeleteDialog = signal(false);
   readonly teamToDelete = signal<Team | null>(null);
 
+  readonly icons = UI_ICONS;
+
   readonly isAdmin = computed(
-    () => this.persistingService.currentUser()?.role === 'admin'
+    () => this.persistingService.currentUser()?.role === 'admin',
   );
 
   readonly form = this.fb.group({
@@ -71,7 +93,11 @@ export class TeamsComponent {
     this.loadTeams();
   }
 
-  loadTeams() {
+  backToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  loadTeams(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
@@ -88,18 +114,20 @@ export class TeamsComponent {
     });
   }
 
-  onImageUploaded(url: string) {
+  onImageUploaded(url: string): void {
     this.uploadedLogoUrl.set(url);
     this.form.patchValue({ logoUrl: url });
   }
 
-  onUploadError(error: string) {
+  onUploadError(error: string): void {
     this.errorMessage.set(error);
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted.set(true);
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      return;
+    }
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
@@ -124,7 +152,7 @@ export class TeamsComponent {
     });
   }
 
-  onEditClick(team: Team) {
+  onEditClick(team: Team): void {
     this.editingTeamId.set(team.id);
     this.editLogoUrl.set(team.logoUrl);
     this.editForm.patchValue({
@@ -134,28 +162,39 @@ export class TeamsComponent {
     });
   }
 
-  onCancelEdit() {
+  onCancelEdit(): void {
     this.editingTeamId.set(null);
     this.editLogoUrl.set(null);
     this.editForm.reset();
   }
 
-  onEditImageUploaded(url: string) {
+  onEditImageUploaded(url: string): void {
     this.editLogoUrl.set(url);
     this.editForm.patchValue({ logoUrl: url });
   }
 
-  onSaveEdit(teamId: string) {
-    if (this.editForm.invalid) return;
+  onSaveEdit(teamId: string): void {
+    if (this.editForm.invalid) {
+      return;
+    }
 
     this.isSaving.set(true);
     this.errorMessage.set(null);
 
-    const updateData: Partial<Team> = {
-      name: this.editForm.value.name ?? undefined,
-      shortName: this.editForm.value.shortName ?? undefined,
-      logoUrl: this.editForm.value.logoUrl ?? undefined,
-    };
+    const updateData: Partial<Team> = {};
+    const name = this.editForm.value.name;
+    const shortName = this.editForm.value.shortName;
+    const logoUrl = this.editForm.value.logoUrl;
+
+    if (name) {
+      updateData.name = name;
+    }
+    if (shortName) {
+      updateData.shortName = shortName;
+    }
+    if (logoUrl) {
+      updateData.logoUrl = logoUrl;
+    }
 
     this.teamService.updateTeam(teamId, updateData).subscribe({
       next: () => {
@@ -172,19 +211,21 @@ export class TeamsComponent {
     });
   }
 
-  onDeleteClick(team: Team) {
+  onDeleteClick(team: Team): void {
     this.teamToDelete.set(team);
     this.showDeleteDialog.set(true);
   }
 
-  handleDeleteCancel() {
+  handleDeleteCancel(): void {
     this.showDeleteDialog.set(false);
     this.teamToDelete.set(null);
   }
 
-  handleDeleteConfirm() {
+  handleDeleteConfirm(): void {
     const team = this.teamToDelete();
-    if (!team) return;
+    if (!team) {
+      return;
+    }
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
@@ -196,7 +237,7 @@ export class TeamsComponent {
         this.loadTeams();
       },
       error: () => {
-        this.errorMessage.set('Team konnte nicht gelöscht werden.');
+        this.errorMessage.set('Team konnte nicht geloescht werden.');
         this.isLoading.set(false);
         this.showDeleteDialog.set(false);
         this.teamToDelete.set(null);

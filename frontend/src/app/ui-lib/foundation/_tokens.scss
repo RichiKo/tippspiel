@@ -1,0 +1,64 @@
+:root {
+  --ts-primary-950: #04281f;
+  --ts-primary-900: #064e3b;
+  --ts-primary-800: #0b5a45;
+  --ts-primary-700: #0f766e;
+  --ts-primary-600: #0e7a55;
+  --ts-primary-500: #10b981;
+
+  --ts-accent-600: #15803d;
+  --ts-accent-500: #16a34a;
+  --ts-accent-300: #86efac;
+
+  --ts-bg: #f3f5f7;
+  --ts-bg-alt: #eef2f4;
+  --ts-surface: #ffffff;
+  --ts-surface-muted: #eef2f1;
+  --ts-surface-emphasis: #e4ece9;
+  --ts-border: #d6dce1;
+
+  --ts-text-primary: #1f2937;
+  --ts-text-secondary: #4b5563;
+  --ts-text-disabled: #9ca3af;
+  --ts-text-inverse: #ecfdf5;
+
+  --ts-success: #22c55e;
+  --ts-warning: #f59e0b;
+  --ts-error: #dc2626;
+  --ts-info: #2563eb;
+
+  --ts-focus-ring: #34d399;
+
+  --ts-font-family-body: "Manrope", "Inter", "Segoe UI", "Helvetica Neue", Arial,
+    sans-serif;
+  --ts-font-family-heading: "Rajdhani", "Barlow Condensed", "Segoe UI", "Helvetica Neue",
+    Arial, sans-serif;
+
+  --ts-text-h1-size: clamp(2rem, 3.2vw, 2.8rem);
+  --ts-text-h2-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  --ts-text-h3-size: clamp(1.3rem, 1.9vw, 1.65rem);
+  --ts-text-body-size: 0.97rem;
+  --ts-text-caption-size: 0.8rem;
+
+  --ts-space-1: 4px;
+  --ts-space-2: 8px;
+  --ts-space-3: 12px;
+  --ts-space-4: 16px;
+  --ts-space-5: 20px;
+  --ts-space-6: 24px;
+  --ts-space-7: 28px;
+  --ts-space-8: 32px;
+
+  --ts-radius-sm: 8px;
+  --ts-radius-md: 12px;
+  --ts-radius-lg: 16px;
+  --ts-radius-xl: 20px;
+  --ts-radius-pill: 999px;
+
+  --ts-shadow-sm: 0 4px 10px rgba(15, 23, 42, 0.06);
+  --ts-shadow-md: 0 8px 24px rgba(16, 24, 39, 0.08);
+  --ts-shadow-lg: 0 14px 34px rgba(6, 78, 59, 0.2);
+
+  --ts-transition-fast: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ts-transition-base: 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}

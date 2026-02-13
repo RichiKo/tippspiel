@@ -1,0 +1,12 @@
+<span
+  class="ui-badge"
+  [class.ui-badge--soft]="appearance() === 'soft'"
+  [class.ui-badge--solid]="appearance() === 'solid'"
+  [class.ui-badge--neutral]="tone() === 'neutral'"
+  [class.ui-badge--info]="tone() === 'info'"
+  [class.ui-badge--success]="tone() === 'success'"
+  [class.ui-badge--warning]="tone() === 'warning'"
+  [class.ui-badge--danger]="tone() === 'danger'"
+>
+  <ng-content />
+</span>

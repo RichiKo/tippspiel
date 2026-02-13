@@ -1,257 +1,159 @@
-.standings-container {
-  max-width: 1000px;
+:host {
+  display: block;
+}
+
+.standings-view {
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--ts-space-6);
+}
 
-  .loading,
-  .error {
-    text-align: center;
-    padding: 24px;
-    font-size: 16px;
-  }
+.standings-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-4);
+}
 
-  .error {
-    color: #e53935;
-  }
+.standings-actions {
+  display: inline-flex;
+  gap: var(--ts-space-2);
+  flex-wrap: wrap;
+}
 
-  .standings-header {
-    margin-bottom: 32px;
+.standings-feedback {
+  text-align: center;
+  color: var(--ts-text-secondary);
+  font-weight: 700;
+}
 
-    h2 {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
+.standings-feedback--error {
+  color: var(--ts-error);
+}
 
-    h3 {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 16px;
-      color: #666;
-    }
+.standings-table-shell {
+  overflow: hidden;
+}
 
-    .back-btn {
-      background-color: #3f51b5;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.3s;
+.standings-table-wrapper {
+  overflow-x: auto;
+}
 
-      &:hover {
-        background-color: #303f9f;
-      }
+.standings-table {
+  width: 100%;
+  min-width: 740px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
 
-      &:active {
-        background-color: #283593;
-      }
-    }
-  }
+.standings-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #395266;
+  border-bottom: 1px solid #dde5eb;
+  background: #f5f8fa;
+}
 
-  .standings-table-wrapper {
-    overflow-x: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.standings-table thead th.rank-col,
+.standings-table thead th.points-col,
+.standings-table thead th.bonus-col,
+.standings-table thead th.total-col {
+  text-align: center;
+}
+
+.standings-table thead th.rank-col {
+  width: 96px;
+}
+
+.standings-table thead th.points-col {
+  width: 140px;
+}
+
+.total-col-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.standings-table tbody tr {
+  transition: background-color var(--ts-transition-fast);
+}
+
+.standings-table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+.standings-table tbody tr.current-user {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.standings-table tbody tr.current-user:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.standings-table tbody tr.top-three {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.standings-table tbody tr.top-three.current-user {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.standings-table tbody td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #e9eff3;
+  font-size: 0.9rem;
+}
+
+.standings-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.standings-table tbody td.rank,
+.standings-table tbody td.points,
+.standings-table tbody td.bonus-points,
+.standings-table tbody td.total-points {
+  text-align: center;
+}
+
+.standings-table tbody td.username {
+  text-align: left;
+}
+
+.username-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+}
+
+.username-text {
+  color: #0f172a;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .standings-view {
+    padding: var(--ts-space-4);
   }
 
   .standings-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    thead {
-      background-color: #f5f5f5;
-
-      th {
-        padding: 16px;
-        text-align: left;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #e0e0e0;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        &.rank-col {
-          width: 80px;
-          text-align: center;
-        }
-
-        &.points-col {
-          width: 120px;
-          text-align: center;
-        }
-
-        &.bonus-col {
-          min-width: 100px;
-          text-align: center;
-          white-space: nowrap;
-        }
-
-        &.total-col {
-          width: 100px;
-          text-align: center;
-          font-weight: 700;
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        border-bottom: 1px solid #e0e0e0;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: #fafafa;
-        }
-
-        &.current-user {
-          background-color: #e3f2fd;
-          font-weight: 600;
-
-          &:hover {
-            background-color: #bbdefb;
-          }
-        }
-
-        &.top-three {
-          background-color: #fffde7;
-
-          &.current-user {
-            background-color: #e3f2fd;
-          }
-
-          &:hover {
-            background-color: #fff9c4;
-
-            &.current-user {
-              background-color: #bbdefb;
-            }
-          }
-        }
-
-        td {
-          padding: 16px;
-          font-size: 14px;
-          color: #555;
-
-          &.rank {
-            text-align: center;
-            font-weight: 600;
-            font-size: 16px;
-
-            .medal {
-              font-size: 24px;
-              display: inline-block;
-            }
-          }
-
-          &.username {
-            font-weight: 500;
-            color: #333;
-            font-size: 16px;
-          }
-
-          &.points {
-            text-align: center;
-            font-weight: 700;
-            font-size: 18px;
-            color: #1976d2;
-          }
-
-          &.bonus-points {
-            text-align: center;
-            font-weight: 600;
-            color: #555;
-
-            .no-bonus {
-              color: #bbb;
-              font-weight: 400;
-            }
-          }
-
-          &.total-points {
-            text-align: center;
-            font-weight: 700;
-            font-size: 18px;
-            color: #2e7d32;
-          }
-        }
-      }
-    }
+    min-width: 620px;
   }
-}
 
-@media (max-width: 768px) {
-  .standings-container {
-    padding: 16px;
+  .standings-table thead th,
+  .standings-table tbody td {
+    padding: 10px 8px;
+  }
 
-    .standings-header {
-      h2 {
-        font-size: 24px;
-      }
+  .standings-table thead th {
+    font-size: 0.63rem;
+  }
 
-      h3 {
-        font-size: 18px;
-      }
-    }
-
-    .standings-table {
-      font-size: 12px;
-
-      thead th {
-        padding: 12px 8px;
-        font-size: 12px;
-
-        &.rank-col {
-          width: 60px;
-        }
-
-        &.points-col {
-          width: 80px;
-        }
-
-        &.bonus-col {
-          min-width: 70px;
-          font-size: 11px;
-        }
-
-        &.total-col {
-          width: 70px;
-        }
-      }
-
-      tbody td {
-        padding: 12px 8px;
-
-        &.rank {
-          font-size: 14px;
-
-          .medal {
-            font-size: 20px;
-          }
-        }
-
-        &.username {
-          font-size: 14px;
-        }
-
-        &.points {
-          font-size: 16px;
-        }
-
-        &.bonus-points {
-          font-size: 13px;
-        }
-
-        &.total-points {
-          font-size: 16px;
-        }
-      }
-    }
+  .username-text {
+    font-size: 0.82rem;
   }
 }

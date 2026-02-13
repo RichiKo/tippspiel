@@ -1,0 +1,13 @@
+<section
+  class="ui-card"
+  [class.ui-card--default]="variant() === 'default'"
+  [class.ui-card--elevated]="variant() === 'elevated'"
+  [class.ui-card--subtle]="variant() === 'subtle'"
+  [class.ui-card--p-none]="padding() === 'none'"
+  [class.ui-card--p-sm]="padding() === 'sm'"
+  [class.ui-card--p-md]="padding() === 'md'"
+  [class.ui-card--p-lg]="padding() === 'lg'"
+  [class.ui-card--interactive]="interactive()"
+>
+  <ng-content />
+</section>

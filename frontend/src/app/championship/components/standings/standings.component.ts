@@ -1,21 +1,43 @@
-import { Component, signal, computed, inject, effect } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 import { Championship } from '../../../dashboard/types/championship.interface';
 import {
-  StandingsResponse,
-  StandingRow,
   BonusColumn,
+  StandingRow,
+  StandingsResponse,
 } from '../../types/ranking.interface';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../services/ranking.service';
 import { PersistingService } from '../../../auth/services/persisisting.service';
+import {
+  UI_ICONS,
+  UiBadgeComponent,
+  UiCardComponent,
+  UiPageHeaderComponent,
+} from '../../../ui-lib/public-api';
 
 @Component({
   selector: 'app-standings',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    LucideAngularModule,
+    UiBadgeComponent,
+    UiCardComponent,
+    UiPageHeaderComponent,
+  ],
   templateUrl: './standings.component.html',
   styleUrl: './standings.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StandingsComponent {
   private readonly route = inject(ActivatedRoute);
@@ -31,12 +53,13 @@ export class StandingsComponent {
   error = signal<string | null>(null);
 
   readonly currentUser = this.persistingService.currentUser;
+  readonly icons = UI_ICONS;
   readonly showTotalColumn = computed(() => this.bonusColumns().length > 0);
 
   readonly sortedStandings = computed(() => {
     const allStandings = this.standings();
 
-    return allStandings.sort((a, b) => {
+    return [...allStandings].sort((a, b) => {
       if (b.totalPoints !== a.totalPoints) {
         return b.totalPoints - a.totalPoints;
       }
@@ -55,10 +78,12 @@ export class StandingsComponent {
   constructor() {
     effect(() => {
       const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        this.championshipId = id;
-        this.loadData();
+      if (!id) {
+        return;
       }
+
+      this.championshipId = id;
+      this.loadData();
     });
   }
 
@@ -71,17 +96,14 @@ export class StandingsComponent {
   }
 
   loadChampionship(): void {
-    this.championshipService
-      .getChampionshipById(this.championshipId)
-      .subscribe({
-        next: (championship) => {
-          this.championship.set(championship);
-        },
-        error: (err) => {
-          console.error('Failed to load championship:', err);
-          this.error.set('Fehler beim Laden der Championship-Daten.');
-        },
-      });
+    this.championshipService.getChampionshipById(this.championshipId).subscribe({
+      next: (championship) => {
+        this.championship.set(championship);
+      },
+      error: () => {
+        this.error.set('Fehler beim Laden der Championship-Daten.');
+      },
+    });
   }
 
   loadStandings(): void {
@@ -91,8 +113,7 @@ export class StandingsComponent {
         this.standings.set(response.standings);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Failed to load standings:', err);
+      error: () => {
         this.error.set('Fehler beim Laden der Ergebnis-Tabelle.');
         this.isLoading.set(false);
       },

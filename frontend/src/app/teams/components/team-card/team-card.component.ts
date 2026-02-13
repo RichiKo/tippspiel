@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -8,11 +9,18 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { Team } from '../../types/team.interface';
 import { PersistingService } from '../../../auth/services/persisisting.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 import { TeamService } from '../../services/team.service';
+import {
+  UI_ICONS,
+  UiBadgeComponent,
+  UiButtonComponent,
+  UiCardComponent,
+} from '../../../ui-lib/public-api';
 
 @Component({
   selector: 'app-team-card',
@@ -20,11 +28,16 @@ import { TeamService } from '../../services/team.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    LucideAngularModule,
     ConfirmationDialogComponent,
     ImageUploadComponent,
+    UiBadgeComponent,
+    UiButtonComponent,
+    UiCardComponent,
   ],
   templateUrl: './team-card.component.html',
   styleUrl: './team-card.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamCardComponent {
   team = input<Team>();
@@ -36,8 +49,9 @@ export class TeamCardComponent {
   private readonly fb = inject(FormBuilder);
   private readonly teamService = inject(TeamService);
 
+  readonly icons = UI_ICONS;
   readonly isAdmin = computed(
-    () => this.persistingService.currentUser()?.role === 'admin'
+    () => this.persistingService.currentUser()?.role === 'admin',
   );
   readonly showDeleteDialog = signal(false);
   readonly isEditing = signal(false);
@@ -50,9 +64,11 @@ export class TeamCardComponent {
     logoUrl: ['', [Validators.required]],
   });
 
-  onEditClick() {
+  onEditClick(): void {
     const team = this.team();
-    if (!team) return;
+    if (!team) {
+      return;
+    }
 
     this.editForm.patchValue({
       name: team.name,
@@ -63,30 +79,42 @@ export class TeamCardComponent {
     this.isEditing.set(true);
   }
 
-  onCancelEdit() {
+  onCancelEdit(): void {
     this.isEditing.set(false);
     this.uploadedLogoUrl.set(null);
     this.editForm.reset();
   }
 
-  onImageUploaded(url: string) {
+  onImageUploaded(url: string): void {
     this.uploadedLogoUrl.set(url);
     this.editForm.patchValue({ logoUrl: url });
   }
 
-  onSaveEdit() {
+  onSaveEdit(): void {
     const team = this.team();
-    if (!team || this.editForm.invalid) return;
+    if (!team || this.editForm.invalid) {
+      return;
+    }
 
     this.isSaving.set(true);
-    const updateData: Partial<Team> = {
-      name: this.editForm.value.name ?? undefined,
-      shortName: this.editForm.value.shortName ?? undefined,
-      logoUrl: this.editForm.value.logoUrl ?? undefined,
-    };
+
+    const updateData: Partial<Team> = {};
+    const name = this.editForm.value.name;
+    const shortName = this.editForm.value.shortName;
+    const logoUrl = this.editForm.value.logoUrl;
+
+    if (name) {
+      updateData.name = name;
+    }
+    if (shortName) {
+      updateData.shortName = shortName;
+    }
+    if (logoUrl) {
+      updateData.logoUrl = logoUrl;
+    }
 
     this.teamService.updateTeam(team.id, updateData).subscribe({
-      next: (updatedTeam) => {
+      next: () => {
         this.isSaving.set(false);
         this.isEditing.set(false);
         this.uploadedLogoUrl.set(null);
@@ -98,17 +126,19 @@ export class TeamCardComponent {
     });
   }
 
-  onDeleteClick() {
+  onDeleteClick(): void {
     this.showDeleteDialog.set(true);
   }
 
-  handleDeleteCancel() {
+  handleDeleteCancel(): void {
     this.showDeleteDialog.set(false);
   }
 
-  handleDeleteConfirm() {
+  handleDeleteConfirm(): void {
     const id = this.team()?.id;
-    if (!id) return;
+    if (!id) {
+      return;
+    }
 
     this.deleteClicked.emit(id);
     this.showDeleteDialog.set(false);

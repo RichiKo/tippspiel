@@ -1,90 +1,79 @@
 @if (!isEditing()) {
-<div class="team-card">
-  <img
-    class="team-logo"
-    [src]="team()?.logoUrl"
-    [alt]="team()?.name"
-    onerror="this.src='https://via.placeholder.com/150?text=Team'"
-  />
-  <div class="team-content">
-    <h3>{{ team()?.name }}</h3>
-    <p class="team-short">{{ team()?.shortName }}</p>
+  <ui-card variant="default" padding="lg" class="team-card">
+    <img
+      class="team-logo"
+      [src]="team()?.logoUrl"
+      [alt]="team()?.name"
+      onerror="this.src='https://via.placeholder.com/150?text=Team'"
+    />
 
-    @if (isAdmin()) {
-    <div class="team-actions">
-      <button type="button" class="edit-btn" (click)="onEditClick()">
-        Bearbeiten
-      </button>
-      <button type="button" class="delete-btn" (click)="onDeleteClick()">
-        Löschen
-      </button>
+    <div class="team-content">
+      <h3>{{ team()?.name }}</h3>
+      <div class="team-meta">
+        <ui-badge tone="neutral" appearance="soft">{{ team()?.shortName }}</ui-badge>
+      </div>
+
+      @if (isAdmin()) {
+        <div class="team-actions">
+          <ui-button type="button" variant="secondary" size="sm" (click)="onEditClick()">
+            Bearbeiten
+          </ui-button>
+          <ui-button type="button" variant="danger" size="sm" (click)="onDeleteClick()">
+            Loeschen
+          </ui-button>
+        </div>
+      }
     </div>
-    }
-  </div>
-</div>
+  </ui-card>
 } @else {
-<div class="team-card team-card-editing">
-  <form [formGroup]="editForm" (ngSubmit)="onSaveEdit()">
-    <div class="form-group">
-      <label for="name">Name*</label>
-      <input
-        id="name"
-        type="text"
-        formControlName="name"
-        maxlength="100"
-        [disabled]="isSaving()"
-      />
-    </div>
+  <ui-card variant="subtle" padding="lg" class="team-card team-card-editing">
+    <form [formGroup]="editForm" (ngSubmit)="onSaveEdit()">
+      <div class="form-group">
+        <label for="name">Name*</label>
+        <input id="name" type="text" formControlName="name" maxlength="100" />
+      </div>
 
-    <div class="form-group">
-      <label for="shortName">Kurzname*</label>
-      <input
-        id="shortName"
-        type="text"
-        formControlName="shortName"
-        maxlength="10"
-        [disabled]="isSaving()"
-      />
-    </div>
+      <div class="form-group">
+        <label for="shortName">Kurzname*</label>
+        <input id="shortName" type="text" formControlName="shortName" maxlength="10" />
+      </div>
 
-    <div class="form-group">
-      <label>Team-Logo*</label>
-      <app-image-upload
-        [uploadCategory]="'teams'"
-        [label]="'Logo ändern'"
-        [currentImageUrl]="uploadedLogoUrl()"
-        (imageUploaded)="onImageUploaded($event)"
-      />
-    </div>
+      <div class="form-group">
+        <label>Team-Logo*</label>
+        <app-image-upload
+          [uploadCategory]="'teams'"
+          [label]="'Logo aendern'"
+          [currentImageUrl]="uploadedLogoUrl()"
+          (imageUploaded)="onImageUploaded($event)"
+        />
+      </div>
 
-    <div class="team-actions">
-      <button
-        type="submit"
-        class="save-btn"
-        [disabled]="editForm.invalid || isSaving()"
-      >
-        Speichern
-      </button>
-      <button
-        type="button"
-        class="cancel-btn"
-        (click)="onCancelEdit()"
-        [disabled]="isSaving()"
-      >
-        Abbrechen
-      </button>
-    </div>
-  </form>
-</div>
+      <div class="team-actions">
+        <ui-button type="submit" size="sm" [disabled]="editForm.invalid || isSaving()">
+          <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
+          Speichern
+        </ui-button>
+        <ui-button
+          type="button"
+          variant="secondary"
+          size="sm"
+          (click)="onCancelEdit()"
+          [disabled]="isSaving()"
+        >
+          Abbrechen
+        </ui-button>
+      </div>
+    </form>
+  </ui-card>
 }
 
 <app-confirmation-dialog
   [visible]="showDeleteDialog()"
-  [title]="'Team löschen'"
+  [title]="'Team loeschen'"
   [message]="
-    'Möchtest du das Team »' + (team()?.name ?? '') + '« wirklich löschen?'
+    'Moechtest du das Team »' + (team()?.name ?? '') + '« wirklich loeschen?'
   "
-  [confirmLabel]="'Löschen'"
+  [confirmLabel]="'Loeschen'"
   [cancelLabel]="'Abbrechen'"
   (confirmed)="handleDeleteConfirm()"
   (cancelled)="handleDeleteCancel()"

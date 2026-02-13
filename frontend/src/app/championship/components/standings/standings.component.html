@@ -1,64 +1,111 @@
-<div class="standings-container">
+<section class="standings-view">
   @if (isLoading()) {
-    <div class="loading">Laden...</div>
+    <ui-card variant="default" padding="lg">
+      <p class="standings-feedback">Laden...</p>
+    </ui-card>
   } @else if (error()) {
-    <div class="error">{{ error() }}</div>
+    <ui-card variant="default" padding="lg">
+      <p class="standings-feedback standings-feedback--error">{{ error() }}</p>
+    </ui-card>
   } @else {
-    <div class="standings-header">
-      <h2>Ergebnis-Tabelle</h2>
-      @if (championship()) {
-        <h3>{{ championship()!.name }}</h3>
-      }
-      <button class="back-btn" (click)="backToChampionship()">← Zurück</button>
-    </div>
+    <ui-card variant="elevated" padding="lg" class="standings-shell">
+      <ui-page-header
+        kicker="Tabelle"
+        title="Ergebnis-Tabelle"
+        [subtitle]="championship()?.name ?? null"
+        [showBack]="true"
+        backLabel="Zurueck zur Championship"
+        (back)="backToChampionship()"
+      >
+        <div uiPageHeaderActions class="standings-actions">
+          <ui-badge tone="info" appearance="soft">
+            <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ sortedStandings().length }} Teilnehmer
+          </ui-badge>
+          <ui-badge tone="success" appearance="soft">
+            <lucide-icon [img]="icons.table" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ bonusColumns().length }} Bonus-Spalten
+          </ui-badge>
+        </div>
+      </ui-page-header>
 
-    <div class="standings-table-wrapper">
-      <table class="standings-table">
-        <thead>
-          <tr>
-            <th class="rank-col">Platz</th>
-            <th>Teilnehmer</th>
-            <th class="points-col">Punkte (Spiele)</th>
-            @for (column of bonusColumns(); track column.key) {
-              <th class="bonus-col">{{ column.label }}</th>
-            }
-            @if (showTotalColumn()) {
-              <th class="total-col">Gesamt</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (standing of sortedStandings(); track standing.id; let i = $index) {
-            <tr [class.current-user]="isCurrentUser(standing.userId)" [class.top-three]="i < 3">
-              <td class="rank">
-                @if (i === 0) {
-                  <span class="medal gold">🥇</span>
-                } @else if (i === 1) {
-                  <span class="medal silver">🥈</span>
-                } @else if (i === 2) {
-                  <span class="medal bronze">🥉</span>
-                } @else {
-                  {{ i + 1 }}
+      <ui-card variant="default" padding="none" class="standings-table-shell">
+        <div class="standings-table-wrapper">
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th class="rank-col">Platz</th>
+                <th>Teilnehmer</th>
+                <th class="points-col">Punkte (Spiele)</th>
+                @for (column of bonusColumns(); track column.key) {
+                  <th class="bonus-col">{{ column.label }}</th>
                 }
-              </td>
-              <td class="username">{{ standing.user.username }}</td>
-              <td class="points">{{ standing.gamePoints }}</td>
-              @for (column of bonusColumns(); track column.key) {
-                <td class="bonus-points">
-                  @if (getBonusPointsForColumn(standing, column.key) > 0) {
-                    {{ getBonusPointsForColumn(standing, column.key) }}
-                  } @else {
-                    <span class="no-bonus">-</span>
+                @if (showTotalColumn()) {
+                  <th class="total-col">
+                    <span class="total-col-label">
+                      <lucide-icon [img]="icons.trophy" [size]="14" aria-hidden="true"></lucide-icon>
+                      Gesamt
+                    </span>
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (standing of sortedStandings(); track standing.id; let i = $index) {
+                <tr [class.current-user]="isCurrentUser(standing.userId)" [class.top-three]="i < 3">
+                  <td class="rank">
+                    @if (i === 0) {
+                      <ui-badge tone="warning" appearance="soft">
+                        <lucide-icon [img]="icons.trophy" [size]="14" aria-hidden="true"></lucide-icon>
+                        1
+                      </ui-badge>
+                    } @else if (i === 1) {
+                      <ui-badge tone="neutral" appearance="soft">
+                        <lucide-icon [img]="icons.medal" [size]="14" aria-hidden="true"></lucide-icon>
+                        2
+                      </ui-badge>
+                    } @else if (i === 2) {
+                      <ui-badge tone="info" appearance="soft">
+                        <lucide-icon [img]="icons.award" [size]="14" aria-hidden="true"></lucide-icon>
+                        3
+                      </ui-badge>
+                    } @else {
+                      <ui-badge tone="neutral" appearance="soft">{{ i + 1 }}</ui-badge>
+                    }
+                  </td>
+                  <td class="username">
+                    <div class="username-cell">
+                      <span class="username-text">{{ standing.user.username }}</span>
+                      @if (isCurrentUser(standing.userId)) {
+                        <ui-badge tone="info" appearance="soft">Du</ui-badge>
+                      }
+                    </div>
+                  </td>
+                  <td class="points">
+                    <ui-badge tone="info" appearance="solid">{{ standing.gamePoints }}</ui-badge>
+                  </td>
+                  @for (column of bonusColumns(); track column.key) {
+                    <td class="bonus-points">
+                      @if (getBonusPointsForColumn(standing, column.key) > 0) {
+                        <ui-badge tone="success" appearance="soft">
+                          {{ getBonusPointsForColumn(standing, column.key) }}
+                        </ui-badge>
+                      } @else {
+                        <ui-badge tone="neutral" appearance="soft">-</ui-badge>
+                      }
+                    </td>
                   }
-                </td>
+                  @if (showTotalColumn()) {
+                    <td class="total-points">
+                      <ui-badge tone="success" appearance="solid">{{ standing.totalPoints }}</ui-badge>
+                    </td>
+                  }
+                </tr>
               }
-              @if (showTotalColumn()) {
-                <td class="total-points">{{ standing.totalPoints }}</td>
-              }
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+            </tbody>
+          </table>
+        </div>
+      </ui-card>
+    </ui-card>
   }
-</div>
+</section>

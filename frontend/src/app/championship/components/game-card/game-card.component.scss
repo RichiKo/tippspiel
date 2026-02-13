@@ -1,397 +1,376 @@
 .game-card {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: box-shadow 0.2s;
+  background: #ffffff;
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  transition: border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-  &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
+.game-card:hover {
+  border-color: rgba(15, 118, 110, 0.36);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.09);
+  transform: translateY(-1px);
+}
 
-  .game-meta-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #f0f0f0;
+.game-meta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.95rem;
+  padding-bottom: 0.72rem;
+  border-bottom: 1px solid #ebf0f4;
+}
 
-    .kickoff-time {
-      color: #666;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
+.kickoff-time {
+  color: #5a6572;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
 
-    .admin-actions {
-      display: flex;
-      gap: 0.35rem;
-      flex-wrap: nowrap;
-      justify-content: flex-end;
-    }
+.admin-actions {
+  display: flex;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
 
-    .edit-game-btn,
-    .delete-game-btn {
-      min-height: 32px;
-      min-width: 32px;
-      padding: 0.3rem 0.55rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.3rem;
-      background: transparent;
-      border: 1px solid;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.74rem;
-      transition: all 0.2s;
-    }
+.edit-game-btn,
+.delete-game-btn {
+  min-height: 34px;
+  padding: 0.35rem 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: all 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-    .btn-icon {
-      font-size: 0.82rem;
-      line-height: 1;
-    }
+.edit-game-btn {
+  color: #1d4ed8;
+  border-color: rgba(29, 78, 216, 0.38);
+}
 
-    .btn-text {
-      line-height: 1;
-    }
+.edit-game-btn:hover {
+  color: #ffffff;
+  background: #2563eb;
+  border-color: #2563eb;
+}
 
-    .edit-game-btn {
-      color: #1976d2;
-      border-color: #1976d2;
+.delete-game-btn {
+  color: #b91c1c;
+  border-color: rgba(220, 38, 38, 0.34);
+}
 
-      &:hover {
-        background: #1976d2;
-        color: white;
-      }
-    }
+.delete-game-btn:hover {
+  color: #ffffff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
 
-    .delete-game-btn {
-      color: #d32f2f;
-      border-color: #d32f2f;
+.game-info {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 0.25rem;
+}
 
-      &:hover {
-        background: #d32f2f;
-        color: white;
-      }
-    }
-  }
+.team {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
 
-  .game-info {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 1rem;
+.team img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 7px;
+  flex-shrink: 0;
+}
 
-    .team {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      min-width: 0;
+.team span {
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #0f172a;
+}
 
-      img {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        border-radius: 4px;
-        flex-shrink: 0;
-      }
+.team.home-team {
+  justify-content: flex-end;
+  text-align: right;
+}
 
-      span {
-        font-weight: 500;
-        font-size: 1rem;
-        min-width: 0;
-        overflow-wrap: anywhere;
-      }
+.team.away-team {
+  justify-content: flex-start;
+  text-align: left;
+}
 
-      &.home-team {
-        justify-content: flex-end;
-        text-align: right;
-      }
+.game-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 178px;
+}
 
-      &.away-team {
-        justify-content: flex-start;
-        text-align: left;
-      }
-    }
+.final-score {
+  text-align: center;
+}
 
-    .game-score {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      min-width: 180px;
+.score {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0f5f4c;
+  letter-spacing: 0.01em;
+}
 
-      .final-score {
-        text-align: center;
+.status {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.77rem;
+  color: #5a6572;
+  font-weight: 600;
+}
 
-        .score {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: #1976d2;
-        }
+.status.closed {
+  color: #15803d;
+}
 
-        .status {
-          display: block;
-          margin-top: 0.25rem;
-          font-size: 0.875rem;
-          color: #666;
+.tip-locked-info {
+  text-align: center;
+}
 
-          &.closed {
-            color: #4caf50;
-          }
-        }
-      }
+.tip-locked {
+  color: #b45309;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
 
-      .tip-locked-info {
-        text-align: center;
+.tip-input {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-        .tip-locked {
-          color: #f57c00;
-          font-weight: 500;
-        }
-      }
+.goal-input {
+  width: 56px;
+  min-height: 40px;
+  padding: 0.45rem;
+  text-align: center;
+  font-size: 0.95rem;
+  border: 1px solid #cfd8e1;
+  border-radius: 9px;
+  background: #f8fbfd;
+  transition: border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-      .tip-input {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
+.goal-input:focus {
+  outline: none;
+  border-color: #0f766e;
+  background: #ffffff;
+}
 
-        .goal-input {
-          width: 60px;
-          padding: 0.5rem;
-          text-align: center;
-          font-size: 1rem;
-          border: 2px solid #e0e0e0;
-          border-radius: 4px;
-          transition: border-color 0.2s;
+.goal-input:disabled {
+  background: #eff3f7;
+  cursor: not-allowed;
+}
 
-          &:focus {
-            outline: none;
-            border-color: #1976d2;
-          }
+.colon {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #64748b;
+}
 
-          &:disabled {
-            background: #f5f5f5;
-            cursor: not-allowed;
-          }
-        }
+.save-tip-btn,
+.cancel-edit-btn,
+.edit-tip-btn {
+  min-height: 38px;
+  padding: 0.44rem 0.84rem;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-        .colon {
-          font-size: 1.25rem;
-          font-weight: bold;
-          color: #666;
-        }
+.save-tip-btn {
+  background: linear-gradient(135deg, #0f5f4c 0%, #10b981 100%);
+  color: #ffffff;
+  border: 0;
+}
 
-        .save-tip-btn {
-          min-height: 36px;
-          padding: 0.5rem 1rem;
-          background: #1976d2;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.875rem;
-          transition: background 0.2s;
+.save-tip-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
 
-          &:hover:not(:disabled) {
-            background: #1565c0;
-          }
+.save-tip-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 
-          &:disabled {
-            background: #bdbdbd;
-            cursor: not-allowed;
-          }
-        }
+.cancel-edit-btn {
+  background: transparent;
+  color: #475569;
+  border: 1px solid #c9d3dc;
+}
 
-        .cancel-edit-btn {
-          min-height: 36px;
-          padding: 0.5rem 1rem;
-          background: transparent;
-          color: #666;
-          border: 1px solid #bdbdbd;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.875rem;
-          transition: all 0.2s;
+.cancel-edit-btn:hover {
+  background: #f1f5f9;
+}
 
-          &:hover {
-            background: #f5f5f5;
-            border-color: #666;
-          }
-        }
-      }
+.tip-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
 
-      .tip-display {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
+.saved-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.22rem;
+}
 
-        .saved-tip {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.25rem;
+.tip-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f5f4c;
+}
 
-          .tip-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1976d2;
-          }
+.tip-label {
+  font-size: 0.76rem;
+  color: #5a6572;
+  font-style: normal;
+  font-weight: 600;
+}
 
-          .tip-label {
-            font-size: 0.875rem;
-            color: #666;
-            font-style: italic;
-          }
-        }
+.edit-tip-btn {
+  background: transparent;
+  color: #0f5f4c;
+  border: 1px solid rgba(15, 118, 110, 0.4);
+}
 
-        .edit-tip-btn {
-          min-height: 36px;
-          padding: 0.5rem 1rem;
-          background: transparent;
-          color: #1976d2;
-          border: 1px solid #1976d2;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.875rem;
-          transition: all 0.2s;
+.edit-tip-btn:hover {
+  background: rgba(15, 118, 110, 0.12);
+}
 
-          &:hover {
-            background: #1976d2;
-            color: white;
-          }
-        }
-      }
+.user-tip {
+  color: #5a6572;
+  font-size: 0.78rem;
+}
 
-      .user-tip {
-        color: #666;
-        font-size: 0.875rem;
-        font-style: italic;
-      }
-    }
-  }
-
-  .game-meta {
-    margin-top: 0;
-  }
+.edit-game-btn:focus-visible,
+.delete-game-btn:focus-visible,
+.save-tip-btn:focus-visible,
+.cancel-edit-btn:focus-visible,
+.edit-tip-btn:focus-visible,
+.goal-input:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
 }
 
 @media (max-width: 767px) {
   .game-card {
-    padding: 1rem;
+    padding: 0.82rem;
+  }
 
-    .game-meta-header {
-      align-items: center;
-      gap: 0.5rem;
-      flex-direction: row;
+  .game-meta-header {
+    gap: 0.4rem;
+  }
 
-      .kickoff-time {
-        font-size: 0.8rem;
-      }
+  .kickoff-time {
+    font-size: 0.76rem;
+  }
 
-      .admin-actions {
-        margin-left: auto;
-        justify-content: flex-end;
-      }
+  .admin-actions {
+    gap: 0.32rem;
+  }
 
-      .edit-game-btn,
-      .delete-game-btn {
-        min-height: 28px;
-        min-width: 28px;
-        padding: 0.2rem;
-        border-radius: 5px;
-      }
+  .edit-game-btn,
+  .delete-game-btn {
+    min-height: 30px;
+    padding: 0.15rem 0.5rem;
+    border-radius: 7px;
+    font-size: 0.66rem;
+  }
 
-      .btn-text {
-        display: none;
-      }
+  .game-info {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.4rem;
+    align-items: center;
+  }
 
-      .btn-icon {
-        font-size: 0.72rem;
-      }
-    }
+  .team {
+    gap: 0.32rem;
+  }
 
-    .game-info {
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      gap: 0.4rem;
-      align-items: center;
+  .team span {
+    font-size: 0.74rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-      .team {
-        gap: 0.3rem;
-        min-width: 0;
+  .team img {
+    width: 22px;
+    height: 22px;
+  }
 
-        span {
-          font-size: 0.76rem;
-          line-height: 1.1;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+  .game-score {
+    min-width: 78px;
+    width: auto;
+    align-items: center;
+    gap: 0.2rem;
+  }
 
-        img {
-          width: 22px;
-          height: 22px;
-        }
+  .score,
+  .tip-value {
+    font-size: 1.05rem;
+  }
 
-        &.home-team {
-          justify-content: flex-end;
-          text-align: right;
-        }
+  .status,
+  .tip-label,
+  .user-tip {
+    font-size: 0.68rem;
+  }
 
-        &.away-team {
-          justify-content: flex-start;
-          text-align: left;
-        }
-      }
+  .tip-input {
+    width: auto;
+    justify-content: center;
+    gap: 0.28rem;
+  }
 
-      .game-score {
-        min-width: 78px;
-        width: auto;
-        align-items: center;
-        gap: 0.2rem;
+  .goal-input {
+    width: 42px;
+    min-height: 38px;
+    padding: 0.2rem;
+    font-size: 0.86rem;
+    border-radius: 8px;
+  }
 
-        .final-score .score,
-        .tip-display .saved-tip .tip-value {
-          font-size: 1.05rem;
-        }
-
-        .final-score .status,
-        .tip-display .saved-tip .tip-label,
-        .user-tip {
-          font-size: 0.68rem;
-        }
-
-        .tip-input {
-          width: auto;
-          justify-content: center;
-          gap: 0.3rem;
-
-          .goal-input {
-            width: 42px;
-            min-height: 40px;
-            padding: 0.25rem;
-            font-size: 0.9rem;
-          }
-
-          .save-tip-btn,
-          .cancel-edit-btn {
-            min-height: 40px;
-            padding: 0.35rem 0.6rem;
-            font-size: 0.75rem;
-          }
-        }
-
-        .edit-tip-btn {
-          min-height: 40px;
-          font-size: 0.75rem;
-          padding: 0.35rem 0.6rem;
-        }
-      }
-    }
+  .save-tip-btn,
+  .cancel-edit-btn,
+  .edit-tip-btn {
+    min-height: 38px;
+    padding: 0.24rem 0.54rem;
+    font-size: 0.71rem;
+    border-radius: 8px;
   }
 }

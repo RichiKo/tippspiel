@@ -1,10 +1,24 @@
-import { Component, signal, inject, effect } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import { BonusService } from '../../services/bonus.service';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
-import { BonusRule, BonusPick } from '../../types/bonus.interface';
+import { BonusPick, BonusRule } from '../../types/bonus.interface';
 import { Championship } from '../../../dashboard/types/championship.interface';
+import {
+  UI_ICONS,
+  UiBadgeComponent,
+  UiCardComponent,
+  UiPageHeaderComponent,
+} from '../../../ui-lib/public-api';
 
 interface UserPicksRow {
   userId: number;
@@ -15,9 +29,17 @@ interface UserPicksRow {
 
 @Component({
   selector: 'app-bonus-overview',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    LucideAngularModule,
+    UiBadgeComponent,
+    UiCardComponent,
+    UiPageHeaderComponent,
+  ],
   templateUrl: './bonus-overview.component.html',
-  styleUrls: ['./bonus-overview.component.scss'],
+  styleUrl: './bonus-overview.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BonusOverviewComponent {
   private readonly route = inject(ActivatedRoute);
@@ -28,23 +50,41 @@ export class BonusOverviewComponent {
   championship = signal<Championship | null>(null);
   bonusRules = signal<BonusRule[]>([]);
   userPicksRows = signal<UserPicksRow[]>([]);
-  isLoading = signal<boolean>(false);
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   eliminatedTeamIds = signal<Set<string>>(new Set());
+
+  readonly icons = UI_ICONS;
+
+  readonly eliminatedPicksCount = computed(() => {
+    const rows = this.userPicksRows();
+    const rules = this.bonusRules();
+
+    let count = 0;
+    for (const row of rows) {
+      for (const rule of rules) {
+        const pick = row.picks.get(rule.id);
+        if (pick && this.eliminatedTeamIds().has(pick.teamId)) {
+          count += 1;
+        }
+      }
+    }
+
+    return count;
+  });
 
   championshipId = '';
 
   constructor() {
-    effect(
-      () => {
-        const id = this.route.snapshot.paramMap.get('id');
-        if (id) {
-          this.championshipId = id;
-          this.loadData();
-        }
-      },
-      { allowSignalWrites: true },
-    );
+    effect(() => {
+      const id = this.route.snapshot.paramMap.get('id');
+      if (!id) {
+        return;
+      }
+
+      this.championshipId = id;
+      this.loadData();
+    });
   }
 
   private loadData(): void {
@@ -56,32 +96,29 @@ export class BonusOverviewComponent {
         this.championship.set(championship);
         this.eliminatedTeamIds.set(new Set(championship.eliminatedTeamIds || []));
       },
-      error: (err) => {
-        console.error('Error loading championship:', err);
+      error: () => {
         this.errorMessage.set('Fehler beim Laden der Championship.');
       },
     });
 
-    // Load all bonus rules (with picks)
     this.bonusService.getBonusRules(this.championshipId).subscribe({
       next: async (rules) => {
         this.bonusRules.set(rules);
 
-        // Load picks for each rule
         const picksPromises = rules.map((rule) =>
           this.bonusService.getAllPicksUser(rule.id).toPromise().catch(() => []),
         );
 
         const allPicksArrays = await Promise.all(picksPromises);
-
-        // Build user rows
         const userMap = new Map<number, UserPicksRow>();
 
         rules.forEach((rule, ruleIndex) => {
           const picks = allPicksArrays[ruleIndex] || [];
 
           picks.forEach((pick: BonusPick) => {
-            if (!pick.user || !pick.team) return;
+            if (!pick.user || !pick.team) {
+              return;
+            }
 
             let userRow = userMap.get(pick.userId);
             if (!userRow) {
@@ -105,8 +142,7 @@ export class BonusOverviewComponent {
         this.userPicksRows.set(Array.from(userMap.values()));
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('Error loading bonus rules:', err);
+      error: () => {
         this.errorMessage.set('Fehler beim Laden der Bonus-Regeln.');
         this.isLoading.set(false);
       },
@@ -118,7 +154,7 @@ export class BonusOverviewComponent {
     ruleId: string,
   ): { teamId: string; teamName: string; teamLogo: string } | null {
     const userRow = this.userPicksRows().find((row) => row.userId === userId);
-    return userRow?.picks.get(ruleId) || null;
+    return userRow?.picks.get(ruleId) ?? null;
   }
 
   isEliminatedTeam(teamId: string): boolean {

@@ -1,15 +1,40 @@
-import { Component, signal, inject, computed } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { LucideAngularModule } from 'lucide-angular';
 import { PersistingService } from '../auth/services/persisisting.service';
-import { UserService } from '../shared/services/user.service';
+import { UpdateUserDto, UserService } from '../shared/services/user.service';
+import {
+  UI_ICONS,
+  UiBadgeComponent,
+  UiButtonComponent,
+  UiCardComponent,
+  UiPageHeaderComponent,
+} from '../ui-lib/public-api';
 
 @Component({
   selector: 'app-user-settings',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    UiBadgeComponent,
+    UiButtonComponent,
+    UiCardComponent,
+    UiPageHeaderComponent,
+  ],
   templateUrl: './user-settings.component.html',
   styleUrl: './user-settings.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSettingsComponent {
   private readonly router = inject(Router);
@@ -17,8 +42,8 @@ export class UserSettingsComponent {
   private readonly userService = inject(UserService);
 
   readonly currentUser = this.persistingService.currentUser;
+  readonly icons = UI_ICONS;
 
-  // Form fields
   username = signal('');
   email = signal('');
   currentPassword = signal('');
@@ -28,78 +53,72 @@ export class UserSettingsComponent {
   selectedFile = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
 
-  // UI state
   isLoading = signal(false);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
   isUploadingImage = signal(false);
 
   readonly passwordsMatch = computed(() => {
-    const newPw = this.newPassword();
-    const confirmPw = this.confirmPassword();
-    return !newPw || !confirmPw || newPw === confirmPw;
+    const newPassword = this.newPassword();
+    const confirmPassword = this.confirmPassword();
+    return !newPassword || !confirmPassword || newPassword === confirmPassword;
   });
 
   readonly isFormValid = computed(() => {
     const hasUsername = this.username().trim().length > 0;
     const hasEmail = this.email().trim().length > 0;
     const emailValid = this.isValidEmail(this.email());
-    
-    // Basic validation: username and email must be valid
+
     if (!hasUsername || !hasEmail || !emailValid) {
       return false;
     }
-    
-    // If changing password, validate password fields
+
     if (this.newPassword() || this.confirmPassword()) {
       const passwordValid = this.newPassword().length >= 6;
-      const passwordsMatch = this.passwordsMatch();
-      return passwordValid && passwordsMatch;
+      return passwordValid && this.passwordsMatch();
     }
-    
-    // If not changing password, just validate username and email
+
     return true;
   });
 
   constructor() {
-    // Initialize form with current user data
     const user = this.currentUser();
-    if (user) {
-      this.username.set(user.username);
-      this.email.set(user.email);
-      this.imageUrl.set(user.image || '');
-      this.previewUrl.set(user.image || null);
+    if (!user) {
+      return;
     }
+
+    this.username.set(user.username);
+    this.email.set(user.email);
+    this.imageUrl.set(user.image || '');
+    this.previewUrl.set(user.image || null);
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        this.error.set('Nur JPG, PNG und WebP Dateien sind erlaubt.');
-        return;
-      }
-
-      // Validate file size (2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        this.error.set('Die Datei ist zu groß. Maximal 2MB sind erlaubt.');
-        return;
-      }
-
-      this.selectedFile.set(file);
-      this.error.set(null);
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.previewUrl.set(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!input.files || input.files.length === 0) {
+      return;
     }
+
+    const file = input.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.error.set('Nur JPG, PNG und WebP Dateien sind erlaubt.');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.error.set('Die Datei ist zu gross. Maximal 2MB sind erlaubt.');
+      return;
+    }
+
+    this.selectedFile.set(file);
+    this.error.set(null);
+
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => {
+      this.previewUrl.set(loadEvent.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   }
 
   async onSave(): Promise<void> {
@@ -112,48 +131,46 @@ export class UserSettingsComponent {
     this.success.set(null);
 
     try {
-      // Upload image first if selected
       let uploadedImageUrl = this.imageUrl();
-      if (this.selectedFile()) {
+      const selectedFile = this.selectedFile();
+
+      if (selectedFile) {
         this.isUploadingImage.set(true);
-        const uploadResponse = await this.userService
-          .uploadUserImage(this.selectedFile()!)
-          .toPromise();
-        uploadedImageUrl = uploadResponse!.url;
+        const uploadResponse = await firstValueFrom(
+          this.userService.uploadUserImage(selectedFile),
+        );
+        uploadedImageUrl = uploadResponse.url;
         this.isUploadingImage.set(false);
       }
 
-      // Prepare update data
-      const updateData: any = {
+      const updateData: UpdateUserDto = {
         username: this.username(),
         email: this.email(),
         image: uploadedImageUrl,
       };
 
-      // Only include password if user wants to change it
       if (this.newPassword()) {
         updateData.password = this.newPassword();
       }
 
-      // Update user
-      await this.userService.updateUser(updateData).toPromise();
+      await firstValueFrom(this.userService.updateUser(updateData));
 
       this.success.set('Einstellungen erfolgreich gespeichert!');
       this.isLoading.set(false);
 
-      // Clear password fields
       this.currentPassword.set('');
       this.newPassword.set('');
       this.confirmPassword.set('');
       this.selectedFile.set(null);
 
-      // Navigate back after short delay
       setTimeout(() => {
         this.router.navigate(['/dashboard']);
       }, 1500);
-    } catch (err: any) {
-      console.error('Failed to update user:', err);
-      this.error.set(err.error?.message || 'Fehler beim Speichern der Einstellungen.');
+    } catch (error: unknown) {
+      const typedError = error as { error?: { message?: string } };
+      this.error.set(
+        typedError.error?.message || 'Fehler beim Speichern der Einstellungen.',
+      );
       this.isLoading.set(false);
       this.isUploadingImage.set(false);
     }

@@ -5,13 +5,23 @@
     </span>
     @if (isAdmin()) {
       <div class="admin-actions">
-        <button class="edit-game-btn" (click)="onEditGame()" aria-label="Spiel bearbeiten" title="Bearbeiten">
-          <span class="btn-icon" aria-hidden="true">✎</span>
-          <span class="btn-text">Bearbeiten</span>
+        <button
+          type="button"
+          class="edit-game-btn"
+          (click)="onEditGame()"
+          aria-label="Spiel bearbeiten"
+          title="Bearbeiten"
+        >
+          Bearbeiten
         </button>
-        <button class="delete-game-btn" (click)="onDeleteGame()" aria-label="Spiel löschen" title="Löschen">
-          <span class="btn-icon" aria-hidden="true">🗑</span>
-          <span class="btn-text">Löschen</span>
+        <button
+          type="button"
+          class="delete-game-btn"
+          (click)="onDeleteGame()"
+          aria-label="Spiel löschen"
+          title="Löschen"
+        >
+          Löschen
         </button>
       </div>
     }
@@ -49,7 +59,7 @@
               <span class="tip-value">{{ tip()?.homeTeamGoals }} : {{ tip()?.awayTeamGoals }}</span>
               <small class="tip-label">Dein Tipp</small>
             </div>
-            <button class="edit-tip-btn" (click)="enterEditMode()">
+            <button type="button" class="edit-tip-btn" (click)="enterEditMode()">
               Bearbeiten
             </button>
           </div>
@@ -73,6 +83,7 @@
               class="goal-input"
             />
             <button 
+              type="button"
               class="save-tip-btn"
               (click)="saveTip()" 
               [disabled]="!canSaveTip()"
@@ -80,7 +91,7 @@
               Speichern
             </button>
             @if (hasTip()) {
-              <button class="cancel-edit-btn" (click)="cancelEdit()">
+              <button type="button" class="cancel-edit-btn" (click)="cancelEdit()">
                 Abbrechen
               </button>
             }

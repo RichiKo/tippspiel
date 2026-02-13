@@ -1,195 +1,209 @@
-<div class="teams-container">
-  <h1>Teams-Verwaltung</h1>
-
-  @if (errorMessage()) {
-  <div class="error-banner">
-    {{ errorMessage() }}
-  </div>
-  }
-
-  <div class="add-team-section">
-    <h2>Neues Team hinzufügen</h2>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="form-layout">
-        <div class="form-inputs">
-          <div class="form-group">
-            <label for="name">Name*</label>
-            <input
-              id="name"
-              type="text"
-              formControlName="name"
-              maxlength="100"
-              placeholder="z.B. Arsenal FC"
-              [disabled]="isLoading()"
-            />
-            @if (submitted() && form.controls.name.errors?.['required']) {
-            <div class="error">Name ist erforderlich.</div>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="shortName">Kurzname*</label>
-            <input
-              id="shortName"
-              type="text"
-              formControlName="shortName"
-              maxlength="10"
-              placeholder="z.B. ARS"
-              [disabled]="isLoading()"
-            />
-            @if (submitted() && form.controls.shortName.errors?.['required']) {
-            <div class="error">Kurzname ist erforderlich.</div>
-            }
-          </div>
-        </div>
-
-        <div class="form-upload">
-          <app-image-upload
-            [uploadCategory]="'teams'"
-            [label]="'Team-Logo*'"
-            [currentImageUrl]="uploadedLogoUrl()"
-            (imageUploaded)="onImageUploaded($event)"
-            (uploadError)="onUploadError($event)"
-          />
-          @if (submitted() && form.controls.logoUrl.errors?.['required']) {
-          <div class="error">Logo ist erforderlich.</div>
-          }
-        </div>
+<section class="teams-view">
+  <ui-card variant="elevated" padding="lg" class="teams-shell">
+    <ui-page-header
+      kicker="Verwaltung"
+      title="Teams"
+      subtitle="Erstelle und pflege alle Teams zentral"
+      [showBack]="true"
+      backLabel="Zurueck zum Dashboard"
+      (back)="backToDashboard()"
+    >
+      <div uiPageHeaderActions class="teams-actions">
+        <ui-badge tone="info" appearance="soft">
+          <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
+          {{ teams().length }} Teams
+        </ui-badge>
+        @if (isAdmin()) {
+          <ui-badge tone="success" appearance="soft">Admin</ui-badge>
+        }
       </div>
+    </ui-page-header>
 
-      <button
-        type="submit"
-        class="add-btn"
-        [disabled]="isLoading() || form.invalid"
-      >
-        + Team hinzufügen
-      </button>
-    </form>
-  </div>
+    @if (errorMessage()) {
+      <ui-card variant="subtle" padding="sm" class="error-banner">
+        <ui-badge tone="danger" appearance="soft">
+          <lucide-icon [img]="icons.circleX" [size]="14" aria-hidden="true"></lucide-icon>
+          {{ errorMessage() }}
+        </ui-badge>
+      </ui-card>
+    }
 
-  <div class="teams-list">
-    <h2>Alle Teams ({{ teams().length }})</h2>
+    @if (isAdmin()) {
+      <ui-card variant="default" padding="lg" class="add-team-section">
+        <h2>Neues Team hinzufuegen</h2>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="form-layout">
+            <div class="form-inputs">
+              <div class="form-group">
+                <label for="name">Name*</label>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  maxlength="100"
+                  placeholder="z.B. Arsenal FC"
+                />
+                @if (submitted() && form.controls.name.errors?.['required']) {
+                  <div class="error">Name ist erforderlich.</div>
+                }
+              </div>
 
-    @if (isLoading() && teams().length === 0) {
-    <div class="loading">Lade Teams...</div>
-    } @if (!isLoading() && teams().length === 0) {
-    <div class="empty-state">
-      Noch keine Teams vorhanden. Füge dein erstes Team hinzu!
-    </div>
-    } @if (teams().length > 0) {
-    <div class="table-container">
-      <table class="teams-table">
-        <thead>
-          <tr>
-            <th>Logo</th>
-            <th>Name</th>
-            <th>Kurzname</th>
-            <th>Erstellt am</th>
-            @if (isAdmin()) {
-            <th>Aktionen</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (team of teams(); track team.id) { @if (editingTeamId() ===
-          team.id) {
-          <tr class="editing-row">
-            <td>
+              <div class="form-group">
+                <label for="shortName">Kurzname*</label>
+                <input
+                  id="shortName"
+                  type="text"
+                  formControlName="shortName"
+                  maxlength="10"
+                  placeholder="z.B. ARS"
+                />
+                @if (submitted() && form.controls.shortName.errors?.['required']) {
+                  <div class="error">Kurzname ist erforderlich.</div>
+                }
+              </div>
+            </div>
+
+            <div class="form-upload">
               <app-image-upload
                 [uploadCategory]="'teams'"
-                [label]="''"
-                [currentImageUrl]="editLogoUrl()"
-                (imageUploaded)="onEditImageUploaded($event)"
+                [label]="'Team-Logo*'"
+                [currentImageUrl]="uploadedLogoUrl()"
+                (imageUploaded)="onImageUploaded($event)"
+                (uploadError)="onUploadError($event)"
               />
-            </td>
-            <td>
-              <input
-                type="text"
-                [formControl]="editForm.controls.name"
-                maxlength="100"
-                class="edit-input"
-              />
-            </td>
-            <td>
-              <input
-                type="text"
-                [formControl]="editForm.controls.shortName"
-                maxlength="10"
-                class="edit-input"
-              />
-            </td>
-            <td>{{ team.createdAt | date : "dd.MM.yyyy" }}</td>
-            @if (isAdmin()) {
-            <td class="actions-cell">
-              <button
-                type="button"
-                class="save-btn"
-                (click)="onSaveEdit(team.id)"
-                [disabled]="editForm.invalid || isSaving()"
-              >
-                Speichern
-              </button>
-              <button
-                type="button"
-                class="cancel-btn"
-                (click)="onCancelEdit()"
-                [disabled]="isSaving()"
-              >
-                Abbrechen
-              </button>
-            </td>
-            }
-          </tr>
-          } @else {
-          <tr>
-            <td>
-              <img
-                [src]="team.logoUrl"
-                [alt]="team.name"
-                class="team-logo"
-                onerror="this.src='https://via.placeholder.com/50?text=Team'"
-              />
-            </td>
-            <td class="team-name">{{ team.name }}</td>
-            <td class="team-short">{{ team.shortName }}</td>
-            <td>{{ team.createdAt | date : "dd.MM.yyyy HH:mm" }}</td>
-            @if (isAdmin()) {
-            <td class="actions-cell">
-              <button
-                type="button"
-                class="edit-btn"
-                (click)="onEditClick(team)"
-              >
-                Bearbeiten
-              </button>
-              <button
-                type="button"
-                class="delete-btn"
-                (click)="onDeleteClick(team)"
-              >
-                Löschen
-              </button>
-            </td>
-            }
-          </tr>
-          } }
-        </tbody>
-      </table>
-    </div>
+              @if (submitted() && form.controls.logoUrl.errors?.['required']) {
+                <div class="error">Logo ist erforderlich.</div>
+              }
+            </div>
+          </div>
+
+          <ui-button type="submit" [disabled]="isLoading() || form.invalid">
+            <lucide-icon [img]="icons.upload" [size]="14" aria-hidden="true"></lucide-icon>
+            Team hinzufuegen
+          </ui-button>
+        </form>
+      </ui-card>
     }
-  </div>
+
+    <ui-card variant="default" padding="lg" class="teams-list">
+      <h2>Alle Teams ({{ teams().length }})</h2>
+
+      @if (isLoading() && teams().length === 0) {
+        <p class="loading">Lade Teams...</p>
+      }
+
+      @if (!isLoading() && teams().length === 0) {
+        <p class="empty-state">Noch keine Teams vorhanden.</p>
+      }
+
+      @if (teams().length > 0) {
+        <div class="table-container">
+          <table class="teams-table">
+            <thead>
+              <tr>
+                <th>Logo</th>
+                <th>Name</th>
+                <th>Kurzname</th>
+                <th>Erstellt am</th>
+                @if (isAdmin()) {
+                  <th>Aktionen</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (team of teams(); track team.id) {
+                @if (editingTeamId() === team.id) {
+                  <tr class="editing-row">
+                    <td>
+                      <app-image-upload
+                        [uploadCategory]="'teams'"
+                        [label]="''"
+                        [currentImageUrl]="editLogoUrl()"
+                        (imageUploaded)="onEditImageUploaded($event)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        [formControl]="editForm.controls.name"
+                        maxlength="100"
+                        class="edit-input"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        [formControl]="editForm.controls.shortName"
+                        maxlength="10"
+                        class="edit-input"
+                      />
+                    </td>
+                    <td>{{ team.createdAt | date : 'dd.MM.yyyy' }}</td>
+                    @if (isAdmin()) {
+                      <td class="actions-cell">
+                        <ui-button
+                          size="sm"
+                          (click)="onSaveEdit(team.id)"
+                          [disabled]="editForm.invalid || isSaving()"
+                        >
+                          <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
+                          Speichern
+                        </ui-button>
+                        <ui-button
+                          variant="secondary"
+                          size="sm"
+                          (click)="onCancelEdit()"
+                          [disabled]="isSaving()"
+                        >
+                          Abbrechen
+                        </ui-button>
+                      </td>
+                    }
+                  </tr>
+                } @else {
+                  <tr>
+                    <td>
+                      <img
+                        [src]="team.logoUrl"
+                        [alt]="team.name"
+                        class="team-logo"
+                        onerror="this.src='https://via.placeholder.com/50?text=Team'"
+                      />
+                    </td>
+                    <td class="team-name">{{ team.name }}</td>
+                    <td class="team-short">{{ team.shortName }}</td>
+                    <td>{{ team.createdAt | date : 'dd.MM.yyyy HH:mm' }}</td>
+                    @if (isAdmin()) {
+                      <td class="actions-cell">
+                        <ui-button variant="secondary" size="sm" (click)="onEditClick(team)">
+                          Bearbeiten
+                        </ui-button>
+                        <ui-button variant="danger" size="sm" (click)="onDeleteClick(team)">
+                          Loeschen
+                        </ui-button>
+                      </td>
+                    }
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ui-card>
+  </ui-card>
 
   <app-confirmation-dialog
     [visible]="showDeleteDialog()"
-    [title]="'Team löschen'"
+    [title]="'Team loeschen'"
     [message]="
-      'Möchtest du das Team »' +
+      'Moechtest du das Team »' +
       (teamToDelete()?.name ?? '') +
-      '« wirklich löschen?'
+      '« wirklich loeschen?'
     "
-    [confirmLabel]="'Löschen'"
+    [confirmLabel]="'Loeschen'"
     [cancelLabel]="'Abbrechen'"
     (confirmed)="handleDeleteConfirm()"
     (cancelled)="handleDeleteCancel()"
   />
-</div>
+</section>

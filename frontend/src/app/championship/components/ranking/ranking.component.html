@@ -1,53 +1,100 @@
-<div class="ranking-container">
+<section class="ranking-view">
   @if (isLoading()) {
-    <div class="loading">Laden...</div>
+    <ui-card variant="default" padding="lg">
+      <p class="ranking-feedback">Laden...</p>
+    </ui-card>
   } @else if (error()) {
-    <div class="error">{{ error() }}</div>
+    <ui-card variant="default" padding="lg">
+      <p class="ranking-feedback ranking-feedback--error">{{ error() }}</p>
+    </ui-card>
   } @else {
-    <div class="ranking-header">
-      <h2>Prüf-Kalkulation</h2>
-      @if (championship()) {
-        <h3>{{ championship()!.name }}</h3>
-      }
-      <div class="games-info">
-        {{ closedGames() }} von {{ totalGames() }} Spielen ausgewertet
-      </div>
-      <button class="back-btn" (click)="backToChampionship()">← Zurück</button>
-    </div>
+    <ui-card variant="elevated" padding="lg" class="ranking-shell">
+      <ui-page-header
+        kicker="Analyse"
+        title="Pruef-Kalkulation"
+        [subtitle]="championship()?.name ?? null"
+        [showBack]="true"
+        backLabel="Zurueck zur Championship"
+        (back)="backToChampionship()"
+      >
+        <div uiPageHeaderActions class="ranking-actions">
+          <ui-badge [tone]="progressTone()" appearance="soft" data-testid="progress-badge">
+            <lucide-icon [img]="icons.circleCheckBig" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ progressPercent() }}%
+          </ui-badge>
+          <ui-badge tone="info" appearance="soft">
+            <lucide-icon [img]="icons.table" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ closedGames() }}/{{ totalGames() }}
+          </ui-badge>
+        </div>
+      </ui-page-header>
 
-    <div class="ranking-table-wrapper">
-      <table class="ranking-table">
-        <thead>
-          <tr>
-            <th>Teilnehmer</th>
-            <th>Exakt (3P)</th>
-            <th>Differenz (2P)</th>
-            <th>Tendenz (1P)</th>
-            <th>Missed (0P)</th>
-            <th class="bonus-col">Bonus</th>
-            <th class="total-col">Gesamt</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (ranking of sortedRankings(); track ranking.id) {
-            <tr [class.current-user]="isCurrentUser(ranking.userId)">
-              <td class="username">{{ ranking.user.username }}</td>
-              <td class="exact">{{ ranking.exactHits }}</td>
-              <td class="goal-diff">{{ ranking.goalDiffHits }}</td>
-              <td class="tendency">{{ ranking.tendencyHits }}</td>
-              <td class="missed">{{ ranking.missedTips }}</td>
-              <td class="bonus">
-                @if (ranking.bonusPoints > 0) {
-                  <span class="bonus-value">+{{ ranking.bonusPoints }}</span>
-                } @else {
-                  <span class="no-bonus">-</span>
-                }
-              </td>
-              <td class="total-points">{{ ranking.totalPoints }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+      <p class="games-info" data-testid="games-info">
+        <lucide-icon [img]="icons.calculator" [size]="15" aria-hidden="true"></lucide-icon>
+        <span>{{ closedGames() }} von {{ totalGames() }} Spielen ausgewertet</span>
+      </p>
+
+      <ui-card variant="default" padding="none" class="ranking-table-shell">
+        <div class="ranking-table-wrapper">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Teilnehmer</th>
+                <th>Exakt (3P)</th>
+                <th>Differenz (2P)</th>
+                <th>Tendenz (1P)</th>
+                <th>Missed (0P)</th>
+                <th class="bonus-col">Bonus</th>
+                <th class="total-col">
+                  <span class="total-col-label">
+                    <lucide-icon [img]="icons.trophy" [size]="14" aria-hidden="true"></lucide-icon>
+                    Gesamt
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ranking of sortedRankings(); track ranking.id) {
+                <tr
+                  [class.current-user]="isCurrentUser(ranking.userId)"
+                  [attr.data-user-id]="ranking.userId"
+                >
+                  <td class="username">
+                    <div class="username-cell">
+                      <span class="username-text">{{ ranking.user.username }}</span>
+                      @if (isCurrentUser(ranking.userId)) {
+                        <ui-badge tone="info" appearance="soft">Du</ui-badge>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <ui-badge tone="success" appearance="soft">{{ ranking.exactHits }}</ui-badge>
+                  </td>
+                  <td>
+                    <ui-badge tone="warning" appearance="soft">{{ ranking.goalDiffHits }}</ui-badge>
+                  </td>
+                  <td>
+                    <ui-badge tone="info" appearance="soft">{{ ranking.tendencyHits }}</ui-badge>
+                  </td>
+                  <td>
+                    <ui-badge tone="danger" appearance="soft">{{ ranking.missedTips }}</ui-badge>
+                  </td>
+                  <td class="bonus">
+                    @if (ranking.bonusPoints > 0) {
+                      <ui-badge tone="info" appearance="solid">+{{ ranking.bonusPoints }}</ui-badge>
+                    } @else {
+                      <ui-badge tone="neutral" appearance="soft">-</ui-badge>
+                    }
+                  </td>
+                  <td class="total-points">
+                    <ui-badge tone="success" appearance="solid">{{ ranking.totalPoints }}</ui-badge>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </ui-card>
+    </ui-card>
   }
-</div>
+</section>

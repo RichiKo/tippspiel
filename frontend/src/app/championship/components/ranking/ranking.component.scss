@@ -1,200 +1,153 @@
-.ranking-container {
-  max-width: 1200px;
+:host {
+  display: block;
+}
+
+.ranking-view {
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--ts-space-6);
+}
 
-  .loading,
-  .error {
-    text-align: center;
-    padding: 24px;
-    font-size: 16px;
+.ranking-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-4);
+}
+
+.ranking-actions {
+  display: inline-flex;
+  gap: var(--ts-space-2);
+  flex-wrap: wrap;
+}
+
+.games-info {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+  color: var(--ts-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.ranking-feedback {
+  text-align: center;
+  color: var(--ts-text-secondary);
+  font-weight: 700;
+}
+
+.ranking-feedback--error {
+  color: var(--ts-error);
+}
+
+.ranking-table-shell {
+  overflow: hidden;
+}
+
+.ranking-table-wrapper {
+  overflow-x: auto;
+}
+
+.ranking-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.ranking-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #395266;
+  border-bottom: 1px solid #dde5eb;
+  background: #f5f8fa;
+}
+
+.ranking-table thead th:not(:first-child) {
+  text-align: center;
+}
+
+.total-col-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ranking-table tbody tr {
+  transition: background-color var(--ts-transition-fast);
+}
+
+.ranking-table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+.ranking-table tbody tr.current-user {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.ranking-table tbody tr.current-user:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.ranking-table tbody td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #e9eff3;
+  text-align: center;
+}
+
+.ranking-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ranking-table tbody td.username {
+  text-align: left;
+}
+
+.username-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+}
+
+.username-text {
+  color: #0f172a;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.bonus-col,
+.total-col {
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .ranking-view {
+    padding: var(--ts-space-4);
   }
 
-  .error {
-    color: #e53935;
-  }
-
-  .ranking-header {
-    margin-bottom: 32px;
-
-    h2 {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    h3 {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 16px;
-      color: #666;
-    }
-
-    .games-info {
-      font-size: 16px;
-      color: #888;
-      margin-bottom: 16px;
-    }
-
-    .back-btn {
-      background-color: #3f51b5;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.3s;
-
-      &:hover {
-        background-color: #303f9f;
-      }
-
-      &:active {
-        background-color: #283593;
-      }
-    }
-  }
-
-  .ranking-table-wrapper {
-    overflow-x: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .games-info {
+    font-size: 0.78rem;
   }
 
   .ranking-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    thead {
-      background-color: #f5f5f5;
-
-      th {
-        padding: 16px;
-        text-align: left;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #e0e0e0;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        &:not(:first-child) {
-          text-align: center;
-        }
-
-        &.bonus-col {
-          color: #9c27b0;
-        }
-
-        &.total-col {
-          background-color: #f5f5f5;
-          font-weight: 700;
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        border-bottom: 1px solid #e0e0e0;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: #fafafa;
-        }
-
-        &.current-user {
-          background-color: #e3f2fd;
-          font-weight: 600;
-
-          &:hover {
-            background-color: #bbdefb;
-          }
-        }
-
-        td {
-          padding: 16px;
-          font-size: 14px;
-          color: #555;
-
-          &.username {
-            font-weight: 500;
-            color: #333;
-          }
-
-          &.exact,
-          &.goal-diff,
-          &.tendency,
-          &.missed,
-          &.bonus,
-          &.total-points {
-            text-align: center;
-            font-weight: 500;
-          }
-
-          &.exact {
-            color: #4caf50;
-          }
-
-          &.goal-diff {
-            color: #ff9800;
-          }
-
-          &.tendency {
-            color: #2196f3;
-          }
-
-          &.missed {
-            color: #e53935;
-          }
-
-          &.bonus {
-            .bonus-value {
-              color: #9c27b0;
-              font-weight: 600;
-            }
-
-            .no-bonus {
-              color: #ccc;
-            }
-          }
-
-          &.total-points {
-            font-weight: 700;
-            font-size: 16px;
-            color: #333;
-            background-color: #f9f9f9;
-          }
-        }
-      }
-    }
+    min-width: 620px;
   }
-}
 
-@media (max-width: 768px) {
-  .ranking-container {
-    padding: 16px;
+  .ranking-table thead th,
+  .ranking-table tbody td {
+    padding: 10px 8px;
+  }
 
-    .ranking-header {
-      h2 {
-        font-size: 24px;
-      }
+  .ranking-table thead th {
+    font-size: 0.63rem;
+  }
 
-      h3 {
-        font-size: 18px;
-      }
-    }
-
-    .ranking-table {
-      font-size: 12px;
-
-      thead th,
-      tbody td {
-        padding: 12px 8px;
-      }
-    }
+  .username-text {
+    font-size: 0.82rem;
   }
 }

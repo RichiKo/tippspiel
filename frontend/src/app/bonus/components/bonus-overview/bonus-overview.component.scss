@@ -1,244 +1,197 @@
-.bonus-overview-container {
-  max-width: 1400px;
+:host {
+  display: block;
+}
+
+.bonus-overview-view {
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--ts-space-6);
+}
 
-  .loading,
-  .error {
-    text-align: center;
-    padding: 24px;
-    font-size: 16px;
-  }
+.bonus-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-4);
+}
 
-  .error {
-    color: #e53935;
-  }
+.bonus-actions {
+  display: inline-flex;
+  gap: var(--ts-space-2);
+  flex-wrap: wrap;
+}
 
-  .overview-header {
-    margin-bottom: 32px;
+.bonus-feedback {
+  text-align: center;
+  color: var(--ts-text-secondary);
+  font-weight: 700;
+}
 
-    h2 {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
+.bonus-feedback--error {
+  color: var(--ts-error);
+}
 
-    h3 {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 16px;
-      color: #666;
-    }
+.bonus-empty-state {
+  text-align: center;
+  color: var(--ts-text-secondary);
+  font-weight: 700;
+}
 
-    .back-btn {
-      background-color: #3f51b5;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.3s;
+.bonus-table-shell {
+  overflow: hidden;
+}
 
-      &:hover {
-        background-color: #303f9f;
-      }
+.table-wrapper {
+  overflow-x: auto;
+}
 
-      &:active {
-        background-color: #283593;
-      }
-    }
-  }
+.bonus-overview-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 820px;
+}
 
-  .no-bonus {
-    text-align: center;
-    padding: 3rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    color: #666;
-  }
+.bonus-overview-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  color: #395266;
+  border-bottom: 1px solid #dde5eb;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  background: #f5f8fa;
+}
 
-  .table-wrapper {
-    overflow-x: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.bonus-overview-table thead th.user-column {
+  min-width: 220px;
+  position: sticky;
+  left: 0;
+  z-index: 4;
+}
+
+.bonus-overview-table thead th.bonus-column {
+  text-align: center;
+  min-width: 190px;
+}
+
+.bonus-overview-table tbody tr {
+  transition: background-color var(--ts-transition-fast);
+}
+
+.bonus-overview-table tbody tr:hover {
+  background: #f8fbfd;
+}
+
+.bonus-overview-table tbody td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #e9eff3;
+  font-size: 0.9rem;
+}
+
+.bonus-overview-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.user-cell {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 3;
+}
+
+.bonus-overview-table tbody tr:hover .user-cell {
+  background: #f8fbfd;
+}
+
+.user-info {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--ts-radius-pill);
+  object-fit: cover;
+  border: 1px solid var(--ts-border);
+}
+
+.username {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.pick-cell {
+  text-align: center;
+}
+
+.team-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ts-space-2);
+  flex-wrap: wrap;
+}
+
+.team-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.team-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.pick-cell.eliminated-pick {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.pick-cell.eliminated-pick .team-name {
+  color: #b91c1c;
+  text-decoration: line-through;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 2.2rem;
+  color: var(--ts-text-secondary);
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .bonus-overview-view {
+    padding: var(--ts-space-4);
   }
 
   .bonus-overview-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-
-    thead {
-      background-color: #f5f5f5;
-
-      th {
-        padding: 16px;
-        text-align: left;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #e0e0e0;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        white-space: nowrap;
-
-        &.user-column {
-          min-width: 200px;
-          position: sticky;
-          left: 0;
-          background-color: #f5f5f5;
-          z-index: 10;
-        }
-
-        &.bonus-column {
-          text-align: center;
-          min-width: 180px;
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        border-bottom: 1px solid #e0e0e0;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: #fafafa;
-        }
-
-        td {
-          padding: 16px;
-          font-size: 14px;
-
-          &.user-cell {
-            position: sticky;
-            left: 0;
-            background-color: white;
-            z-index: 5;
-
-            .user-info {
-              display: flex;
-              align-items: center;
-              gap: 12px;
-
-              .user-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid #e0e0e0;
-              }
-
-              .username {
-                font-weight: 500;
-                color: #333;
-              }
-            }
-          }
-
-          &.pick-cell {
-            text-align: center;
-
-            .team-display {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-
-              .team-logo {
-                width: 32px;
-                height: 32px;
-                object-fit: contain;
-              }
-
-              .team-name {
-                font-weight: 500;
-                color: #333;
-              }
-            }
-
-            .no-pick {
-              color: #ccc;
-              font-size: 18px;
-            }
-
-            &.eliminated-pick {
-              background-color: #d50000;
-
-              .team-name {
-                color: #fff;
-                text-decoration: line-through;
-              }
-            }
-          }
-
-          &.empty-row {
-            text-align: center;
-            padding: 3rem;
-            color: #999;
-          }
-        }
-
-        &:hover td.user-cell {
-          background-color: #fafafa;
-        }
-      }
-    }
+    min-width: 680px;
   }
-}
 
-@media (max-width: 768px) {
-  .bonus-overview-container {
-    padding: 16px;
+  .bonus-overview-table thead th,
+  .bonus-overview-table tbody td {
+    padding: 10px 8px;
+  }
 
-    .overview-header {
-      h2 {
-        font-size: 24px;
-      }
+  .bonus-overview-table thead th {
+    font-size: 0.63rem;
+  }
 
-      h3 {
-        font-size: 18px;
-      }
-    }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
 
-    .bonus-overview-table {
-      font-size: 12px;
+  .team-logo {
+    width: 26px;
+    height: 26px;
+  }
 
-      thead th,
-      tbody td {
-        padding: 12px 8px;
-      }
-
-      .user-cell .user-info {
-        gap: 8px;
-
-        .user-avatar {
-          width: 32px;
-          height: 32px;
-        }
-
-        .username {
-          font-size: 13px;
-        }
-      }
-
-      .pick-cell .team-display {
-        flex-direction: column;
-        gap: 4px;
-
-        .team-logo {
-          width: 28px;
-          height: 28px;
-        }
-
-        .team-name {
-          font-size: 11px;
-        }
-      }
-    }
+  .team-name {
+    font-size: 0.8rem;
   }
 }

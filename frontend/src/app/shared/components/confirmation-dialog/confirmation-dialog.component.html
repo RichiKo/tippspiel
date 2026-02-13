@@ -1,28 +1,18 @@
 @if (visible()) {
-  <div class="cd-backdrop">
-    <div class="cd-dialog">
+  <div class="cd-backdrop" (click)="onCancel()">
+    <section class="cd-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
       <h3 class="cd-title">{{ title() }}</h3>
-      <p class="cd-message">
-        {{ message() }}
-      </p>
+      <p class="cd-message">{{ message() }}</p>
       <div class="cd-actions">
         @if (showCancelButton()) {
-          <button
-            type="button"
-            class="cd-btn cd-btn-secondary"
-            (click)="onCancel()"
-          >
+          <ui-button type="button" variant="secondary" size="sm" (click)="onCancel()">
             {{ cancelLabel() }}
-          </button>
+          </ui-button>
         }
-        <button
-          type="button"
-          class="cd-btn cd-btn-primary"
-          (click)="onConfirm()"
-        >
+        <ui-button type="button" variant="danger" size="sm" (click)="onConfirm()">
           {{ confirmLabel() }}
-        </button>
+        </ui-button>
       </div>
-    </div>
+    </section>
   </div>
 }

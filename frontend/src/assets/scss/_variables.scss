@@ -1,7 +1,5 @@
-@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,300,600,700&display=swap");
-
 // font
-$font-family: 'Poppins', sans-serif;
+$font-family: 'Manrope', 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 
 // light color variable
 
@@ -30,7 +28,7 @@ $light-accent: var(--mat-sys-secondary-fixed-dim);
 $light-error: var(--mat-sys-error-fixed-dim);
 $light-warning: rgba(246, 192, 0, 0.15);
 $light-success: rgba(44, 208, 126, 0.15);
-$dark: #3A4752;
+$dark: #3a4752;
 
 // layout
 $boxedWidth: 1300px;

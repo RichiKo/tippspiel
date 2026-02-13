@@ -1,0 +1,120 @@
+:host {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.ui-button {
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: var(--ts-radius-md);
+  padding: 0 var(--ts-space-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ts-space-2);
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+  transition: transform var(--ts-transition-fast), box-shadow var(--ts-transition-fast),
+    border-color var(--ts-transition-fast), background-color var(--ts-transition-fast),
+    color var(--ts-transition-fast);
+}
+
+.ui-button:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
+}
+
+.ui-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.ui-button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.ui-button__content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+}
+
+.ui-button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-button-spin 0.8s linear infinite;
+}
+
+.ui-button--full-width {
+  width: 100%;
+}
+
+.ui-button--sm {
+  min-height: 36px;
+  padding: 0 var(--ts-space-3);
+  font-size: 0.82rem;
+}
+
+.ui-button--md {
+  min-height: 42px;
+  font-size: 0.9rem;
+}
+
+.ui-button--lg {
+  min-height: 48px;
+  padding: 0 var(--ts-space-5);
+  font-size: 0.95rem;
+}
+
+.ui-button--primary {
+  background: linear-gradient(135deg, #0f5f4c 0%, #10b981 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.24);
+}
+
+.ui-button--primary:not(:disabled):hover {
+  box-shadow: 0 12px 22px rgba(15, 118, 110, 0.3);
+}
+
+.ui-button--secondary {
+  background: var(--ts-surface-muted);
+  border-color: rgba(15, 118, 110, 0.2);
+  color: var(--ts-primary-900);
+}
+
+.ui-button--secondary:not(:disabled):hover {
+  border-color: rgba(15, 118, 110, 0.4);
+  background: #e5eeea;
+}
+
+.ui-button--ghost {
+  background: transparent;
+  border-color: rgba(15, 118, 110, 0.26);
+  color: var(--ts-primary-900);
+}
+
+.ui-button--ghost:not(:disabled):hover {
+  background: rgba(15, 118, 110, 0.08);
+  border-color: rgba(15, 118, 110, 0.4);
+}
+
+.ui-button--danger {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.ui-button--danger:not(:disabled):hover {
+  background: #b91c1c;
+}
+
+@keyframes ui-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

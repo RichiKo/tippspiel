@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.ui-card {
+  border-radius: var(--ts-radius-lg);
+  border: 1px solid rgba(211, 219, 226, 0.9);
+  background: var(--ts-surface);
+  box-shadow: var(--ts-shadow-sm);
+  transition: border-color var(--ts-transition-fast), box-shadow var(--ts-transition-fast),
+    transform var(--ts-transition-fast), background-color var(--ts-transition-fast);
+}
+
+.ui-card--default {
+  box-shadow: var(--ts-shadow-sm);
+}
+
+.ui-card--elevated {
+  box-shadow: var(--ts-shadow-md);
+}
+
+.ui-card--subtle {
+  background: var(--ts-surface-muted);
+  border-color: rgba(211, 219, 226, 0.7);
+  box-shadow: none;
+}
+
+.ui-card--interactive {
+  cursor: pointer;
+}
+
+.ui-card--interactive:hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 118, 110, 0.36);
+  box-shadow: var(--ts-shadow-md);
+}
+
+.ui-card--p-none {
+  padding: 0;
+}
+
+.ui-card--p-sm {
+  padding: var(--ts-space-3);
+}
+
+.ui-card--p-md {
+  padding: var(--ts-space-5);
+}
+
+.ui-card--p-lg {
+  padding: var(--ts-space-6);
+}

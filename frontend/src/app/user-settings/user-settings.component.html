@@ -1,23 +1,45 @@
-<div class="settings-container">
-  <div class="settings-card">
-    <h1>Benutzer-Einstellungen</h1>
+<section class="settings-view">
+  <ui-card variant="elevated" padding="lg" class="settings-shell">
+    <ui-page-header
+      kicker="Profil"
+      title="Benutzer-Einstellungen"
+      subtitle="Verwalte Profilbild, Zugangsdaten und Sicherheit"
+      [showBack]="true"
+      backLabel="Zurueck zum Dashboard"
+      (back)="onCancel()"
+    >
+      <div uiPageHeaderActions class="settings-actions">
+        <ui-badge tone="info" appearance="soft">
+          <lucide-icon [img]="icons.user" [size]="14" aria-hidden="true"></lucide-icon>
+          {{ username() || 'Profil' }}
+        </ui-badge>
+      </div>
+    </ui-page-header>
 
     @if (error()) {
-      <div class="alert alert-error">
-        {{ error() }}
-      </div>
+      <ui-card variant="subtle" padding="sm" class="alert-error">
+        <ui-badge tone="danger" appearance="soft">
+          <lucide-icon [img]="icons.circleX" [size]="14" aria-hidden="true"></lucide-icon>
+          {{ error() }}
+        </ui-badge>
+      </ui-card>
     }
 
     @if (success()) {
-      <div class="alert alert-success">
-        {{ success() }}
-      </div>
+      <ui-card variant="subtle" padding="sm" class="alert-success">
+        <ui-badge tone="success" appearance="soft">
+          <lucide-icon [img]="icons.circleCheckBig" [size]="14" aria-hidden="true"></lucide-icon>
+          {{ success() }}
+        </ui-badge>
+      </ui-card>
     }
 
     <form class="settings-form" (ngSubmit)="onSave()">
-      <!-- Profile Image Section -->
-      <div class="form-section">
-        <h2>Profilbild</h2>
+      <ui-card variant="default" padding="lg" class="form-section">
+        <h2>
+          <lucide-icon [img]="icons.image" [size]="16" aria-hidden="true"></lucide-icon>
+          Profilbild
+        </h2>
         <div class="image-upload-section">
           <div class="image-preview">
             @if (previewUrl()) {
@@ -28,6 +50,7 @@
               </div>
             }
           </div>
+
           <div class="upload-controls">
             <input
               type="file"
@@ -37,24 +60,27 @@
               hidden
             />
             <label for="imageUpload" class="upload-btn">
-              Bild auswählen
+              <lucide-icon [img]="icons.upload" [size]="14" aria-hidden="true"></lucide-icon>
+              Bild auswaehlen
             </label>
             <p class="upload-hint">JPG, PNG oder WebP (max. 2MB)</p>
           </div>
         </div>
-      </div>
+      </ui-card>
 
-      <!-- Basic Info Section -->
-      <div class="form-section">
-        <h2>Basis-Informationen</h2>
-        
+      <ui-card variant="default" padding="lg" class="form-section">
+        <h2>
+          <lucide-icon [img]="icons.user" [size]="16" aria-hidden="true"></lucide-icon>
+          Basis-Informationen
+        </h2>
+
         <div class="form-group">
           <label for="username">Benutzername</label>
           <input
             type="text"
             id="username"
             [(ngModel)]="username"
-            [ngModelOptions]="{updateOn: 'change'}"
+            [ngModelOptions]="{ updateOn: 'change' }"
             name="username"
             maxlength="30"
             required
@@ -69,18 +95,22 @@
             type="email"
             id="email"
             [(ngModel)]="email"
-            [ngModelOptions]="{updateOn: 'change'}"
+            [ngModelOptions]="{ updateOn: 'change' }"
             name="email"
             required
             placeholder="email@example.com"
           />
         </div>
-      </div>
+      </ui-card>
 
-      <!-- Password Section -->
-      <div class="form-section">
-        <h2>Passwort ändern</h2>
-        <p class="section-description">Lasse die Felder leer, wenn du das Passwort nicht ändern möchtest.</p>
+      <ui-card variant="default" padding="lg" class="form-section">
+        <h2>
+          <lucide-icon [img]="icons.shield" [size]="16" aria-hidden="true"></lucide-icon>
+          Passwort aendern
+        </h2>
+        <p class="section-description">
+          Lass die Felder leer, wenn du das Passwort nicht aendern moechtest.
+        </p>
 
         <div class="form-group">
           <label for="newPassword">Neues Passwort</label>
@@ -88,7 +118,7 @@
             type="password"
             id="newPassword"
             [(ngModel)]="newPassword"
-            [ngModelOptions]="{updateOn: 'change'}"
+            [ngModelOptions]="{ updateOn: 'change' }"
             name="newPassword"
             placeholder="Neues Passwort"
           />
@@ -96,37 +126,34 @@
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword">Passwort bestätigen</label>
+          <label for="confirmPassword">Passwort bestaetigen</label>
           <input
             type="password"
             id="confirmPassword"
             [(ngModel)]="confirmPassword"
-            [ngModelOptions]="{updateOn: 'change'}"
+            [ngModelOptions]="{ updateOn: 'change' }"
             name="confirmPassword"
             placeholder="Passwort wiederholen"
             [class.invalid]="!passwordsMatch()"
           />
           @if (!passwordsMatch() && confirmPassword()) {
-            <small class="form-error">Passwörter stimmen nicht überein</small>
+            <small class="form-error">Passwoerter stimmen nicht ueberein</small>
           }
         </div>
-      </div>
+      </ui-card>
 
-      <!-- Action Buttons -->
       <div class="form-actions">
-        <button
+        <ui-button
           type="button"
-          class="btn btn-cancel"
+          variant="secondary"
           (click)="onCancel()"
           [disabled]="isLoading()"
         >
           Abbrechen
-        </button>
-        <button
-          type="submit"
-          class="btn btn-save"
-          [disabled]="!isFormValid() || isLoading()"
-        >
+        </ui-button>
+
+        <ui-button type="submit" [disabled]="!isFormValid() || isLoading()">
+          <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
           @if (isLoading()) {
             @if (isUploadingImage()) {
               <span>Bild wird hochgeladen...</span>
@@ -136,8 +163,8 @@
           } @else {
             <span>Speichern</span>
           }
-        </button>
+        </ui-button>
       </div>
     </form>
-  </div>
-</div>
+  </ui-card>
+</section>

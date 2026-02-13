@@ -1,0 +1,74 @@
+:host {
+  display: inline-flex;
+}
+
+.ui-badge {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: var(--ts-radius-pill);
+  border: 1px solid transparent;
+  font-size: 0.74rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ui-badge--neutral.ui-badge--soft {
+  color: #334155;
+  background: #f1f5f9;
+  border-color: #dbe2e8;
+}
+
+.ui-badge--neutral.ui-badge--solid {
+  color: #ffffff;
+  background: #475569;
+}
+
+.ui-badge--info.ui-badge--soft {
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.ui-badge--info.ui-badge--solid {
+  color: #ffffff;
+  background: #2563eb;
+}
+
+.ui-badge--success.ui-badge--soft {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.36);
+}
+
+.ui-badge--success.ui-badge--solid {
+  color: #ffffff;
+  background: #16a34a;
+}
+
+.ui-badge--warning.ui-badge--soft {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.ui-badge--warning.ui-badge--solid {
+  color: #ffffff;
+  background: #d97706;
+}
+
+.ui-badge--danger.ui-badge--soft {
+  color: #b91c1c;
+  background: rgba(220, 38, 38, 0.14);
+  border-color: rgba(220, 38, 38, 0.34);
+}
+
+.ui-badge--danger.ui-badge--solid {
+  color: #ffffff;
+  background: #dc2626;
+}

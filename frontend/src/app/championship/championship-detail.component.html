@@ -12,22 +12,27 @@
           @if (champ.description) {
             <p>{{ champ.description }}</p>
           }
+
           <div class="action-links action-links-scroll">
             <a [routerLink]="['/championship', championshipId, 'ranking']" class="ranking-link">
-              📊 Prüf-Kalkulation
+              <span class="action-link__kicker">Analyse</span>
+              <span class="action-link__label">Prüf-Kalkulation</span>
             </a>
             <a [routerLink]="['/championship', championshipId, 'standings']" class="standings-link">
-              🏆 Ergebnis-Tabelle
+              <span class="action-link__kicker">Tabelle</span>
+              <span class="action-link__label">Ergebnis-Tabelle</span>
             </a>
             <a [routerLink]="['/championship', championshipId, 'bonus-overview']" class="bonus-link">
-              🎁 Bonus-Übersicht
+              <span class="action-link__kicker">Bonus</span>
+              <span class="action-link__label">Bonus-Übersicht</span>
             </a>
             @if (isAdmin()) {
               <a
                 [routerLink]="['/dashboard/championship', championshipId, 'edit']"
-                class="bonus-link"
+                class="admin-link"
               >
-                ✏️ Championship bearbeiten
+                <span class="action-link__kicker">Admin</span>
+                <span class="action-link__label">Championship bearbeiten</span>
               </a>
             }
           </div>
@@ -71,7 +76,7 @@
         [attr.aria-expanded]="isRoundDrawerOpen()"
         (click)="toggleRoundDrawer()"
       >
-        <span aria-hidden="true">☰</span>
+        <span class="round-drawer-fab-label">Spieltage</span>
       </button>
     }
 
@@ -89,7 +94,7 @@
           }
 
           @if (isAdmin()) {
-            <button class="create-round-btn" (click)="onCreateRound()">
+            <button type="button" class="create-round-btn" (click)="onCreateRound()">
               + Neuer Spieltag
             </button>
           }
@@ -99,21 +104,22 @@
       @if (!isMobileView()) {
         <aside class="rounds-sidebar">
           @if (isAdmin()) {
-            <button class="create-round-btn" (click)="onCreateRound()">
+            <button type="button" class="create-round-btn" (click)="onCreateRound()">
               + Neuer Spieltag
             </button>
           }
 
           <div class="rounds-list">
             @for (round of rounds(); track round.id) {
-              <div
+              <button
+                type="button"
                 class="round-item"
                 [class.selected]="selectedRound()?.id === round.id"
                 (click)="selectRound(round)"
               >
                 <span class="round-name">{{ round.name }}</span>
                 <small class="round-date">{{ formatRoundDate(round) }}</small>
-              </div>
+              </button>
             } @empty {
               <p class="no-rounds">Keine Spieltage vorhanden</p>
             }
@@ -126,7 +132,7 @@
           <div class="games-header">
             <h2>{{ round.name }}</h2>
             @if (isAdmin()) {
-              <button class="add-game-btn" (click)="onAddGame()">
+              <button type="button" class="add-game-btn" (click)="onAddGame()">
                 + Spiel hinzufügen
               </button>
             }
@@ -256,7 +262,7 @@
           (touchcancel)="onDrawerTouchEnd()"
         >
           <div class="round-drawer-title">
-            <span class="round-drawer-title-icon" aria-hidden="true">⚽</span>
+            <span class="round-drawer-title-icon" aria-hidden="true"></span>
             <span>Spieltage</span>
           </div>
           <button
@@ -265,7 +271,7 @@
             aria-label="Spieltage schließen"
             (click)="closeRoundDrawer()"
           >
-            X
+            ×
           </button>
         </header>
 
@@ -287,13 +293,13 @@
       </aside>
     }
   }
-  
+
   <app-round-dialog
     [visible]="showRoundDialog()"
     (confirmed)="onRoundDialogConfirmed($event)"
     (cancelled)="onRoundDialogCancelled()"
   />
-  
+
   <app-game-dialog
     [visible]="showGameDialog()"
     [gameId]="selectedGame()?.id ?? null"

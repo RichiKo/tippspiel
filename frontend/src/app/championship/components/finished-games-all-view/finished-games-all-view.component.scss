@@ -1,7 +1,7 @@
 .finished-all-view {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .game-group {
@@ -10,12 +10,14 @@
 }
 
 .game-date-header {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #1976d2;
   margin: 0 0 10px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e3f2fd;
+  padding: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0f5f4c;
+  border-bottom: 1px solid #dce5eb;
 }
 
 app-game-card {
@@ -40,7 +42,7 @@ app-game-card:last-child {
 
 @media (max-width: 767px) {
   .game-date-header {
-    font-size: 1rem;
+    font-size: 0.68rem;
     margin-bottom: 8px;
   }
 }

@@ -1,75 +1,94 @@
-<div class="bonus-overview-container">
+<section class="bonus-overview-view">
   @if (isLoading()) {
-    <div class="loading">Laden...</div>
+    <ui-card variant="default" padding="lg">
+      <p class="bonus-feedback">Laden...</p>
+    </ui-card>
   } @else if (errorMessage()) {
-    <div class="error">{{ errorMessage() }}</div>
+    <ui-card variant="default" padding="lg">
+      <p class="bonus-feedback bonus-feedback--error">{{ errorMessage() }}</p>
+    </ui-card>
   } @else {
-    <div class="overview-header">
-      <h2>Bonus-Tipps Übersicht</h2>
-      @if (championship()) {
-        <h3>{{ championship()!.name }}</h3>
-      }
-      <button class="back-btn" (click)="backToChampionship()">← Zurück</button>
-    </div>
+    <ui-card variant="elevated" padding="lg" class="bonus-shell">
+      <ui-page-header
+        kicker="Bonus"
+        title="Bonus-Tipps Uebersicht"
+        [subtitle]="championship()?.name ?? null"
+        [showBack]="true"
+        backLabel="Zurueck zur Championship"
+        (back)="backToChampionship()"
+      >
+        <div uiPageHeaderActions class="bonus-actions">
+          <ui-badge tone="info" appearance="soft">
+            <lucide-icon [img]="icons.table" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ bonusRules().length }} Regeln
+          </ui-badge>
+          <ui-badge tone="success" appearance="soft">
+            <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ userPicksRows().length }} Teilnehmer
+          </ui-badge>
+          <ui-badge tone="danger" appearance="soft" data-testid="eliminated-count-badge">
+            <lucide-icon [img]="icons.circleX" [size]="14" aria-hidden="true"></lucide-icon>
+            {{ eliminatedPicksCount() }} eliminiert
+          </ui-badge>
+        </div>
+      </ui-page-header>
 
-    @if (bonusRules().length === 0) {
-      <div class="no-bonus">
-        <p>Keine Bonus-Regeln vorhanden.</p>
-      </div>
-    } @else {
-      <div class="table-wrapper">
-        <table class="bonus-overview-table">
-          <thead>
-            <tr>
-              <th class="user-column">Teilnehmer</th>
-              @for (rule of bonusRules(); track rule.id) {
-                <th class="bonus-column">{{ rule.name }}</th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            @for (userRow of userPicksRows(); track userRow.userId) {
-              <tr>
-                <td class="user-cell">
-                  <div class="user-info">
-                    <img
-                      [src]="userRow.userImage"
-                      [alt]="userRow.username"
-                      class="user-avatar"
-                    />
-                    <span class="username">{{ userRow.username }}</span>
-                  </div>
-                </td>
-                @for (rule of bonusRules(); track rule.id) {
-                  <td
-                    class="pick-cell"
-                    [class.eliminated-pick]="isUserPickEliminated(userRow.userId, rule.id)"
-                  >
-                    @if (getUserPick(userRow.userId, rule.id); as pick) {
-                      <div class="team-display">
-                        <img
-                          [src]="pick.teamLogo"
-                          [alt]="pick.teamName"
-                          class="team-logo"
-                        />
-                        <span class="team-name">{{ pick.teamName }}</span>
+      @if (bonusRules().length === 0) {
+        <ui-card variant="subtle" padding="lg" class="bonus-empty-state">
+          <p>Keine Bonus-Regeln vorhanden.</p>
+        </ui-card>
+      } @else {
+        <ui-card variant="default" padding="none" class="bonus-table-shell">
+          <div class="table-wrapper">
+            <table class="bonus-overview-table">
+              <thead>
+                <tr>
+                  <th class="user-column">Teilnehmer</th>
+                  @for (rule of bonusRules(); track rule.id) {
+                    <th class="bonus-column">{{ rule.name }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (userRow of userPicksRows(); track userRow.userId) {
+                  <tr>
+                    <td class="user-cell">
+                      <div class="user-info">
+                        <img [src]="userRow.userImage" [alt]="userRow.username" class="user-avatar" />
+                        <span class="username">{{ userRow.username }}</span>
                       </div>
-                    } @else {
-                      <span class="no-pick">-</span>
+                    </td>
+                    @for (rule of bonusRules(); track rule.id) {
+                      <td
+                        class="pick-cell"
+                        [class.eliminated-pick]="isUserPickEliminated(userRow.userId, rule.id)"
+                      >
+                        @if (getUserPick(userRow.userId, rule.id); as pick) {
+                          <div class="team-display">
+                            <img [src]="pick.teamLogo" [alt]="pick.teamName" class="team-logo" />
+                            <span class="team-name">{{ pick.teamName }}</span>
+                            @if (isUserPickEliminated(userRow.userId, rule.id)) {
+                              <ui-badge tone="danger" appearance="soft">Eliminiert</ui-badge>
+                            }
+                          </div>
+                        } @else {
+                          <ui-badge tone="neutral" appearance="soft">-</ui-badge>
+                        }
+                      </td>
                     }
-                  </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td [attr.colspan]="bonusRules().length + 1" class="empty-row">
+                      Keine Tipps vorhanden.
+                    </td>
+                  </tr>
                 }
-              </tr>
-            } @empty {
-              <tr>
-                <td [attr.colspan]="bonusRules().length + 1" class="empty-row">
-                  Keine Tipps vorhanden.
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+              </tbody>
+            </table>
+          </div>
+        </ui-card>
+      }
+    </ui-card>
   }
-</div>
+</section>

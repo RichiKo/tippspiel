@@ -6,40 +6,42 @@
 
 .table-meta {
   margin: 0;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   color: var(--ts-text-secondary);
 }
 
 .table-wrapper {
   overflow-x: auto;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-border);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(16, 24, 39, 0.08);
 }
 
 .spieltags-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 560px;
 }
 
 .spieltags-table thead th {
-  padding: 16px;
+  padding: 14px 16px;
   text-align: left;
-  font-size: 14px;
+  font-size: 0.74rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e0e0e0;
-  background: #f5f5f5;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #395266;
+  border-bottom: 1px solid #dde5eb;
+  background: #f5f8fa;
 }
 
 .spieltags-table tbody td {
-  padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 14px;
-  color: #555;
+  padding: 13px 16px;
+  border-bottom: 1px solid #e9eff3;
+  font-size: 0.9rem;
+  color: #3c4a5a;
 }
 
 .spieltags-table tbody tr:last-child td {
@@ -47,35 +49,66 @@
 }
 
 .spieltags-table tbody tr {
-  transition: background-color 0.2s;
+  transition: background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .spieltags-table tbody tr:hover {
-  background: #fafafa;
+  background: #f8fbfd;
 }
 
 .spieltags-table tbody tr.current-user {
-  background: #e3f2fd;
-  font-weight: 600;
+  background: rgba(16, 185, 129, 0.14);
+  font-weight: 700;
 }
 
 .spieltags-table tbody tr.current-user:hover {
-  background: #bbdefb;
+  background: rgba(16, 185, 129, 0.2);
 }
 
 .spieltags-table tbody tr.top-three {
-  background: #fffde7;
+  background: rgba(245, 158, 11, 0.08);
 }
 
 .spieltags-table tbody tr.top-three.current-user {
-  background: #e3f2fd;
+  background: rgba(16, 185, 129, 0.2);
 }
 
 .rank-col {
-  width: 80px;
+  width: 92px;
   text-align: center;
-  font-weight: 600;
-  font-size: 16px;
+}
+
+.rank-pill {
+  min-width: 34px;
+  min-height: 30px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.86rem;
+  font-weight: 700;
+  border: 1px solid #d4dce3;
+  color: #334155;
+  background: #f8fafc;
+}
+
+.rank-pill--gold {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.18);
+  color: #92400e;
+}
+
+.rank-pill--silver {
+  border-color: rgba(100, 116, 139, 0.4);
+  background: rgba(148, 163, 184, 0.2);
+  color: #334155;
+}
+
+.rank-pill--bronze {
+  border-color: rgba(180, 83, 9, 0.35);
+  background: rgba(217, 119, 6, 0.16);
+  color: #9a3412;
 }
 
 .name-col {
@@ -83,21 +116,21 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 500;
-  color: #333;
-  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.95rem;
 }
 
 .num-col {
-  width: 120px;
+  width: 132px;
   text-align: center;
   font-weight: 700;
-  font-size: 18px;
-  color: #1976d2;
+  font-size: 1rem;
+  color: #0f5f4c;
 }
 
 .total-col {
-  color: #2e7d32;
+  color: #1d4ed8;
 }
 
 .table-empty {
@@ -113,35 +146,45 @@
 
 @media (max-width: 767px) {
   .table-meta {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+  }
+
+  .spieltags-table {
+    min-width: 480px;
   }
 
   .spieltags-table thead th,
   .spieltags-table tbody td {
-    padding: 12px 8px;
+    padding: 11px 8px;
   }
 
   .spieltags-table thead th {
-    font-size: 12px;
+    font-size: 0.65rem;
   }
 
   .spieltags-table tbody td {
-    font-size: 13px;
+    font-size: 0.8rem;
   }
 
   .rank-col {
-    width: 60px;
-    font-size: 14px;
+    width: 72px;
+  }
+
+  .rank-pill {
+    min-width: 28px;
+    min-height: 26px;
+    font-size: 0.74rem;
+    padding: 1px 7px;
   }
 
   .name-col {
-    max-width: 120px;
-    font-size: 14px;
+    max-width: 138px;
+    font-size: 0.82rem;
   }
 
   .num-col {
-    width: 80px;
-    font-size: 16px;
+    width: 84px;
+    font-size: 0.86rem;
     text-align: right;
   }
 }

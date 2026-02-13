@@ -1,55 +1,50 @@
 .cd-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(2, 12, 27, 0.42);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: var(--ts-space-4);
+  backdrop-filter: blur(2px);
 }
 
 .cd-dialog {
+  width: min(420px, 100%);
+  border-radius: var(--ts-radius-lg);
+  border: 1px solid rgba(211, 219, 226, 0.92);
   background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--ts-shadow-md);
+  padding: var(--ts-space-5);
 }
 
 .cd-title {
-  margin: 0 0 0.75rem;
-  font-size: 1.1rem;
-  font-weight: 600;
+  margin: 0 0 var(--ts-space-2);
+  font-size: 1.2rem;
+  color: #0f172a;
 }
 
 .cd-message {
-  margin: 0 0 1.25rem;
-  font-size: 0.95rem;
-  color: #374151;
+  margin: 0 0 var(--ts-space-4);
+  color: var(--ts-text-secondary);
+  font-weight: 600;
+  line-height: 1.42;
 }
 
 .cd-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: var(--ts-space-2);
+  flex-wrap: wrap;
 }
 
-.cd-btn {
-  padding: 0.45rem 0.9rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
+@media (max-width: 767px) {
+  .cd-actions {
+    flex-direction: column-reverse;
+  }
 
-.cd-btn-primary {
-  background: #b91c1c;
-  color: #ffffff;
-}
-
-.cd-btn-secondary {
-  background: #e5e7eb;
-  color: #111827;
+  .cd-actions ui-button {
+    width: 100%;
+  }
 }
