@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 86px;
   border-bottom: 1px solid var(--ts-border);
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(10px);
@@ -24,11 +24,11 @@
 .logo-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  padding: 8px 10px;
+  padding: 4px 10px;
   cursor: pointer;
   transition: background-color var(--ts-transition-fast), border-color var(--ts-transition-fast);
 }
@@ -43,9 +43,12 @@
   outline-offset: 2px;
 }
 
-.logo-icon {
-  display: inline-flex;
-  color: var(--ts-primary-700);
+.logo-mark {
+  display: block;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .logo-text {
@@ -182,7 +185,7 @@
 
 .mobile-menu-backdrop {
   position: fixed;
-  inset: 64px 0 0;
+  inset: 86px 0 0;
   background: transparent;
   border: 0;
   width: 100%;
@@ -190,7 +193,7 @@
 
 .mobile-menu {
   position: fixed;
-  top: 68px;
+  top: 90px;
   right: 12px;
   min-width: 184px;
   border-radius: 12px;
@@ -236,7 +239,7 @@
 
 @media (max-width: 767px) {
   .app-header {
-    height: 56px;
+    height: 70px;
   }
 
   .header-content {
@@ -244,7 +247,12 @@
   }
 
   .logo-text {
-    font-size: 1.45rem;
+    font-size: 1.35rem;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
   }
 
   .user-info,
@@ -267,11 +275,11 @@
   }
 
   .mobile-menu-backdrop {
-    inset: 56px 0 0;
+    inset: 70px 0 0;
   }
 
   .mobile-menu {
-    top: 60px;
+    top: 74px;
     right: 10px;
   }
 }

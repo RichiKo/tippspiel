@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Rajdhani:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 *,
 *::before,
@@ -69,11 +69,11 @@ img {
 }
 
 body.has-header {
-  padding-top: 64px;
+  padding-top: 86px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   body.has-header {
-    padding-top: 56px;
+    padding-top: 70px;
   }
 }

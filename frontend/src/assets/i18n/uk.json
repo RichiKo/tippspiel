@@ -1,0 +1,638 @@
+{
+  "common": {
+    "back": "Назад",
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "confirm": "Підтвердити",
+    "confirmation": {
+      "title": "Підтвердження"
+    }
+  },
+  "header": {
+    "brand": "TippsLiga",
+    "settings": "Налаштування",
+    "logout": "Вийти",
+    "menu": {
+      "open": "Відкрити меню",
+      "close": "Закрити меню"
+    },
+    "logoutDialog": {
+      "title": "Вийти",
+      "message": "Ви дійсно хочете вийти?",
+      "confirm": "Вийти",
+      "cancel": "Скасувати"
+    }
+  },
+  "auth": {
+    "landing": {
+      "brand": "TippsLiga",
+      "headline": "Прогнози, бали, таблиця. Все в одному місці.",
+      "subline": "Цифровий футбольний тоталізатор для ліги, друзів і спільноти.",
+      "stats": {
+        "liveValue": "Наживо",
+        "liveLabel": "Рейтинги туру",
+        "lockedLabel": "Прогнози зафіксовано до початку матчу"
+      },
+      "panel": {
+        "loginTitle": "З поверненням",
+        "registerTitle": "Створити новий акаунт",
+        "loginSubtitle": "Увійди та зроби прогнози на наступний тур.",
+        "registerSubtitle": "Зареєструйся менше ніж за хвилину."
+      },
+      "switch": {
+        "aria": "Вхід або реєстрація",
+        "login": "Вхід",
+        "register": "Реєстрація"
+      }
+    },
+    "login": {
+      "emailLabel": "Електронна пошта",
+      "emailRequired": "Електронна пошта обов'язкова.",
+      "emailInvalid": "Введіть коректну електронну пошту.",
+      "passwordLabel": "Пароль",
+      "passwordShow": "Показати пароль",
+      "passwordHide": "Приховати пароль",
+      "passwordRequired": "Пароль обов'язковий.",
+      "passwordMinLength": "Потрібно щонайменше 6 символів.",
+      "submit": "Увійти",
+      "submitting": "Зачекайте...",
+      "noAccount": "Ще немає акаунта?",
+      "registerNow": "Зареєструватися",
+      "errors": {
+        "invalidCredentials": "Неправильна електронна пошта або пароль.",
+        "general": "Зараз неможливо увійти. Спробуйте пізніше."
+      }
+    },
+    "register": {
+      "usernameLabel": "Ім'я користувача",
+      "usernameRequired": "Ім'я користувача обов'язкове.",
+      "usernameMinLength": "Потрібно щонайменше 3 символи.",
+      "emailLabel": "Електронна пошта",
+      "emailRequired": "Електронна пошта обов'язкова.",
+      "emailInvalid": "Введіть коректну електронну пошту.",
+      "passwordLabel": "Пароль",
+      "passwordShow": "Показати пароль",
+      "passwordHide": "Приховати пароль",
+      "passwordRequired": "Пароль обов'язковий.",
+      "passwordMinLength": "Потрібно щонайменше 8 символів.",
+      "confirmPasswordLabel": "Підтвердіть пароль",
+      "confirmPasswordRequired": "Будь ласка, підтвердіть пароль.",
+      "submit": "Зареєструватися",
+      "submitting": "Зачекайте...",
+      "hasAccount": "Вже маєш акаунт?",
+      "toLogin": "Увійти зараз",
+      "note": "Реєструючись, ти підтверджуєш, що робиш прогнози лише до початку матчу.",
+      "errors": {
+        "passwordMismatch": "Паролі не збігаються.",
+        "conflict": "Ім'я користувача або електронна пошта вже зайняті.",
+        "general": "Зараз неможливо завершити реєстрацію. Спробуйте пізніше."
+      }
+    }
+  },
+  "dashboard": {
+    "hero": {
+      "badge": "Тоталізатор",
+      "eyebrow": "Огляд",
+      "title": "Dashboard",
+      "subtitle": "Тут ти можеш обрати свій чемпіонат, зробити прогнози на матчі та стежити за таблицею."
+    },
+    "actions": {
+      "addChampionship": "+ Додати чемпіонат",
+      "manageTeams": "Керувати командами"
+    },
+    "states": {
+      "loading": "Завантаження чемпіонатів...",
+      "retry": "Спробувати ще раз",
+      "empty": "Чемпіонатів поки немає."
+    },
+    "errors": {
+      "loadFailed": "Не вдалося завантажити чемпіонати. Спробуйте ще раз."
+    }
+  },
+  "championshipForm": {
+    "create": {
+      "title": "Створити новий чемпіонат",
+      "submit": "Створити чемпіонат"
+    },
+    "edit": {
+      "title": "Редагувати чемпіонат",
+      "back": "← Назад"
+    },
+    "fields": {
+      "name": "Назва*",
+      "description": "Опис",
+      "image": "Зображення чемпіонату",
+      "public": "Публічний",
+      "active": "Активний"
+    },
+    "validation": {
+      "nameRequired": "Назва обов'язкова.",
+      "nameMax": "Максимум 64 символи.",
+      "descriptionMax": "Максимум 256 символів.",
+      "imageRequired": "Зображення обов'язкове."
+    },
+    "errors": {
+      "createFailed": "Не вдалося створити чемпіонат.",
+      "loadFailed": "Не вдалося завантажити чемпіонат.",
+      "updateFailed": "Не вдалося оновити чемпіонат.",
+      "eliminatedUpdateFailed": "Не вдалося оновити статус вибуття."
+    }
+  },
+  "championshipCard": {
+    "status": {
+      "active": "Активний",
+      "inactive": "Неактивний"
+    },
+    "visibility": {
+      "public": "Публічний",
+      "private": "Приватний"
+    },
+    "pendingRequests": "{{count}} нових заявок",
+    "ended": "Чемпіонат завершено",
+    "membership": {
+      "pending": "Твою заявку ще не підтверджено",
+      "rejected": "Вступ відхилено",
+      "retry": "Надіслати заявку ще раз"
+    },
+    "deleteDialog": {
+      "title": "Підтвердити видалення",
+      "message": "Справді видалити чемпіонат «{{name}}»?"
+    },
+    "join": {
+      "publicTitle": "Приєднатися?",
+      "privateTitle": "Подати заявку?",
+      "publicMessage": "Хочеш приєднатися до цього чемпіонату?",
+      "privateMessage": "Хочеш подати заявку до цього приватного чемпіонату?",
+      "publicConfirm": "Так, приєднатися",
+      "privateConfirm": "Так, подати заявку"
+    }
+  },
+  "settings": {
+    "page": {
+      "kicker": "Профіль",
+      "title": "Налаштування профілю",
+      "subtitle": "Керуй аватаром, обліковими даними та безпекою",
+      "back": "Назад до панелі"
+    },
+    "image": {
+      "title": "Аватар",
+      "select": "Вибрати зображення",
+      "hint": "JPG, PNG або WebP (макс. 2MB)"
+    },
+    "base": {
+      "title": "Основна інформація",
+      "username": "Ім'я користувача",
+      "usernameHint": "Максимум 30 символів",
+      "email": "Електронна пошта"
+    },
+    "password": {
+      "title": "Змінити пароль",
+      "description": "Залиш поля порожніми, якщо не хочеш змінювати пароль.",
+      "newLabel": "Новий пароль",
+      "confirmLabel": "Підтвердження пароля",
+      "minHint": "Щонайменше 6 символів",
+      "mismatch": "Паролі не збігаються"
+    },
+    "actions": {
+      "uploadingImage": "Завантаження зображення...",
+      "saving": "Збереження..."
+    },
+    "success": {
+      "saved": "Налаштування успішно збережено!"
+    },
+    "errors": {
+      "fileType": "Неприпустимий тип файлу. Дозволено лише JPG, PNG, WebP.",
+      "fileSize": "Файл занадто великий. Максимум 2MB.",
+      "saveFailed": "Не вдалося зберегти налаштування."
+    }
+  },
+  "imageUpload": {
+    "label": "Завантажити зображення",
+    "selectButton": "Вибрати зображення",
+    "uploading": "Завантаження...",
+    "hint": "Макс. {{size}}MB (JPG, PNG, WebP)",
+    "errors": {
+      "fileType": "Неприпустимий тип файлу. Дозволено лише JPG, PNG, WebP.",
+      "fileSize": "Файл занадто великий. Максимум {{size}}MB.",
+      "uploadFailed": "Не вдалося завантажити зображення."
+    }
+  },
+  "teamSelector": {
+    "title": "Вибір команд",
+    "searchPlaceholder": "Пошук команди...",
+    "originLabel": "Походження",
+    "allOrigins": "Усі",
+    "selectedTitle": "Обрані команди ({{count}})",
+    "selectedEmpty": "Поки не обрано жодної команди",
+    "active": "Активна",
+    "remove": "Прибрати команду",
+    "availableTitle": "Доступні команди ({{count}})",
+    "loading": "Завантаження команд...",
+    "searchEmpty": "Нічого не знайдено для \"{{term}}\"",
+    "availableEmpty": "Усі команди вже обрані",
+    "add": "Додати команду",
+    "errors": {
+      "loadFailed": "Не вдалося завантажити команди."
+    }
+  },
+  "memberSelector": {
+    "title": "Керування учасниками",
+    "activeTitle": "Активні учасники ({{count}})",
+    "activeEmpty": "Немає активних учасників",
+    "avatarAlt": "Аватар користувача",
+    "remove": "Видалити",
+    "requestsTitle": "Заявки ({{count}})",
+    "loading": "Завантаження заявок...",
+    "requestsEmpty": "Немає відкритих заявок",
+    "approve": "Схвалити",
+    "reject": "Відхилити",
+    "errors": {
+      "loadRequests": "Помилка завантаження заявок",
+      "loadMembers": "Помилка завантаження учасників",
+      "approve": "Помилка під час схвалення",
+      "reject": "Помилка під час відхилення",
+      "remove": "Помилка під час видалення"
+    }
+  },
+  "teams": {
+    "page": {
+      "kicker": "Керування",
+      "title": "Команди",
+      "subtitle": "Створюйте та керуйте командами централізовано",
+      "backLabel": "Назад до панелі",
+      "countBadge": "{{count}} команд",
+      "adminBadge": "Адміністратор"
+    },
+    "form": {
+      "newTeamTitle": "Додати нову команду",
+      "nameLabel": "Назва*",
+      "namePlaceholder": "напр. Arsenal FC",
+      "nameRequired": "Назва обов'язкова.",
+      "shortNameLabel": "Коротка назва*",
+      "shortNamePlaceholder": "напр. ARS",
+      "shortNameRequired": "Коротка назва обов'язкова.",
+      "originLabel": "Походження*",
+      "logoLabel": "Логотип команди*",
+      "changeLogo": "Змінити логотип",
+      "logoRequired": "Логотип обов'язковий.",
+      "addButton": "Додати команду"
+    },
+    "list": {
+      "title": "Усі команди ({{count}})",
+      "loading": "Завантаження команд...",
+      "empty": "Команд ще немає.",
+      "table": {
+        "logo": "Логотип",
+        "name": "Назва",
+        "shortName": "Коротка назва",
+        "origin": "Походження",
+        "createdAt": "Створено",
+        "actions": "Дії"
+      },
+      "actions": {
+        "edit": "Редагувати",
+        "delete": "Видалити"
+      }
+    },
+    "edit": {
+      "save": "Зберегти",
+      "cancel": "Скасувати"
+    },
+    "deleteDialog": {
+      "title": "Видалити команду",
+      "message": "Ви дійсно хочете видалити команду «{{name}}»?"
+    },
+    "origin": {
+      "ENGLAND": "Англія",
+      "GERMANY": "Німеччина",
+      "SPAIN": "Іспанія",
+      "ITALY": "Італія",
+      "FRANCE": "Франція",
+      "NATIONAL": "Збірна",
+      "OTHER": "Інше"
+    },
+    "errors": {
+      "loadFailed": "Не вдалося завантажити команди.",
+      "createFailed": "Не вдалося створити команду.",
+      "updateFailed": "Не вдалося оновити команду.",
+      "deleteFailed": "Не вдалося видалити команду."
+    }
+  },
+  "bonus": {
+    "overview": {
+      "loading": "Завантаження...",
+      "page": {
+        "kicker": "Бонус",
+        "title": "Огляд бонус-прогнозів",
+        "backLabel": "Назад до чемпіонату"
+      },
+      "badges": {
+        "rules": "{{count}} правил",
+        "participants": "{{count}} учасників",
+        "eliminated": "{{count}} вибулих"
+      },
+      "emptyRules": "Немає бонус-правил.",
+      "emptyPicks": "Прогнозів ще немає.",
+      "headers": {
+        "participant": "Учасник"
+      },
+      "eliminated": "Вибула",
+      "errors": {
+        "loadChampionship": "Помилка завантаження чемпіонату.",
+        "loadRules": "Помилка завантаження бонус-правил."
+      }
+    },
+    "pickForm": {
+      "loading": "Завантаження бонус-правил...",
+      "empty": "Зараз для цього чемпіонату немає активних бонус-правил.",
+      "ruleTypeChampion": "Прогноз на чемпіона",
+      "ruleTypeChampionFinalist": "Прогноз: чемпіон + фіналіст",
+      "meta": {
+        "type": "Тип",
+        "points": "Бали",
+        "deadline": "Дедлайн"
+      },
+      "selectLabel": "Обери команду",
+      "selectOption": "Оберіть команду",
+      "eliminatedSuffix": "(вибула)",
+      "currentSelection": "Поточний вибір",
+      "update": "Оновити",
+      "expiredNotice": "Дедлайн для цього бонусу минув. Зміни більше неможливі.",
+      "deadlineExpired": "Дедлайн минув",
+      "pointsChampion": "{{points}} балів",
+      "pointsChampionFinalist": "Чемпіон: {{championPoints}} балів | Фіналіст: {{finalistPoints}} балів",
+      "errors": {
+        "loadRules": "Помилка завантаження бонус-правил. Спробуйте пізніше.",
+        "savePick": "Помилка збереження вибору. Спробуйте ще раз."
+      }
+    },
+    "picksTable": {
+      "title": "Усі прогнози: {{ruleName}}",
+      "loading": "Завантаження прогнозів...",
+      "empty": "Ще не зроблено жодного прогнозу.",
+      "summaryTitle": "Підсумок",
+      "pickCount": "{{count}} прогнозів",
+      "headers": {
+        "user": "Користувач",
+        "team": "Обрана команда",
+        "time": "Час"
+      },
+      "total": "Усього: {{count}} прогнозів",
+      "errors": {
+        "visibleAfterDeadline": "Прогнози стають видимими лише після дедлайну.",
+        "loadFailed": "Помилка завантаження прогнозів. Спробуйте пізніше."
+      }
+    },
+    "admin": {
+      "pageTitle": "Керування бонус-правилами",
+      "loading": "Завантаження...",
+      "empty": "Бонус-правил не знайдено.",
+      "errorLabel": "Помилка:",
+      "form": {
+        "titleCreate": "Створити нове бонус-правило",
+        "titleEdit": "Редагувати бонус-правило",
+        "typeLabel": "Тип",
+        "nameLabel": "Назва",
+        "namePlaceholder": "напр. Чемпіон турніру 2026",
+        "deadlineLabel": "Дедлайн",
+        "championPointsLabel": "Бали за чемпіона",
+        "finalistPointsLabel": "Бали за фіналіста"
+      },
+      "actions": {
+        "newRule": "+ Нове бонус-правило",
+        "create": "Створити",
+        "publish": "Опублікувати",
+        "evaluate": "Підрахувати",
+        "evaluateChampion": "Підрахувати чемпіона",
+        "evaluateFinalists": "Підрахувати фіналістів",
+        "reEvaluate": "Підрахувати повторно"
+      },
+      "details": {
+        "type": "Тип:",
+        "deadline": "Дедлайн:",
+        "picks": "Прогнози:",
+        "evaluated": "Оцінено:",
+        "pointsAwarded": "Нараховано {{count}} балів"
+      },
+      "confirm": {
+        "publishTitle": "Опублікувати бонус-правило",
+        "publishMessage": "Ви дійсно хочете опублікувати бонус-правило \"{{name}}\"?",
+        "deleteTitle": "Видалити бонус-правило",
+        "deleteMessage": "Ви дійсно хочете видалити бонус-правило \"{{name}}\"?"
+      },
+      "evaluate": {
+        "title": "Підрахунок бонусу: {{name}}",
+        "finalist1": "Фіналіст 1",
+        "finalist2": "Фіналіст 2",
+        "finalist1Locked": "Фіналіст 1 (зафіксовано)",
+        "finalist2Locked": "Фіналіст 2 (зафіксовано)",
+        "champion": "Команда-чемпіон",
+        "selectTeam": "-- Оберіть команду --"
+      },
+      "status": {
+        "draft": "Чернетка",
+        "published": "Опубліковано",
+        "locked": "Заблоковано",
+        "partiallyEvaluated": "Фіналістів оцінено",
+        "evaluated": "Оцінено"
+      },
+      "type": {
+        "champion": "Чемпіон",
+        "championFinalist": "Чемпіон + фіналіст"
+      },
+      "success": {
+        "created": "Бонус-правило успішно створено!",
+        "updated": "Бонус-правило успішно оновлено!",
+        "published": "Бонус-правило опубліковано!",
+        "deleted": "Бонус-правило видалено!",
+        "evaluated": "Оцінювання завершено! Нараховано {{count}} балів."
+      },
+      "errors": {
+        "loadRules": "Помилка завантаження бонус-правил.",
+        "createRule": "Помилка створення бонус-правила.",
+        "updateRule": "Помилка оновлення бонус-правила.",
+        "publishRule": "Помилка публікації.",
+        "deleteRule": "Помилка видалення.",
+        "selectBothFinalists": "Будь ласка, оберіть обох фіналістів.",
+        "finalistsMustDiffer": "Фіналіст 1 і Фіналіст 2 мають бути різними.",
+        "selectChampionFromFinalists": "Будь ласка, оберіть чемпіона з двох фіналістів.",
+        "selectChampion": "Будь ласка, оберіть чемпіона.",
+        "evaluateUnknown": "Невідома помилка під час оцінювання"
+      }
+    }
+  },
+  "championship": {
+    "detail": {
+      "loading": "Завантаження...",
+      "links": {
+        "ranking": "Перевірка нарахувань",
+        "standings": "Таблиця результатів",
+        "bonusOverview": "Огляд бонусів",
+        "editChampionship": "Редагувати чемпіонат"
+      },
+      "bonus": {
+        "title": "Бонус-правила",
+        "hide": "Сховати",
+        "show": "Показати"
+      },
+      "rounds": {
+        "title": "Тури",
+        "activeRound": "Активний тур",
+        "empty": "Турів немає",
+        "drawerLabel": "Список турів",
+        "close": "Закрити список турів"
+      },
+      "actions": {
+        "newRound": "+ Новий тур",
+        "addGame": "+ Додати матч"
+      },
+      "sections": {
+        "finishedGames": "Оцінені матчі",
+        "noFinishedResults": "Наразі ще немає результатів.",
+        "openGames": "Відкриті матчі",
+        "noOpenGames": "Наразі немає відкритих матчів."
+      },
+      "views": {
+        "ariaLabel": "Перегляди туру",
+        "myGames": "Мої матчі",
+        "allTips": "Усі прогнози",
+        "table": "Таблиця туру"
+      },
+      "selectRound": "Оберіть тур",
+      "deleteDialog": {
+        "title": "Видалити матч",
+        "message": "Ви дійсно хочете видалити цей матч? Цю дію неможливо скасувати."
+      },
+      "errors": {
+        "loadTeams": "Не вдалося завантажити команди.",
+        "loadChampionship": "Не вдалося завантажити чемпіонат.",
+        "loadRounds": "Не вдалося завантажити тури.",
+        "loadGames": "Не вдалося завантажити матчі.",
+        "saveTip": "Не вдалося зберегти прогноз.",
+        "createRound": "Не вдалося створити тур.",
+        "updateResult": "Не вдалося оновити результат.",
+        "updateGame": "Не вдалося оновити матч.",
+        "createGame": "Не вдалося створити матч.",
+        "deleteGame": "Не вдалося видалити матч."
+      }
+    },
+    "dialogs": {
+      "round": {
+        "titleCreate": "Новий тур",
+        "titleEdit": "Редагувати тур",
+        "nameLabel": "Назва",
+        "namePlaceholder": "напр. Груповий етап 1",
+        "startDateLabel": "Дата початку",
+        "endDateLabel": "Дата завершення (необов'язково)",
+        "create": "Створити",
+        "update": "Оновити"
+      },
+      "game": {
+        "titleCreate": "Новий матч",
+        "titleEdit": "Редагувати матч",
+        "homeTeamLabel": "Домашня команда",
+        "awayTeamLabel": "Виїзна команда",
+        "selectTeamOption": "-- Оберіть команду --",
+        "eliminatedSuffix": "(вибула)",
+        "kickoffLabel": "Час початку",
+        "resultSection": "Результат",
+        "homeGoalsLabel": "Голи господарів",
+        "awayGoalsLabel": "Голи гостей",
+        "closedLabel": "Матч завершено",
+        "create": "Створити",
+        "update": "Оновити"
+      }
+    },
+    "gameCard": {
+      "editGame": "Редагувати матч",
+      "deleteGame": "Видалити матч",
+      "teamFallback": "Команда {{id}}",
+      "finished": "Завершено",
+      "tipLocked": "Подання прогнозів завершено",
+      "yourTip": "Твій прогноз"
+    },
+    "finishedAll": {
+      "empty": "Оцінених матчів ще немає."
+    },
+    "finishedMy": {
+      "kickoffLabel": "Початок",
+      "finalScore": "Підсумковий рахунок",
+      "yourTip": "Твій прогноз",
+      "tipPrefix": "Прогноз",
+      "points": "Бали",
+      "pointsShort": "б.",
+      "empty": "Оцінених матчів ще немає."
+    },
+    "spieltagTable": {
+      "evaluatedGames": "{{count}} оцінених матчів",
+      "headers": {
+        "rank": "Місце",
+        "participant": "Учасник",
+        "gamePoints": "Бали (матчі)"
+      },
+      "empty": "Оцінених матчів ще немає."
+    },
+    "ranking": {
+      "loading": "Завантаження...",
+      "page": {
+        "kicker": "Аналіз",
+        "title": "Перевірка нарахувань",
+        "backLabel": "Назад до чемпіонату"
+      },
+      "gamesInfo": "{{closed}} з {{total}} матчів уже оцінено",
+      "headers": {
+        "participant": "Учасник",
+        "exact": "Точно (3Б)",
+        "goalDiff": "Різниця м'ячів (2Б)",
+        "tendency": "Тенденція (1Б)",
+        "missed": "Хибно (0Б)"
+      },
+      "you": "Ти",
+      "errors": {
+        "loadChampionship": "Помилка завантаження даних чемпіонату.",
+        "loadRanking": "Помилка завантаження рейтингу."
+      }
+    },
+    "standings": {
+      "loading": "Завантаження...",
+      "page": {
+        "kicker": "Таблиця",
+        "title": "Таблиця результатів",
+        "backLabel": "Назад до чемпіонату"
+      },
+      "badges": {
+        "participants": "{{count}} учасників",
+        "bonusColumns": "{{count}} бонусних колонок"
+      },
+      "headers": {
+        "rank": "Місце",
+        "participant": "Учасник",
+        "gamePoints": "Бали (матчі)",
+        "total": "Разом"
+      },
+      "errors": {
+        "loadChampionship": "Помилка завантаження даних чемпіонату.",
+        "loadStandings": "Помилка завантаження таблиці результатів."
+      }
+    },
+    "tipsTable": {
+      "headers": {
+        "participant": "Учасник",
+        "tip": "Прогноз",
+        "points": "Бали",
+        "result": "Результат"
+      },
+      "unknownUser": "Невідомо",
+      "open": "Відкрито",
+      "outcomes": {
+        "exact": "Точно",
+        "goalDiff": "Різниця м'ячів",
+        "tendency": "Тенденція",
+        "missed": "Хибно",
+        "notTipped": "Без прогнозу"
+      }
+    }
+  }
+}

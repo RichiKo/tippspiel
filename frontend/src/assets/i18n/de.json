@@ -1,0 +1,638 @@
+{
+  "common": {
+    "back": "Zurueck",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Loeschen",
+    "edit": "Bearbeiten",
+    "confirm": "Bestaetigen",
+    "confirmation": {
+      "title": "Bestaetigung"
+    }
+  },
+  "header": {
+    "brand": "TippsLiga",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "menu": {
+      "open": "Menue oeffnen",
+      "close": "Menue schliessen"
+    },
+    "logoutDialog": {
+      "title": "Abmelden",
+      "message": "Moechtest du dich wirklich abmelden?",
+      "confirm": "Abmelden",
+      "cancel": "Abbrechen"
+    }
+  },
+  "auth": {
+    "landing": {
+      "brand": "TippsLiga",
+      "headline": "Tipp, Punkte, Tabelle. Alles an einem Ort.",
+      "subline": "Das digitale Fussball-Tippspiel fuer Liga, Freunde und Community.",
+      "stats": {
+        "liveValue": "Live",
+        "liveLabel": "Spieltag-Rankings",
+        "lockedLabel": "Tipps vor Anpfiff gesichert"
+      },
+      "panel": {
+        "loginTitle": "Willkommen zurueck",
+        "registerTitle": "Neues Konto erstellen",
+        "loginSubtitle": "Melde dich an und gib deine Tipps fuer den naechsten Spieltag ab.",
+        "registerSubtitle": "Registriere dich in weniger als einer Minute."
+      },
+      "switch": {
+        "aria": "Anmeldung oder Registrierung",
+        "login": "Login",
+        "register": "Registrierung"
+      }
+    },
+    "login": {
+      "emailLabel": "E-Mail",
+      "emailRequired": "E-Mail ist erforderlich.",
+      "emailInvalid": "Bitte gib eine gueltige E-Mail ein.",
+      "passwordLabel": "Passwort",
+      "passwordShow": "Passwort anzeigen",
+      "passwordHide": "Passwort verbergen",
+      "passwordRequired": "Passwort ist erforderlich.",
+      "passwordMinLength": "Mindestens 6 Zeichen erforderlich.",
+      "submit": "Einloggen",
+      "submitting": "Bitte warten...",
+      "noAccount": "Noch kein Account?",
+      "registerNow": "Jetzt registrieren",
+      "errors": {
+        "invalidCredentials": "E-Mail oder Passwort ist nicht korrekt.",
+        "general": "Login ist momentan nicht moeglich. Bitte versuche es erneut."
+      }
+    },
+    "register": {
+      "usernameLabel": "Benutzername",
+      "usernameRequired": "Benutzername ist erforderlich.",
+      "usernameMinLength": "Mindestens 3 Zeichen erforderlich.",
+      "emailLabel": "E-Mail",
+      "emailRequired": "E-Mail ist erforderlich.",
+      "emailInvalid": "Bitte gib eine gueltige E-Mail ein.",
+      "passwordLabel": "Passwort",
+      "passwordShow": "Passwort anzeigen",
+      "passwordHide": "Passwort verbergen",
+      "passwordRequired": "Passwort ist erforderlich.",
+      "passwordMinLength": "Mindestens 8 Zeichen erforderlich.",
+      "confirmPasswordLabel": "Passwort bestaetigen",
+      "confirmPasswordRequired": "Bitte bestaetige dein Passwort.",
+      "submit": "Registrieren",
+      "submitting": "Bitte warten...",
+      "hasAccount": "Schon einen Account?",
+      "toLogin": "Jetzt einloggen",
+      "note": "Mit der Registrierung bestaetigst du, dass du Tipps nur vor Spielbeginn abgibst.",
+      "errors": {
+        "passwordMismatch": "Die Passwoerter stimmen nicht ueberein.",
+        "conflict": "Benutzername oder E-Mail ist bereits vergeben.",
+        "general": "Registrierung ist momentan nicht moeglich. Bitte versuche es erneut."
+      }
+    }
+  },
+  "dashboard": {
+    "hero": {
+      "badge": "Tippspiel",
+      "eyebrow": "Uebersicht",
+      "title": "Dashboard",
+      "subtitle": "Verwalte Championships, Teams und alle aktiven Spieltage in einer klaren Admin-Oberflaeche."
+    },
+    "actions": {
+      "addChampionship": "+ Championship hinzufuegen",
+      "manageTeams": "Teams verwalten"
+    },
+    "states": {
+      "loading": "Lade Championships...",
+      "retry": "Erneut laden",
+      "empty": "Keine Championships vorhanden."
+    },
+    "errors": {
+      "loadFailed": "Championships konnten nicht geladen werden. Bitte erneut versuchen."
+    }
+  },
+  "championshipForm": {
+    "create": {
+      "title": "Neue Championship anlegen",
+      "submit": "Championship anlegen"
+    },
+    "edit": {
+      "title": "Championship bearbeiten",
+      "back": "← Zurueck"
+    },
+    "fields": {
+      "name": "Name*",
+      "description": "Beschreibung",
+      "image": "Championship-Bild",
+      "public": "Oeffentlich",
+      "active": "Aktiv"
+    },
+    "validation": {
+      "nameRequired": "Name ist erforderlich.",
+      "nameMax": "Maximal 64 Zeichen.",
+      "descriptionMax": "Maximal 256 Zeichen.",
+      "imageRequired": "Bild ist erforderlich."
+    },
+    "errors": {
+      "createFailed": "Championship konnte nicht erstellt werden.",
+      "loadFailed": "Championship konnte nicht geladen werden.",
+      "updateFailed": "Championship konnte nicht aktualisiert werden.",
+      "eliminatedUpdateFailed": "Ausgestiegen-Markierung konnte nicht aktualisiert werden."
+    }
+  },
+  "championshipCard": {
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "visibility": {
+      "public": "Oeffentlich",
+      "private": "Privat"
+    },
+    "pendingRequests": "{{count}} neue Anfrage(n)",
+    "ended": "Championship beendet",
+    "membership": {
+      "pending": "Deine Anfrage wurde noch nicht freigegeben",
+      "rejected": "Beitritt abgelehnt",
+      "retry": "Erneut anfragen"
+    },
+    "deleteDialog": {
+      "title": "Loeschen bestaetigen",
+      "message": "Moechtest du die Championship «{{name}}» wirklich loeschen?"
+    },
+    "join": {
+      "publicTitle": "Mitspielen?",
+      "privateTitle": "Beitritt anfragen?",
+      "publicMessage": "Moechtest du an diesem Championship teilnehmen?",
+      "privateMessage": "Moechtest du den Beitritt zu diesem privaten Championship anfragen?",
+      "publicConfirm": "Ja, mitspielen",
+      "privateConfirm": "Ja, anfragen"
+    }
+  },
+  "settings": {
+    "page": {
+      "kicker": "Profil",
+      "title": "Benutzer-Einstellungen",
+      "subtitle": "Verwalte Profilbild, Zugangsdaten und Sicherheit",
+      "back": "Zurueck zum Dashboard"
+    },
+    "image": {
+      "title": "Profilbild",
+      "select": "Bild auswaehlen",
+      "hint": "JPG, PNG oder WebP (max. 2MB)"
+    },
+    "base": {
+      "title": "Basis-Informationen",
+      "username": "Benutzername",
+      "usernameHint": "Maximal 30 Zeichen",
+      "email": "E-Mail"
+    },
+    "password": {
+      "title": "Passwort aendern",
+      "description": "Lass die Felder leer, wenn du das Passwort nicht aendern moechtest.",
+      "newLabel": "Neues Passwort",
+      "confirmLabel": "Passwort bestaetigen",
+      "minHint": "Mindestens 6 Zeichen",
+      "mismatch": "Passwoerter stimmen nicht ueberein"
+    },
+    "actions": {
+      "uploadingImage": "Bild wird hochgeladen...",
+      "saving": "Speichern..."
+    },
+    "success": {
+      "saved": "Einstellungen erfolgreich gespeichert!"
+    },
+    "errors": {
+      "fileType": "Nur JPG, PNG und WebP Dateien sind erlaubt.",
+      "fileSize": "Die Datei ist zu gross. Maximal 2MB sind erlaubt.",
+      "saveFailed": "Fehler beim Speichern der Einstellungen."
+    }
+  },
+  "imageUpload": {
+    "label": "Bild hochladen",
+    "selectButton": "Bild auswaehlen",
+    "uploading": "Wird hochgeladen...",
+    "hint": "Max. {{size}}MB (JPG, PNG, WebP)",
+    "errors": {
+      "fileType": "Ungueltiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP",
+      "fileSize": "Datei ist zu gross. Maximal {{size}}MB sind erlaubt",
+      "uploadFailed": "Fehler beim Hochladen des Bildes"
+    }
+  },
+  "teamSelector": {
+    "title": "Teams auswaehlen",
+    "searchPlaceholder": "Team suchen...",
+    "originLabel": "Herkunft",
+    "allOrigins": "Alle",
+    "selectedTitle": "Ausgewaehlte Teams ({{count}})",
+    "selectedEmpty": "Noch keine Teams ausgewaehlt",
+    "active": "Aktiv",
+    "remove": "Team entfernen",
+    "availableTitle": "Verfuegbare Teams ({{count}})",
+    "loading": "Lade Teams...",
+    "searchEmpty": "Keine Teams gefunden fuer \"{{term}}\"",
+    "availableEmpty": "Alle Teams sind bereits ausgewaehlt",
+    "add": "Team hinzufuegen",
+    "errors": {
+      "loadFailed": "Teams konnten nicht geladen werden."
+    }
+  },
+  "memberSelector": {
+    "title": "Teilnehmer verwalten",
+    "activeTitle": "Aktive Teilnehmer ({{count}})",
+    "activeEmpty": "Keine aktiven Teilnehmer",
+    "avatarAlt": "Nutzeravatar",
+    "remove": "Entfernen",
+    "requestsTitle": "Anfragen ({{count}})",
+    "loading": "Lade Anfragen...",
+    "requestsEmpty": "Keine offenen Anfragen",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "errors": {
+      "loadRequests": "Fehler beim Laden der Anfragen",
+      "loadMembers": "Fehler beim Laden der Teilnehmer",
+      "approve": "Fehler beim Genehmigen",
+      "reject": "Fehler beim Ablehnen",
+      "remove": "Fehler beim Entfernen"
+    }
+  },
+  "teams": {
+    "page": {
+      "kicker": "Verwaltung",
+      "title": "Teams",
+      "subtitle": "Erstelle und pflege alle Teams zentral",
+      "backLabel": "Zurueck zum Dashboard",
+      "countBadge": "{{count}} Teams",
+      "adminBadge": "Admin"
+    },
+    "form": {
+      "newTeamTitle": "Neues Team hinzufuegen",
+      "nameLabel": "Name*",
+      "namePlaceholder": "z.B. Arsenal FC",
+      "nameRequired": "Name ist erforderlich.",
+      "shortNameLabel": "Kurzname*",
+      "shortNamePlaceholder": "z.B. ARS",
+      "shortNameRequired": "Kurzname ist erforderlich.",
+      "originLabel": "Herkunft*",
+      "logoLabel": "Team-Logo*",
+      "changeLogo": "Logo aendern",
+      "logoRequired": "Logo ist erforderlich.",
+      "addButton": "Team hinzufuegen"
+    },
+    "list": {
+      "title": "Alle Teams ({{count}})",
+      "loading": "Lade Teams...",
+      "empty": "Noch keine Teams vorhanden.",
+      "table": {
+        "logo": "Logo",
+        "name": "Name",
+        "shortName": "Kurzname",
+        "origin": "Herkunft",
+        "createdAt": "Erstellt am",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "delete": "Loeschen"
+      }
+    },
+    "edit": {
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "deleteDialog": {
+      "title": "Team loeschen",
+      "message": "Moechtest du das Team «{{name}}» wirklich loeschen?"
+    },
+    "origin": {
+      "ENGLAND": "England",
+      "GERMANY": "Deutschland",
+      "SPAIN": "Spanien",
+      "ITALY": "Italien",
+      "FRANCE": "Frankreich",
+      "NATIONAL": "Nationalmannschaft",
+      "OTHER": "Andere"
+    },
+    "errors": {
+      "loadFailed": "Teams konnten nicht geladen werden.",
+      "createFailed": "Team konnte nicht erstellt werden.",
+      "updateFailed": "Team konnte nicht aktualisiert werden.",
+      "deleteFailed": "Team konnte nicht geloescht werden."
+    }
+  },
+  "bonus": {
+    "overview": {
+      "loading": "Laden...",
+      "page": {
+        "kicker": "Bonus",
+        "title": "Bonus-Tipps Uebersicht",
+        "backLabel": "Zurueck zur Championship"
+      },
+      "badges": {
+        "rules": "{{count}} Regeln",
+        "participants": "{{count}} Teilnehmer",
+        "eliminated": "{{count}} eliminiert"
+      },
+      "emptyRules": "Keine Bonus-Regeln vorhanden.",
+      "emptyPicks": "Keine Tipps vorhanden.",
+      "headers": {
+        "participant": "Teilnehmer"
+      },
+      "eliminated": "Eliminiert",
+      "errors": {
+        "loadChampionship": "Fehler beim Laden der Championship.",
+        "loadRules": "Fehler beim Laden der Bonus-Regeln."
+      }
+    },
+    "pickForm": {
+      "loading": "Lade Bonus-Regeln...",
+      "empty": "Aktuell gibt es keine aktiven Bonus-Regeln fuer diese Championship.",
+      "ruleTypeChampion": "Champion-Bonus",
+      "ruleTypeChampionFinalist": "Champion + Finalist",
+      "meta": {
+        "type": "Typ",
+        "points": "Punkte",
+        "deadline": "Deadline"
+      },
+      "selectLabel": "Waehle dein Team",
+      "selectOption": "Team auswaehlen",
+      "eliminatedSuffix": "(ausgeschieden)",
+      "currentSelection": "Aktuelle Auswahl",
+      "update": "Aktualisieren",
+      "expiredNotice": "Die Deadline fuer diesen Bonus ist abgelaufen. Keine Aenderungen mehr moeglich.",
+      "deadlineExpired": "Abgelaufen",
+      "pointsChampion": "{{points}} Punkte",
+      "pointsChampionFinalist": "Champion: {{championPoints}}P | Finalist: {{finalistPoints}}P",
+      "errors": {
+        "loadRules": "Fehler beim Laden der Bonus-Regeln. Bitte versuche es spaeter erneut.",
+        "savePick": "Fehler beim Speichern deiner Auswahl. Bitte versuche es erneut."
+      }
+    },
+    "picksTable": {
+      "title": "Alle Tipps: {{ruleName}}",
+      "loading": "Lade Tipps...",
+      "empty": "Es wurden noch keine Tipps abgegeben.",
+      "summaryTitle": "Zusammenfassung",
+      "pickCount": "{{count}} Tipp(s)",
+      "headers": {
+        "user": "Benutzer",
+        "team": "Gewaehltes Team",
+        "time": "Zeitpunkt"
+      },
+      "total": "Gesamt: {{count}} Tipp(s)",
+      "errors": {
+        "visibleAfterDeadline": "Die Picks sind erst nach Ablauf der Deadline sichtbar.",
+        "loadFailed": "Fehler beim Laden der Picks. Bitte versuche es spaeter erneut."
+      }
+    },
+    "admin": {
+      "pageTitle": "Bonus-Regeln Verwaltung",
+      "loading": "Lade...",
+      "empty": "Keine Bonus-Regeln gefunden.",
+      "errorLabel": "Fehler:",
+      "form": {
+        "titleCreate": "Neue Bonus-Regel erstellen",
+        "titleEdit": "Bonus-Regel bearbeiten",
+        "typeLabel": "Typ",
+        "nameLabel": "Name",
+        "namePlaceholder": "z.B. Bundesliga Champion 2024/25",
+        "deadlineLabel": "Deadline",
+        "championPointsLabel": "Champion-Punkte",
+        "finalistPointsLabel": "Finalist-Punkte"
+      },
+      "actions": {
+        "newRule": "+ Neue Bonus-Regel",
+        "create": "Erstellen",
+        "publish": "Veroeffentlichen",
+        "evaluate": "Auswerten",
+        "evaluateChampion": "Champion auswerten",
+        "evaluateFinalists": "Finalisten auswerten",
+        "reEvaluate": "Erneut auswerten"
+      },
+      "details": {
+        "type": "Typ:",
+        "deadline": "Deadline:",
+        "picks": "Picks:",
+        "evaluated": "Ausgewertet:",
+        "pointsAwarded": "{{count}} Punkte vergeben"
+      },
+      "confirm": {
+        "publishTitle": "Bonus-Regel veroeffentlichen",
+        "publishMessage": "Moechtest du die Bonus-Regel \"{{name}}\" wirklich veroeffentlichen?",
+        "deleteTitle": "Bonus-Regel loeschen",
+        "deleteMessage": "Moechtest du die Bonus-Regel \"{{name}}\" wirklich loeschen?"
+      },
+      "evaluate": {
+        "title": "Bonus auswerten: {{name}}",
+        "finalist1": "Finalist 1",
+        "finalist2": "Finalist 2",
+        "finalist1Locked": "Finalist 1 (fixiert)",
+        "finalist2Locked": "Finalist 2 (fixiert)",
+        "champion": "Champion-Team",
+        "selectTeam": "-- Team auswaehlen --"
+      },
+      "status": {
+        "draft": "Entwurf",
+        "published": "Veroeffentlicht",
+        "locked": "Gesperrt",
+        "partiallyEvaluated": "Finalisten ausgewertet",
+        "evaluated": "Ausgewertet"
+      },
+      "type": {
+        "champion": "Champion",
+        "championFinalist": "Champion + Finalist"
+      },
+      "success": {
+        "created": "Bonus-Regel erfolgreich erstellt!",
+        "updated": "Bonus-Regel erfolgreich aktualisiert!",
+        "published": "Bonus-Regel veroeffentlicht!",
+        "deleted": "Bonus-Regel geloescht!",
+        "evaluated": "Auswertung abgeschlossen! {{count}} Punkte vergeben."
+      },
+      "errors": {
+        "loadRules": "Fehler beim Laden der Bonus-Regeln.",
+        "createRule": "Fehler beim Erstellen der Bonus-Regel.",
+        "updateRule": "Fehler beim Aktualisieren der Bonus-Regel.",
+        "publishRule": "Fehler beim Veroeffentlichen.",
+        "deleteRule": "Fehler beim Loeschen.",
+        "selectBothFinalists": "Bitte waehle beide Finalisten aus.",
+        "finalistsMustDiffer": "Finalist 1 und Finalist 2 muessen unterschiedlich sein.",
+        "selectChampionFromFinalists": "Bitte waehle den Champion aus den beiden Finalisten aus.",
+        "selectChampion": "Bitte waehle den Champion aus.",
+        "evaluateUnknown": "Unbekannter Fehler bei der Auswertung"
+      }
+    }
+  },
+  "championship": {
+    "detail": {
+      "loading": "Laedt...",
+      "links": {
+        "ranking": "Pruef-Kalkulation",
+        "standings": "Ergebnis-Tabelle",
+        "bonusOverview": "Bonus-Uebersicht",
+        "editChampionship": "Championship bearbeiten"
+      },
+      "bonus": {
+        "title": "Bonus-Regeln",
+        "hide": "Ausblenden",
+        "show": "Anzeigen"
+      },
+      "rounds": {
+        "title": "Spieltage",
+        "activeRound": "Aktiver Spieltag",
+        "empty": "Keine Spieltage vorhanden",
+        "drawerLabel": "Spieltage Auswahl",
+        "close": "Spieltage schliessen"
+      },
+      "actions": {
+        "newRound": "+ Neuer Spieltag",
+        "addGame": "+ Spiel hinzufuegen"
+      },
+      "sections": {
+        "finishedGames": "Ausgewertete Spiele",
+        "noFinishedResults": "Momentan gibt es noch keine Ergebnisse.",
+        "openGames": "Offene Spiele",
+        "noOpenGames": "Momentan gibt es keine offenen Spiele."
+      },
+      "views": {
+        "ariaLabel": "Spieltag Ansichten",
+        "myGames": "Meine Spiele",
+        "allTips": "Alle Tipps",
+        "table": "Spieltags-Tabelle"
+      },
+      "selectRound": "Waehle einen Spieltag aus",
+      "deleteDialog": {
+        "title": "Spiel loeschen",
+        "message": "Moechtest du dieses Spiel wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden."
+      },
+      "errors": {
+        "loadTeams": "Teams konnten nicht geladen werden.",
+        "loadChampionship": "Championship konnte nicht geladen werden.",
+        "loadRounds": "Spieltage konnten nicht geladen werden.",
+        "loadGames": "Spiele konnten nicht geladen werden.",
+        "saveTip": "Tipp konnte nicht gespeichert werden.",
+        "createRound": "Spieltag konnte nicht erstellt werden.",
+        "updateResult": "Ergebnis konnte nicht aktualisiert werden.",
+        "updateGame": "Spiel konnte nicht aktualisiert werden.",
+        "createGame": "Spiel konnte nicht erstellt werden.",
+        "deleteGame": "Spiel konnte nicht geloescht werden."
+      }
+    },
+    "dialogs": {
+      "round": {
+        "titleCreate": "Neuer Spieltag",
+        "titleEdit": "Spieltag bearbeiten",
+        "nameLabel": "Name",
+        "namePlaceholder": "z.B. Vorrunde 1",
+        "startDateLabel": "Startdatum",
+        "endDateLabel": "Enddatum (optional)",
+        "create": "Erstellen",
+        "update": "Aktualisieren"
+      },
+      "game": {
+        "titleCreate": "Neues Spiel",
+        "titleEdit": "Spiel bearbeiten",
+        "homeTeamLabel": "Heimteam",
+        "awayTeamLabel": "Auswaertsteam",
+        "selectTeamOption": "-- Waehle Team --",
+        "eliminatedSuffix": "(ausgestiegen)",
+        "kickoffLabel": "Anstosszeit",
+        "resultSection": "Ergebnis",
+        "homeGoalsLabel": "Tore Heim",
+        "awayGoalsLabel": "Tore Auswaerts",
+        "closedLabel": "Spiel beendet",
+        "create": "Erstellen",
+        "update": "Aktualisieren"
+      }
+    },
+    "gameCard": {
+      "editGame": "Spiel bearbeiten",
+      "deleteGame": "Spiel loeschen",
+      "teamFallback": "Team {{id}}",
+      "finished": "Beendet",
+      "tipLocked": "Tippabgabe beendet",
+      "yourTip": "Dein Tipp"
+    },
+    "finishedAll": {
+      "empty": "Noch keine gewerteten Spiele."
+    },
+    "finishedMy": {
+      "kickoffLabel": "Anstoss",
+      "finalScore": "Endstand",
+      "yourTip": "Dein Tipp",
+      "tipPrefix": "Tipp",
+      "points": "Punkte",
+      "pointsShort": "P",
+      "empty": "Noch keine gewerteten Spiele."
+    },
+    "spieltagTable": {
+      "evaluatedGames": "{{count}} gewertete Spiele",
+      "headers": {
+        "rank": "Platz",
+        "participant": "Teilnehmer",
+        "gamePoints": "Punkte (Spiele)"
+      },
+      "empty": "Noch keine gewerteten Spiele."
+    },
+    "ranking": {
+      "loading": "Laden...",
+      "page": {
+        "kicker": "Analyse",
+        "title": "Pruef-Kalkulation",
+        "backLabel": "Zurueck zur Championship"
+      },
+      "gamesInfo": "{{closed}} von {{total}} Spielen ausgewertet",
+      "headers": {
+        "participant": "Teilnehmer",
+        "exact": "Exakt (3P)",
+        "goalDiff": "Differenz (2P)",
+        "tendency": "Tendenz (1P)",
+        "missed": "Missed (0P)"
+      },
+      "you": "Du",
+      "errors": {
+        "loadChampionship": "Fehler beim Laden der Championship-Daten.",
+        "loadRanking": "Fehler beim Laden der Rangliste."
+      }
+    },
+    "standings": {
+      "loading": "Laden...",
+      "page": {
+        "kicker": "Tabelle",
+        "title": "Ergebnis-Tabelle",
+        "backLabel": "Zurueck zur Championship"
+      },
+      "badges": {
+        "participants": "{{count}} Teilnehmer",
+        "bonusColumns": "{{count}} Bonus-Spalten"
+      },
+      "headers": {
+        "rank": "Platz",
+        "participant": "Teilnehmer",
+        "gamePoints": "Punkte (Spiele)",
+        "total": "Gesamt"
+      },
+      "errors": {
+        "loadChampionship": "Fehler beim Laden der Championship-Daten.",
+        "loadStandings": "Fehler beim Laden der Ergebnis-Tabelle."
+      }
+    },
+    "tipsTable": {
+      "headers": {
+        "participant": "Teilnehmer",
+        "tip": "Tipp",
+        "points": "Punkte",
+        "result": "Ergebnis"
+      },
+      "unknownUser": "Unbekannt",
+      "open": "Offen",
+      "outcomes": {
+        "exact": "Exakt",
+        "goalDiff": "Tordifferenz",
+        "tendency": "Tendenz",
+        "missed": "Falsch",
+        "notTipped": "Nicht getippt"
+      }
+    }
+  }
+}

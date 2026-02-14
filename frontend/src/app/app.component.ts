@@ -18,7 +18,7 @@ import { PersistingService } from './auth/services/persisisting.service';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'TippsLiga';
   private readonly persistingService = inject(PersistingService);
   readonly currentUser = this.persistingService.currentUser;
 
