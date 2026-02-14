@@ -7,6 +7,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { ChampionshipEntity } from '../championship/championship.entity';
+import { TeamOrigin } from './team-origin.enum';
 
 @Entity({ name: 'teams' })
 export class TeamEntity {
@@ -21,6 +22,13 @@ export class TeamEntity {
 
   @Column()
   logoUrl: string;
+
+  @Column({
+    type: 'enum',
+    enum: TeamOrigin,
+    default: TeamOrigin.OTHER,
+  })
+  origin: TeamOrigin;
 
   @CreateDateColumn()
   createdAt: Date;

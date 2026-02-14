@@ -5,6 +5,7 @@ import { TeamEntity } from './team.entity';
 import { ChampionshipEntity } from '../championship/championship.entity';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { TeamOrigin } from './team-origin.enum';
 
 @Injectable()
 export class TeamService {
@@ -15,8 +16,9 @@ export class TeamService {
     private readonly championshipRepository: Repository<ChampionshipEntity>,
   ) {}
 
-  async findAll(): Promise<TeamEntity[]> {
+  async findAll(origin?: TeamOrigin): Promise<TeamEntity[]> {
     return this.teamRepository.find({
+      where: origin ? { origin } : undefined,
       relations: ['championships'],
     });
   }

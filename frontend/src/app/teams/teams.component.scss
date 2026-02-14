@@ -61,6 +61,7 @@
 }
 
 .form-group input,
+.form-group select,
 .edit-input {
   width: 100%;
   min-height: 42px;
@@ -74,6 +75,7 @@
 }
 
 .form-group input:focus,
+.form-group select:focus,
 .edit-input:focus {
   outline: none;
   border-color: var(--ts-primary-700);
@@ -81,6 +83,7 @@
 }
 
 .form-group input:disabled,
+.form-group select:disabled,
 .edit-input:disabled {
   background: #eef2f4;
   cursor: not-allowed;

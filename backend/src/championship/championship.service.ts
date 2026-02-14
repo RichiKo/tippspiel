@@ -64,6 +64,20 @@ export class ChampionshipService {
   }
 
   async remove(id: string): Promise<void> {
+    const championship = await this.championshipRepository.findOne({
+      where: { id },
+      relations: ['teams'],
+    });
+
+    if (!championship) {
+      return;
+    }
+
+    if (championship.teams?.length) {
+      championship.teams = [];
+      await this.championshipRepository.save(championship);
+    }
+
     await this.championshipRepository.delete(id);
   }
 

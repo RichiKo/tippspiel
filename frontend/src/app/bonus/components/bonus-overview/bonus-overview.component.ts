@@ -23,7 +23,7 @@ import {
 interface UserPicksRow {
   userId: number;
   username: string;
-  userImage: string;
+  userImage: string | null;
   picks: Map<string, { teamId: string; teamName: string; teamLogo: string }>;
 }
 
@@ -53,6 +53,7 @@ export class BonusOverviewComponent {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   eliminatedTeamIds = signal<Set<string>>(new Set());
+  brokenAvatarUserIds = signal<Set<number>>(new Set());
 
   readonly icons = UI_ICONS;
 
@@ -172,5 +173,22 @@ export class BonusOverviewComponent {
 
   backToChampionship(): void {
     this.router.navigate(['/championship', this.championshipId]);
+  }
+
+  shouldRenderUserAvatar(userRow: UserPicksRow): boolean {
+    const image = userRow.userImage?.trim();
+    return !!image && !this.brokenAvatarUserIds().has(userRow.userId);
+  }
+
+  getUserInitial(username: string): string {
+    return username?.charAt(0).toUpperCase() || 'U';
+  }
+
+  onUserAvatarError(userId: number): void {
+    this.brokenAvatarUserIds.update((ids) => {
+      const next = new Set(ids);
+      next.add(userId);
+      return next;
+    });
   }
 }

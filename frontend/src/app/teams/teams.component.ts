@@ -9,7 +9,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { Team } from './types/team.interface';
+import {
+  Team,
+  TeamOrigin,
+  TEAM_ORIGIN_LABELS,
+  TEAM_ORIGIN_OPTIONS,
+} from './types/team.interface';
 import { TeamService } from './services/team.service';
 import { ImageUploadComponent } from '../shared/components/image-upload/image-upload.component';
 import { PersistingService } from '../auth/services/persisisting.service';
@@ -60,6 +65,8 @@ export class TeamsComponent {
   readonly teamToDelete = signal<Team | null>(null);
 
   readonly icons = UI_ICONS;
+  readonly originOptions = TEAM_ORIGIN_OPTIONS;
+  readonly originLabels = TEAM_ORIGIN_LABELS;
 
   readonly isAdmin = computed(
     () => this.persistingService.currentUser()?.role === 'admin',
@@ -75,6 +82,9 @@ export class TeamsComponent {
       Validators.maxLength(10),
     ]),
     logoUrl: this.fb.nonNullable.control('', [Validators.required]),
+    origin: this.fb.nonNullable.control<TeamOrigin>(TeamOrigin.ENGLAND, [
+      Validators.required,
+    ]),
   });
 
   readonly editForm = this.fb.group({
@@ -87,6 +97,9 @@ export class TeamsComponent {
       Validators.maxLength(10),
     ]),
     logoUrl: this.fb.nonNullable.control('', [Validators.required]),
+    origin: this.fb.nonNullable.control<TeamOrigin>(TeamOrigin.ENGLAND, [
+      Validators.required,
+    ]),
   });
 
   constructor() {
@@ -136,11 +149,13 @@ export class TeamsComponent {
       name: this.form.value.name ?? '',
       shortName: this.form.value.shortName ?? '',
       logoUrl: this.form.value.logoUrl ?? '',
+      origin: this.form.value.origin ?? TeamOrigin.ENGLAND,
     };
 
     this.teamService.createTeam(newTeam).subscribe({
       next: () => {
         this.form.reset();
+        this.form.patchValue({ origin: TeamOrigin.ENGLAND });
         this.submitted.set(false);
         this.uploadedLogoUrl.set(null);
         this.loadTeams();
@@ -159,6 +174,7 @@ export class TeamsComponent {
       name: team.name,
       shortName: team.shortName,
       logoUrl: team.logoUrl,
+      origin: team.origin,
     });
   }
 
@@ -185,6 +201,7 @@ export class TeamsComponent {
     const name = this.editForm.value.name;
     const shortName = this.editForm.value.shortName;
     const logoUrl = this.editForm.value.logoUrl;
+    const origin = this.editForm.value.origin;
 
     if (name) {
       updateData.name = name;
@@ -194,6 +211,9 @@ export class TeamsComponent {
     }
     if (logoUrl) {
       updateData.logoUrl = logoUrl;
+    }
+    if (origin) {
+      updateData.origin = origin;
     }
 
     this.teamService.updateTeam(teamId, updateData).subscribe({
@@ -209,6 +229,10 @@ export class TeamsComponent {
         this.isSaving.set(false);
       },
     });
+  }
+
+  getOriginLabel(origin: TeamOrigin): string {
+    return this.originLabels[origin];
   }
 
   onDeleteClick(team: Team): void {

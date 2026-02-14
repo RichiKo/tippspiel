@@ -1,10 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, output } from '@angular/core';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from '../../../material.module';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -48,7 +44,8 @@ export class RegisterComponent {
       return;
     }
 
-    const { username, email, password, confirmPassword } = this.form.getRawValue();
+    const { username, email, password, confirmPassword } =
+      this.form.getRawValue();
     if (password !== confirmPassword) {
       this.passwordMismatchError = 'Die Passwoerter stimmen nicht ueberein.';
       return;
@@ -58,7 +55,7 @@ export class RegisterComponent {
     this.authService.register(username, email, password).subscribe({
       next: (user) => {
         this.persistingService.save(user.user);
-        this.router.navigate(['/home']);
+        this.router.navigate(['/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 409) {
@@ -80,7 +77,7 @@ export class RegisterComponent {
   }
 
   shouldShowError(
-    controlName: 'username' | 'email' | 'password' | 'confirmPassword'
+    controlName: 'username' | 'email' | 'password' | 'confirmPassword',
   ): boolean {
     const control = this.form.controls[controlName];
     return control.invalid && (control.touched || this.hasSubmitted);

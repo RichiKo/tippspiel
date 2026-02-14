@@ -1,4 +1,5 @@
-import { IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsString, MaxLength } from 'class-validator';
+import { TeamOrigin } from '../team-origin.enum';
 
 export class CreateTeamDto {
   @IsString()
@@ -11,4 +12,7 @@ export class CreateTeamDto {
 
   @IsString()
   logoUrl: string;
+
+  @IsEnum(TeamOrigin)
+  origin: TeamOrigin;
 }

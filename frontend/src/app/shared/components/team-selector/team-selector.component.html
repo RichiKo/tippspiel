@@ -1,15 +1,32 @@
 <div class="team-selector">
   <div class="selector-header">
     <h3>Teams auswählen</h3>
-    <div class="search-box">
-      <input
-        type="text"
-        placeholder="Team suchen..."
-        [value]="searchTerm()"
-        (input)="onSearchChange($any($event.target).value)"
-        [disabled]="disabled()"
-        class="search-input"
-      />
+    <div class="filter-row">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Team suchen..."
+          [value]="searchTerm()"
+          (input)="onSearchChange($any($event.target).value)"
+          [disabled]="disabled()"
+          class="search-input"
+        />
+      </div>
+      <div class="origin-box">
+        <label for="originFilter">Herkunft</label>
+        <select
+          id="originFilter"
+          class="origin-select"
+          [value]="selectedOrigin()"
+          (change)="onOriginChange($any($event.target).value)"
+          [disabled]="disabled()"
+        >
+          <option value="ALL">Alle</option>
+          @for (origin of originOptions; track origin) {
+            <option [value]="origin">{{ originLabels[origin] }}</option>
+          }
+        </select>
+      </div>
     </div>
   </div>
 

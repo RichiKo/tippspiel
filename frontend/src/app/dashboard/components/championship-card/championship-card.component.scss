@@ -82,6 +82,28 @@
   letter-spacing: 0.01em;
 }
 
+.admin-request-indicator {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid #f59e0b;
+  background: #fff7ed;
+  color: #9a3412;
+  padding: 5px 10px;
+  font-size: 0.79rem;
+  font-weight: 700;
+}
+
+.admin-request-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f97316;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.18);
+}
+
 .meta-pill {
   border-radius: 999px;
   border: 1px solid var(--ts-border);

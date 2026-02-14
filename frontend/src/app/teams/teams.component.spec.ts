@@ -19,6 +19,7 @@ describe('TeamsComponent', () => {
           name: 'Arsenal FC',
           shortName: 'ARS',
           logoUrl: 'https://example.com/arsenal.png',
+          origin: 'ENGLAND',
           createdAt: new Date('2026-01-01T00:00:00.000Z'),
         },
       ]),

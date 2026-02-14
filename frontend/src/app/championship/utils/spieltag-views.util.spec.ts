@@ -4,6 +4,7 @@ import {
 } from './spieltag-views.util';
 import { Game } from '../types/game.interface';
 import { Tip } from '../types/tip.interface';
+import { TeamOrigin } from '../../teams/types/team.interface';
 
 describe('spieltag-views util', () => {
   it('buildMyFinishedEntries should only create logged-in user entries from provided user tip map', () => {
@@ -23,6 +24,7 @@ describe('spieltag-views util', () => {
           name: 'BVB',
           shortName: 'BVB',
           logoUrl: '',
+          origin: TeamOrigin.GERMANY,
           createdAt: new Date('2026-01-01T12:00:00.000Z'),
         },
         awayTeam: {
@@ -30,6 +32,7 @@ describe('spieltag-views util', () => {
           name: 'Arsenal',
           shortName: 'ARS',
           logoUrl: '',
+          origin: TeamOrigin.ENGLAND,
           createdAt: new Date('2026-01-01T12:00:00.000Z'),
         },
       },
@@ -48,6 +51,7 @@ describe('spieltag-views util', () => {
           name: 'Juventus',
           shortName: 'JUV',
           logoUrl: '',
+          origin: TeamOrigin.ITALY,
           createdAt: new Date('2026-01-01T12:00:00.000Z'),
         },
         awayTeam: {
@@ -55,6 +59,7 @@ describe('spieltag-views util', () => {
           name: 'Inter',
           shortName: 'INT',
           logoUrl: '',
+          origin: TeamOrigin.ITALY,
           createdAt: new Date('2026-01-01T12:00:00.000Z'),
         },
       },

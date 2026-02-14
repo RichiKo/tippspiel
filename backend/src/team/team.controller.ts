@@ -6,6 +6,7 @@ import {
   Put,
   Delete,
   Param,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,14 +15,16 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamEntity } from './team.entity';
 import { ChampionshipEntity } from '../championship/championship.entity';
+import { TeamFilterDto } from './dto/team-filter.dto';
 
 @Controller('teams')
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Get()
-  async findAll(): Promise<TeamEntity[]> {
-    return this.teamService.findAll();
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async findAll(@Query() query: TeamFilterDto): Promise<TeamEntity[]> {
+    return this.teamService.findAll(query.origin);
   }
 
   @Get(':id')

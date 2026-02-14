@@ -27,6 +27,7 @@ export class MemberSelectorComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly isProcessing = signal<string | null>(null); // membershipId being processed
+  readonly brokenAvatarMembershipIds = signal<Set<string>>(new Set());
 
   // Outputs
   membershipChanged = output<void>();
@@ -121,12 +122,20 @@ export class MemberSelectorComponent implements OnInit {
     });
   }
 
-  getUserImage(membership: Membership): string {
+  shouldRenderAvatarImage(membership: Membership): boolean {
     const image = membership.user?.image;
-    return (
-      image ||
-      'https://via.placeholder.com/40?text=' +
-        (membership.user?.username.charAt(0).toUpperCase() || 'U')
-    );
+    return !!image && !this.brokenAvatarMembershipIds().has(membership.id);
+  }
+
+  getUserInitial(membership: Membership): string {
+    return membership.user?.username?.charAt(0).toUpperCase() || 'U';
+  }
+
+  onAvatarError(membershipId: string): void {
+    this.brokenAvatarMembershipIds.update((ids) => {
+      const next = new Set(ids);
+      next.add(membershipId);
+      return next;
+    });
   }
 }

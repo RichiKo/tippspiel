@@ -8,8 +8,16 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { TeamService } from '../../../teams/services/team.service';
-import { Team } from '../../../teams/types/team.interface';
+import {
+  Team,
+  TeamOrigin,
+  TEAM_ORIGIN_LABELS,
+  TEAM_ORIGIN_OPTIONS,
+} from '../../../teams/types/team.interface';
+
+type TeamOriginFilter = TeamOrigin | 'ALL';
 
 @Component({
   selector: 'app-team-selector',
@@ -34,9 +42,13 @@ export class TeamSelectorComponent {
 
   // State
   readonly allTeams = signal<Team[]>([]);
+  readonly filteredTeams = signal<Team[]>([]);
   readonly searchTerm = signal<string>('');
+  readonly selectedOrigin = signal<TeamOriginFilter>(TeamOrigin.ENGLAND);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly originOptions = TEAM_ORIGIN_OPTIONS;
+  readonly originLabels = TEAM_ORIGIN_LABELS;
 
   // Computed
   readonly selectedTeams = computed(() => {
@@ -47,7 +59,7 @@ export class TeamSelectorComponent {
   readonly availableTeams = computed(() => {
     const ids = this.selectedTeamIds();
     const search = this.searchTerm().toLowerCase();
-    return this.allTeams()
+    return this.filteredTeams()
       .filter((team) => !ids.includes(team.id))
       .filter(
         (team) =>
@@ -63,14 +75,22 @@ export class TeamSelectorComponent {
   loadTeams() {
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    const origin = this.selectedOrigin();
+    const originFilter = origin === 'ALL' ? undefined : origin;
 
-    this.teamService.getAllTeams().subscribe({
-      next: (teams) => {
-        this.allTeams.set(teams);
+    forkJoin({
+      allTeams: this.teamService.getAllTeams(),
+      filteredTeams: this.teamService.getAllTeams(originFilter),
+    }).subscribe({
+      next: ({ allTeams, filteredTeams }) => {
+        this.allTeams.set(allTeams);
+        this.filteredTeams.set(filteredTeams);
         this.isLoading.set(false);
       },
       error: () => {
         this.errorMessage.set('Teams konnten nicht geladen werden.');
+        this.allTeams.set([]);
+        this.filteredTeams.set([]);
         this.isLoading.set(false);
       },
     });
@@ -78,6 +98,19 @@ export class TeamSelectorComponent {
 
   onSearchChange(value: string) {
     this.searchTerm.set(value);
+  }
+
+  onOriginChange(value: string): void {
+    if (value === 'ALL') {
+      this.selectedOrigin.set('ALL');
+      this.loadTeams();
+      return;
+    }
+
+    if (this.originOptions.includes(value as TeamOrigin)) {
+      this.selectedOrigin.set(value as TeamOrigin);
+      this.loadTeams();
+    }
   }
 
   onAddTeam(teamId: string) {

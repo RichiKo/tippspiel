@@ -1,15 +1,21 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Team } from '../types/team.interface';
+import { Team, TeamOrigin } from '../types/team.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TeamService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/teams';
 
-  getAllTeams(): Observable<Team[]> {
-    return this.http.get<Team[]>(this.apiUrl);
+  getAllTeams(origin?: TeamOrigin): Observable<Team[]> {
+    let params = new HttpParams();
+
+    if (origin) {
+      params = params.set('origin', origin);
+    }
+
+    return this.http.get<Team[]>(this.apiUrl, { params });
   }
 
   getTeamById(id: string): Observable<Team> {

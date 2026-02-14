@@ -43,6 +43,7 @@ import { Team } from '../../../teams/types/team.interface';
               type="datetime-local" 
               [(ngModel)]="kickoffTime" 
               name="kickoffTime"
+              step="900"
               required
             />
           </div>

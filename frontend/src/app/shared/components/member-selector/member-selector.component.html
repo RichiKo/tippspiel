@@ -18,11 +18,18 @@
           <div class="member-list">
             @for (membership of activeMembers(); track membership.id) {
               <div class="member-item active">
-                <img
-                  [src]="getUserImage(membership)"
-                  [alt]="membership.user?.username"
-                  class="user-avatar"
-                />
+                @if (shouldRenderAvatarImage(membership)) {
+                  <img
+                    [src]="membership.user?.image || ''"
+                    [alt]="membership.user?.username || 'Nutzeravatar'"
+                    class="user-avatar"
+                    (error)="onAvatarError(membership.id)"
+                  />
+                } @else {
+                  <div class="user-avatar-placeholder" aria-hidden="true">
+                    {{ getUserInitial(membership) }}
+                  </div>
+                }
                 <div class="user-info">
                   <div class="user-name">{{ membership.user?.username }}</div>
                   <div class="user-email">{{ membership.user?.email }}</div>
@@ -54,11 +61,18 @@
         <div class="member-list">
           @for (membership of pendingRequests(); track membership.id) {
             <div class="member-item pending">
-              <img
-                [src]="getUserImage(membership)"
-                [alt]="membership.user?.username"
-                class="user-avatar"
-              />
+              @if (shouldRenderAvatarImage(membership)) {
+                <img
+                  [src]="membership.user?.image || ''"
+                  [alt]="membership.user?.username || 'Nutzeravatar'"
+                  class="user-avatar"
+                  (error)="onAvatarError(membership.id)"
+                />
+              } @else {
+                <div class="user-avatar-placeholder" aria-hidden="true">
+                  {{ getUserInitial(membership) }}
+                </div>
+              }
               <div class="user-info">
                 <div class="user-name">{{ membership.user?.username }}</div>
                 <div class="user-email">{{ membership.user?.email }}</div>

@@ -61,7 +61,7 @@ describe('BonusOverviewComponent', () => {
             id: 1,
             username: 'Richi',
             email: 'richi@test.com',
-            image: 'https://example.com/user.png',
+            image: '',
           },
           createdAt: '2026-01-01T00:00:00.000Z',
           updatedAt: '2026-01-01T00:00:00.000Z',
@@ -130,5 +130,14 @@ describe('BonusOverviewComponent', () => {
     backButton.click();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/championship', 'champ-1']);
+  });
+
+  it('should render username initials placeholder when avatar image is missing', () => {
+    const placeholder = fixture.nativeElement.querySelector(
+      '.user-avatar-placeholder',
+    ) as HTMLElement;
+
+    expect(placeholder).toBeTruthy();
+    expect(placeholder.textContent?.trim()).toBe('R');
   });
 });

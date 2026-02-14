@@ -10,7 +10,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
-import { Team } from '../../types/team.interface';
+import {
+  Team,
+  TeamOrigin,
+  TEAM_ORIGIN_LABELS,
+  TEAM_ORIGIN_OPTIONS,
+} from '../../types/team.interface';
 import { PersistingService } from '../../../auth/services/persisisting.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
@@ -50,6 +55,8 @@ export class TeamCardComponent {
   private readonly teamService = inject(TeamService);
 
   readonly icons = UI_ICONS;
+  readonly originOptions = TEAM_ORIGIN_OPTIONS;
+  readonly originLabels = TEAM_ORIGIN_LABELS;
   readonly isAdmin = computed(
     () => this.persistingService.currentUser()?.role === 'admin',
   );
@@ -62,6 +69,7 @@ export class TeamCardComponent {
     name: ['', [Validators.required, Validators.maxLength(100)]],
     shortName: ['', [Validators.required, Validators.maxLength(10)]],
     logoUrl: ['', [Validators.required]],
+    origin: [TeamOrigin.ENGLAND, [Validators.required]],
   });
 
   onEditClick(): void {
@@ -74,6 +82,7 @@ export class TeamCardComponent {
       name: team.name,
       shortName: team.shortName,
       logoUrl: team.logoUrl,
+      origin: team.origin,
     });
     this.uploadedLogoUrl.set(team.logoUrl);
     this.isEditing.set(true);
@@ -102,6 +111,7 @@ export class TeamCardComponent {
     const name = this.editForm.value.name;
     const shortName = this.editForm.value.shortName;
     const logoUrl = this.editForm.value.logoUrl;
+    const origin = this.editForm.value.origin;
 
     if (name) {
       updateData.name = name;
@@ -111,6 +121,9 @@ export class TeamCardComponent {
     }
     if (logoUrl) {
       updateData.logoUrl = logoUrl;
+    }
+    if (origin) {
+      updateData.origin = origin;
     }
 
     this.teamService.updateTeam(team.id, updateData).subscribe({
@@ -124,6 +137,10 @@ export class TeamCardComponent {
         this.isSaving.set(false);
       },
     });
+  }
+
+  getOriginLabel(origin: TeamOrigin): string {
+    return this.originLabels[origin];
   }
 
   onDeleteClick(): void {

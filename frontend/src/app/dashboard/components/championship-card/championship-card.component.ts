@@ -25,6 +25,8 @@ export class ChampionshipCardComponent implements OnInit {
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
   readonly showDeleteDialog = signal(false);
   readonly isDeleting = signal(false);
+  readonly pendingRequestsCount = signal(0);
+  readonly hasPendingRequests = computed(() => this.pendingRequestsCount() > 0);
 
   // Membership state signals
   readonly membershipStatus = signal<MembershipStatus | null>(null);
@@ -48,7 +50,26 @@ export class ChampionshipCardComponent implements OnInit {
     const championship = this.championship();
     if (championship && this.currentUser()) {
       this.loadMembershipStatus();
+      if (this.isAdmin()) {
+        this.loadPendingRequests();
+      }
     }
+  }
+
+  private loadPendingRequests() {
+    const championship = this.championship();
+    if (!championship) {
+      return;
+    }
+
+    this.membershipService.getPendingMemberships(championship.id).subscribe({
+      next: (response) => {
+        this.pendingRequestsCount.set(response.pendingRequests.length);
+      },
+      error: () => {
+        this.pendingRequestsCount.set(0);
+      },
+    });
   }
 
   private loadMembershipStatus() {

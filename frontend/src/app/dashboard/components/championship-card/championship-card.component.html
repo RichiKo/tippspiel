@@ -32,6 +32,15 @@
       }
     </div>
 
+    @if (isAdmin() && hasPendingRequests()) {
+      <div class="admin-request-indicator">
+        <span class="admin-request-dot" aria-hidden="true"></span>
+        <span>
+          {{ pendingRequestsCount() }} neue Anfrage{{ pendingRequestsCount() === 1 ? '' : 'n' }}
+        </span>
+      </div>
+    }
+
     @if (!championship()?.isActive) {
       <p class="championship-ended-note">Championship beendet</p>
     }

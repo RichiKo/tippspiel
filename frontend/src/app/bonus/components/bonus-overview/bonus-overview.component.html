@@ -54,7 +54,18 @@
                   <tr>
                     <td class="user-cell">
                       <div class="user-info">
-                        <img [src]="userRow.userImage" [alt]="userRow.username" class="user-avatar" />
+                        @if (shouldRenderUserAvatar(userRow)) {
+                          <img
+                            [src]="userRow.userImage || ''"
+                            [alt]="userRow.username"
+                            class="user-avatar"
+                            (error)="onUserAvatarError(userRow.userId)"
+                          />
+                        } @else {
+                          <div class="user-avatar-placeholder" aria-hidden="true">
+                            {{ getUserInitial(userRow.username) }}
+                          </div>
+                        }
                         <span class="username">{{ userRow.username }}</span>
                       </div>
                     </td>

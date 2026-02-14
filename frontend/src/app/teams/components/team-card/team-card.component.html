@@ -11,6 +11,9 @@
       <h3>{{ team()?.name }}</h3>
       <div class="team-meta">
         <ui-badge tone="neutral" appearance="soft">{{ team()?.shortName }}</ui-badge>
+        @if (team()?.origin; as origin) {
+          <ui-badge tone="info" appearance="soft">{{ getOriginLabel(origin) }}</ui-badge>
+        }
       </div>
 
       @if (isAdmin()) {
@@ -36,6 +39,15 @@
       <div class="form-group">
         <label for="shortName">Kurzname*</label>
         <input id="shortName" type="text" formControlName="shortName" maxlength="10" />
+      </div>
+
+      <div class="form-group">
+        <label for="origin">Herkunft*</label>
+        <select id="origin" formControlName="origin">
+          @for (origin of originOptions; track origin) {
+            <option [value]="origin">{{ originLabels[origin] }}</option>
+          }
+        </select>
       </div>
 
       <div class="form-group">
