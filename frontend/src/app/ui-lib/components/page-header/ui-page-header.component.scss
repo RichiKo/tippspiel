@@ -20,6 +20,30 @@
   align-self: flex-start;
 }
 
+.ui-page-header__back ::ng-deep .ui-button {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid #bcd5cc;
+  background: #f3faf7;
+  color: #0b5a45;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.ui-page-header__back ::ng-deep .ui-button:not(:disabled):hover {
+  background: #e9f6f0;
+  border-color: #95c2b1;
+  transform: none;
+  box-shadow: none;
+}
+
+.ui-page-header__back ::ng-deep .ui-button:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
+}
+
 .ui-page-header__copy {
   min-width: 0;
 }

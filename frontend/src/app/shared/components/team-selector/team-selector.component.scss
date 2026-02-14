@@ -32,7 +32,7 @@
   padding: 0.6rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 4px;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .search-input:focus {
@@ -61,25 +61,27 @@
   letter-spacing: 0.06em;
 }
 
-.origin-select {
+.origin-field {
   width: 100%;
-  min-height: 39px;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  background: #ffffff;
 }
 
-.origin-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.origin-field ::ng-deep .mat-mdc-text-field-wrapper {
+  min-height: 40px;
 }
 
-.origin-select:disabled {
-  background: #f3f4f6;
-  cursor: not-allowed;
+.origin-field ::ng-deep .mat-mdc-form-field-infix {
+  min-height: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.origin-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.origin-field ::ng-deep .mat-mdc-select-value-text,
+.origin-field ::ng-deep .mat-mdc-select-min-line {
+  font-size: 1rem;
 }
 
 .error-message {
@@ -258,5 +260,17 @@
 
   .selector-content {
     grid-template-columns: 1fr;
+  }
+
+  /* Prevent mobile browser input zoom that can misplace native select dropdowns */
+  .search-input,
+  .origin-field ::ng-deep .mat-mdc-select-value-text,
+  .origin-field ::ng-deep .mat-mdc-select-min-line {
+    font-size: 16px;
+  }
+
+  .origin-field ::ng-deep .mat-mdc-text-field-wrapper,
+  .origin-field ::ng-deep .mat-mdc-form-field-infix {
+    min-height: 44px;
   }
 }

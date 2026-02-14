@@ -1,21 +1,23 @@
 <div class="dashboard-container">
   <section class="dashboard-hero">
     <div class="hero-copy">
-      <span class="hero-badge">{{ 'dashboard.hero.badge' | translate }}</span>
-      <p class="hero-eyebrow">{{ 'dashboard.hero.eyebrow' | translate }}</p>
-      <h1>{{ 'dashboard.hero.title' | translate }}</h1>
+      <span class="hero-badge">{{ "dashboard.hero.badge" | translate }}</span>
+      <h1>{{ "dashboard.hero.title" | translate }}</h1>
       <p class="hero-subtitle">
-        {{ 'dashboard.hero.subtitle' | translate }}
+        {{ "dashboard.hero.subtitle" | translate }}
       </p>
     </div>
 
     @if (isAdmin()) {
       <div class="dashboard-actions">
-        <a routerLink="/dashboard/create" class="action-btn action-btn--primary">
-          {{ 'dashboard.actions.addChampionship' | translate }}
+        <a
+          routerLink="/dashboard/create"
+          class="action-btn action-btn--primary"
+        >
+          {{ "dashboard.actions.addChampionship" | translate }}
         </a>
         <a routerLink="/teams" class="action-btn action-btn--secondary">
-          {{ 'dashboard.actions.manageTeams' | translate }}
+          {{ "dashboard.actions.manageTeams" | translate }}
         </a>
       </div>
     }
@@ -23,18 +25,21 @@
 
   @if (isLoading()) {
     <section class="dashboard-state" aria-live="polite">
-      <p>{{ 'dashboard.states.loading' | translate }}</p>
+      <p>{{ "dashboard.states.loading" | translate }}</p>
     </section>
   } @else if (loadError()) {
-    <section class="dashboard-state dashboard-state--error" aria-live="assertive">
+    <section
+      class="dashboard-state dashboard-state--error"
+      aria-live="assertive"
+    >
       <p>{{ loadError() }}</p>
       <button type="button" class="retry-btn" (click)="loadChampionships()">
-        {{ 'dashboard.states.retry' | translate }}
+        {{ "dashboard.states.retry" | translate }}
       </button>
     </section>
   } @else if (!hasChampionships()) {
     <section class="dashboard-state" aria-live="polite">
-      <p>{{ 'dashboard.states.empty' | translate }}</p>
+      <p>{{ "dashboard.states.empty" | translate }}</p>
     </section>
   } @else {
     <div class="championships-grid">

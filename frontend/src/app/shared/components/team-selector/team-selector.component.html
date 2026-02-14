@@ -14,18 +14,22 @@
       </div>
       <div class="origin-box">
         <label for="originFilter">{{ 'teamSelector.originLabel' | translate }}</label>
-        <select
-          id="originFilter"
-          class="origin-select"
-          [value]="selectedOrigin()"
-          (change)="onOriginChange($any($event.target).value)"
-          [disabled]="disabled()"
-        >
-          <option value="ALL">{{ 'teamSelector.allOrigins' | translate }}</option>
-          @for (origin of originOptions; track origin) {
-            <option [value]="origin">{{ getOriginLabel(origin) }}</option>
-          }
-        </select>
+        <mat-form-field appearance="outline" class="origin-field">
+          <mat-select
+            id="originFilter"
+            class="origin-select"
+            panelClass="origin-select-panel"
+            disableOptionCentering
+            [value]="selectedOrigin()"
+            (selectionChange)="onOriginChange($event.value)"
+            [disabled]="disabled()"
+          >
+            <mat-option value="ALL">{{ 'teamSelector.allOrigins' | translate }}</mat-option>
+            @for (origin of originOptions; track origin) {
+              <mat-option [value]="origin">{{ getOriginLabel(origin) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
   </div>

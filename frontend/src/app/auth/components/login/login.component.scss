@@ -18,12 +18,16 @@ mat-form-field {
   min-height: 46px;
   border-radius: 10px;
   font-weight: 700;
-  background: var(--ts-accent-500);
+  --mdc-filled-button-container-color: var(--ts-primary-600);
+  --mdc-filled-button-label-text-color: #ffffff;
+  --mat-filled-button-state-layer-color: #ffffff;
+  background: var(--ts-primary-600);
   color: #ffffff;
   transition: all 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
   &:hover:not(:disabled) {
-    background: var(--ts-accent-600);
+    --mdc-filled-button-container-color: var(--ts-primary-700);
+    background: var(--ts-primary-700);
     transform: translateY(-1px);
   }
 

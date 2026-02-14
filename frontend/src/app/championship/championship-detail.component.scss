@@ -56,6 +56,8 @@
   height: 360px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 74%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .championship-image {
@@ -70,6 +72,7 @@
 }
 
 .championship-info {
+  position: relative;
   min-width: 0;
   width: 100%;
   z-index: 1;

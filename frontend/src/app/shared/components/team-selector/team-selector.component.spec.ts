@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { TeamSelectorComponent } from './team-selector.component';
@@ -40,7 +41,7 @@ describe('TeamSelectorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TeamSelectorComponent, TranslateModule.forRoot()],
+      imports: [TeamSelectorComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [{ provide: TeamService, useValue: mockTeamService }],
     }).compileComponents();
 
@@ -59,9 +60,7 @@ describe('TeamSelectorComponent', () => {
   });
 
   it('should reload teams when origin filter changes', () => {
-    const originSelect = fixture.nativeElement.querySelector('#originFilter') as HTMLSelectElement;
-    originSelect.value = TeamOrigin.GERMANY;
-    originSelect.dispatchEvent(new Event('change'));
+    component.onOriginChange(TeamOrigin.GERMANY);
     fixture.detectChanges();
 
     expect(mockTeamService.getAllTeams).toHaveBeenCalledWith(TeamOrigin.GERMANY);

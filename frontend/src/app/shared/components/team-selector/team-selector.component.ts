@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MaterialModule } from '../../../material.module';
 import { TeamService } from '../../../teams/services/team.service';
 import {
   Team,
@@ -22,7 +23,7 @@ type TeamOriginFilter = TeamOrigin | 'ALL';
 @Component({
   selector: 'app-team-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MaterialModule],
   templateUrl: './team-selector.component.html',
   styleUrl: './team-selector.component.scss',
 })
