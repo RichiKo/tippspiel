@@ -9,6 +9,7 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MaterialModule } from './material.module';
+import { DateAdapter } from '@angular/material/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 import { firstValueFrom, Observable } from 'rxjs';
@@ -17,6 +18,7 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import { MondayFirstNativeDateAdapter } from './shared/adapters/monday-first-native-date-adapter';
 
 class AppTranslateLoader implements TranslateLoader {
   constructor(private readonly http: HttpClient) {}
@@ -55,6 +57,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor])),
+    { provide: DateAdapter, useClass: MondayFirstNativeDateAdapter },
     {
       provide: APP_INITIALIZER,
       multi: true,

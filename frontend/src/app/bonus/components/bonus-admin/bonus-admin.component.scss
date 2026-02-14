@@ -151,6 +151,14 @@
         cursor: not-allowed;
       }
     }
+
+    .form-control-mat {
+      width: 100%;
+
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+    }
   }
 
   .form-actions {
@@ -474,29 +482,32 @@
       font-size: 0.95rem;
     }
 
+    .form-select-field {
+      width: 100%;
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+
     .form-select {
       width: 100%;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border: 2px solid #ddd;
+    }
+
+    .form-select-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+
+    .form-select-field ::ng-deep .mat-mdc-text-field-wrapper {
+      min-height: 50px;
       border-radius: 8px;
-      background-color: white;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    }
 
-      &:hover {
-        border-color: #007bff;
-      }
+    .form-select-field ::ng-deep .mat-mdc-select-trigger {
+      min-height: 48px;
+      align-items: center;
+    }
 
-      &:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-      }
-
-      option {
-        padding: 0.5rem;
-      }
+    .form-select-field ::ng-deep .mat-mdc-select-value {
+      font-size: 1rem;
     }
   }
 }

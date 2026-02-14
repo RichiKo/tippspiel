@@ -1,13 +1,29 @@
 <div class="championship-detail">
   @if (isLoading()) {
-    <div class="loading">{{ 'championship.detail.loading' | translate }}</div>
+    <div class="loading">{{ "championship.detail.loading" | translate }}</div>
   } @else if (error()) {
     <div class="error">{{ error() }}</div>
   } @else {
+    <div class="detail-back-row">
+      <button
+        type="button"
+        class="detail-back-btn"
+        (click)="onBackClick()"
+        [attr.aria-label]="'common.back' | translate"
+      >
+        <lucide-icon [img]="icons.arrowLeft" [size]="16" aria-hidden="true"></lucide-icon>
+        <span>{{ "common.back" | translate }}</span>
+      </button>
+    </div>
+
     <header class="championship-header">
       @if (championship(); as champ) {
         <div class="championship-heading-row">
-          <img [src]="champ.image" [alt]="champ.name" class="championship-image" />
+          <img
+            [src]="champ.image"
+            [alt]="champ.name"
+            class="championship-image"
+          />
           <h1 class="championship-title">{{ champ.name }}</h1>
         </div>
         <div class="championship-info">
@@ -16,7 +32,10 @@
           }
 
           <div class="action-links action-links-scroll">
-            <a [routerLink]="['/championship', championshipId, 'ranking']" class="ranking-link">
+            <a
+              [routerLink]="['/championship', championshipId, 'ranking']"
+              class="ranking-link"
+            >
               <lucide-icon
                 [img]="icons.calculator"
                 [size]="18"
@@ -24,10 +43,13 @@
                 aria-hidden="true"
               ></lucide-icon>
               <span class="action-link__label">{{
-                'championship.detail.links.ranking' | translate
+                "championship.detail.links.ranking" | translate
               }}</span>
             </a>
-            <a [routerLink]="['/championship', championshipId, 'standings']" class="standings-link">
+            <a
+              [routerLink]="['/championship', championshipId, 'standings']"
+              class="standings-link"
+            >
               <lucide-icon
                 [img]="icons.table"
                 [size]="18"
@@ -35,10 +57,13 @@
                 aria-hidden="true"
               ></lucide-icon>
               <span class="action-link__label">{{
-                'championship.detail.links.standings' | translate
+                "championship.detail.links.standings" | translate
               }}</span>
             </a>
-            <a [routerLink]="['/championship', championshipId, 'bonus-overview']" class="bonus-link">
+            <a
+              [routerLink]="['/championship', championshipId, 'bonus-overview']"
+              class="bonus-link"
+            >
               <lucide-icon
                 [img]="icons.award"
                 [size]="18"
@@ -46,12 +71,16 @@
                 aria-hidden="true"
               ></lucide-icon>
               <span class="action-link__label">{{
-                'championship.detail.links.bonusOverview' | translate
+                "championship.detail.links.bonusOverview" | translate
               }}</span>
             </a>
             @if (isAdmin()) {
               <a
-                [routerLink]="['/dashboard/championship', championshipId, 'edit']"
+                [routerLink]="[
+                  '/dashboard/championship',
+                  championshipId,
+                  'edit',
+                ]"
                 class="admin-link"
               >
                 <lucide-icon
@@ -61,7 +90,7 @@
                   aria-hidden="true"
                 ></lucide-icon>
                 <span class="action-link__label">{{
-                  'championship.detail.links.editChampionship' | translate
+                  "championship.detail.links.editChampionship" | translate
                 }}</span>
               </a>
             }
@@ -73,7 +102,7 @@
     @if (hasActiveBonusRules()) {
       <section class="bonus-section-full">
         <div class="bonus-section-header">
-          <h2>{{ 'championship.detail.bonus.title' | translate }}</h2>
+          <h2>{{ "championship.detail.bonus.title" | translate }}</h2>
           @if (isMobileView()) {
             <button
               type="button"
@@ -83,8 +112,8 @@
             >
               {{
                 isBonusExpanded()
-                  ? ('championship.detail.bonus.hide' | translate)
-                  : ('championship.detail.bonus.show' | translate)
+                  ? ("championship.detail.bonus.hide" | translate)
+                  : ("championship.detail.bonus.show" | translate)
               }}
             </button>
           }
@@ -110,7 +139,9 @@
         [attr.aria-expanded]="isRoundDrawerOpen()"
         (click)="toggleRoundDrawer()"
       >
-        <span class="round-drawer-fab-label">{{ 'championship.detail.rounds.title' | translate }}</span>
+        <span class="round-drawer-fab-label">{{
+          "championship.detail.rounds.title" | translate
+        }}</span>
       </button>
     }
 
@@ -120,17 +151,23 @@
           @if (rounds().length > 0) {
             @if (selectedRound(); as round) {
               <p class="mobile-selected-round">
-                {{ 'championship.detail.rounds.activeRound' | translate }}:
+                {{ "championship.detail.rounds.activeRound" | translate }}:
                 <strong>{{ round.name }} - {{ formatRoundDate(round) }}</strong>
               </p>
             }
           } @else {
-            <p class="mobile-no-rounds">{{ 'championship.detail.rounds.empty' | translate }}</p>
+            <p class="mobile-no-rounds">
+              {{ "championship.detail.rounds.empty" | translate }}
+            </p>
           }
 
           @if (isAdmin()) {
-            <button type="button" class="create-round-btn" (click)="onCreateRound()">
-              {{ 'championship.detail.actions.newRound' | translate }}
+            <button
+              type="button"
+              class="create-round-btn"
+              (click)="onCreateRound()"
+            >
+              {{ "championship.detail.actions.newRound" | translate }}
             </button>
           }
         </div>
@@ -139,8 +176,12 @@
       @if (!isMobileView()) {
         <aside class="rounds-sidebar">
           @if (isAdmin()) {
-            <button type="button" class="create-round-btn" (click)="onCreateRound()">
-              {{ 'championship.detail.actions.newRound' | translate }}
+            <button
+              type="button"
+              class="create-round-btn"
+              (click)="onCreateRound()"
+            >
+              {{ "championship.detail.actions.newRound" | translate }}
             </button>
           }
 
@@ -156,7 +197,9 @@
                 <small class="round-date">{{ formatRoundDate(round) }}</small>
               </button>
             } @empty {
-              <p class="no-rounds">{{ 'championship.detail.rounds.empty' | translate }}</p>
+              <p class="no-rounds">
+                {{ "championship.detail.rounds.empty" | translate }}
+              </p>
             }
           </div>
         </aside>
@@ -167,19 +210,28 @@
           <div class="games-header">
             <h2>{{ round.name }}</h2>
             @if (isAdmin()) {
-              <ui-button type="button" class="add-game-btn" size="lg" (click)="onAddGame()">
-                {{ 'championship.detail.actions.addGame' | translate }}
+              <ui-button
+                type="button"
+                class="add-game-btn"
+                size="lg"
+                (click)="onAddGame()"
+              >
+                {{ "championship.detail.actions.addGame" | translate }}
               </ui-button>
             }
           </div>
 
           <section class="finished-games-section">
-            <h3 class="finished-games-title">{{ 'championship.detail.sections.finishedGames' | translate }}</h3>
+            <h3 class="finished-games-title">
+              {{ "championship.detail.sections.finishedGames" | translate }}
+            </h3>
             @if (finishedGames().length > 0) {
               <div
                 class="spieltag-view-toggle"
                 role="tablist"
-                [attr.aria-label]="'championship.detail.views.ariaLabel' | translate"
+                [attr.aria-label]="
+                  'championship.detail.views.ariaLabel' | translate
+                "
               >
                 <button
                   type="button"
@@ -189,7 +241,7 @@
                   [class.is-active]="selectedView() === 'myGames'"
                   (click)="setSelectedView('myGames')"
                 >
-                  {{ 'championship.detail.views.myGames' | translate }}
+                  {{ "championship.detail.views.myGames" | translate }}
                 </button>
                 <button
                   type="button"
@@ -199,7 +251,7 @@
                   [class.is-active]="selectedView() === 'allGames'"
                   (click)="setSelectedView('allGames')"
                 >
-                  {{ 'championship.detail.views.allTips' | translate }}
+                  {{ "championship.detail.views.allTips" | translate }}
                 </button>
                 <button
                   type="button"
@@ -209,19 +261,19 @@
                   [class.is-active]="selectedView() === 'table'"
                   (click)="setSelectedView('table')"
                 >
-                  {{ 'championship.detail.views.table' | translate }}
+                  {{ "championship.detail.views.table" | translate }}
                 </button>
               </div>
 
               <div class="finished-view-shell">
-                @if (selectedView() === 'myGames') {
+                @if (selectedView() === "myGames") {
                   <app-finished-games-my-view
                     data-testid="view-my"
                     [entries]="myFinishedEntries()"
                   />
                 }
 
-                @if (selectedView() === 'allGames') {
+                @if (selectedView() === "allGames") {
                   <app-finished-games-all-view
                     data-testid="view-all"
                     [groupedGames]="finishedGamesGroupedByKickoff()"
@@ -236,7 +288,7 @@
                   />
                 }
 
-                @if (selectedView() === 'table') {
+                @if (selectedView() === "table") {
                   <app-spieltags-ranking-table
                     data-testid="view-table"
                     [rows]="spieltagRankingRows()"
@@ -246,17 +298,25 @@
                 }
               </div>
             } @else {
-              <p class="section-inline-info">{{ 'championship.detail.sections.noFinishedResults' | translate }}</p>
+              <p class="section-inline-info">
+                {{
+                  "championship.detail.sections.noFinishedResults" | translate
+                }}
+              </p>
             }
           </section>
 
-          @if (openGamesGroupedByDate().length > 0) {
-            <section class="open-games-section">
-              <h3 class="open-games-title">{{ 'championship.detail.sections.openGames' | translate }}</h3>
+          <section class="open-games-section">
+            <h3 class="finished-games-title">
+              {{ "championship.detail.sections.openGames" | translate }}
+            </h3>
+            @if (openGamesGroupedByDate().length > 0) {
               <div class="games-list">
                 @for (group of openGamesGroupedByDate(); track group.date) {
                   <div class="game-group">
-                    <h3 class="game-date-header">{{ formatGameDateHeader(group.date) }}</h3>
+                    <h3 class="game-date-header">
+                      {{ formatGameDateHeader(group.date) }}
+                    </h3>
                     @for (game of group.games; track game.id) {
                       <app-game-card
                         [game]="game"
@@ -273,14 +333,16 @@
                   </div>
                 }
               </div>
-            </section>
-          } @else {
-            <p class="section-inline-info section-inline-info--subtle">
-              {{ 'championship.detail.sections.noOpenGames' | translate }}
-            </p>
-          }
+            } @else {
+              <p class="section-inline-info section-inline-info--subtle">
+                {{ "championship.detail.sections.noOpenGames" | translate }}
+              </p>
+            }
+          </section>
         } @else {
-          <p class="no-selection">{{ 'championship.detail.selectRound' | translate }}</p>
+          <p class="no-selection">
+            {{ "championship.detail.selectRound" | translate }}
+          </p>
         }
       </main>
     </div>
@@ -313,7 +375,7 @@
         >
           <div class="round-drawer-title">
             <span class="round-drawer-title-icon" aria-hidden="true"></span>
-            <span>{{ 'championship.detail.rounds.title' | translate }}</span>
+            <span>{{ "championship.detail.rounds.title" | translate }}</span>
           </div>
           <button
             type="button"
@@ -334,10 +396,14 @@
               (click)="selectRoundFromDrawer(round)"
             >
               <span class="round-drawer-item-name">{{ round.name }}</span>
-              <small class="round-drawer-item-date">{{ formatRoundDate(round) }}</small>
+              <small class="round-drawer-item-date">{{
+                formatRoundDate(round)
+              }}</small>
             </button>
           } @empty {
-            <p class="round-drawer-empty">{{ 'championship.detail.rounds.empty' | translate }}</p>
+            <p class="round-drawer-empty">
+              {{ "championship.detail.rounds.empty" | translate }}
+            </p>
           }
         </div>
       </aside>

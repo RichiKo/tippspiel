@@ -19,6 +19,7 @@ import { TeamService } from './services/team.service';
 import { ImageUploadComponent } from '../shared/components/image-upload/image-upload.component';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MaterialModule } from '../material.module';
 import {
   UI_ICONS,
   UiBadgeComponent,
@@ -40,6 +41,7 @@ import {
     UiButtonComponent,
     UiCardComponent,
     UiPageHeaderComponent,
+    MaterialModule,
     TranslateModule,
   ],
   templateUrl: './teams.component.html',

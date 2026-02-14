@@ -693,4 +693,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
     const preferredWidth = viewportWidth * 0.7;
     return Math.min(380, Math.max(260, preferredWidth));
   }
+
+  onBackClick(): void {
+    this.router.navigate(['/dashboard']);
+  }
 }

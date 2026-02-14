@@ -24,6 +24,7 @@ import {
   BonusPick,
 } from '../../types/bonus.interface';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MaterialModule } from '../../../material.module';
 
 interface TeamOption {
   id: string;
@@ -38,6 +39,7 @@ interface TeamOption {
     FormsModule,
     ReactiveFormsModule,
     TranslateModule,
+    MaterialModule,
     ConfirmationDialogComponent,
   ],
   templateUrl: './bonus-admin.component.html',

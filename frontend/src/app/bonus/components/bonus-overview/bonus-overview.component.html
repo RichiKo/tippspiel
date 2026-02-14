@@ -1,7 +1,7 @@
 <section class="bonus-overview-view">
   @if (isLoading()) {
     <ui-card variant="default" padding="lg">
-      <p class="bonus-feedback">{{ 'bonus.overview.loading' | translate }}</p>
+      <p class="bonus-feedback">{{ "bonus.overview.loading" | translate }}</p>
     </ui-card>
   } @else if (errorMessage()) {
     <ui-card variant="default" padding="lg">
@@ -19,19 +19,40 @@
       >
         <div uiPageHeaderActions class="bonus-actions">
           <ui-badge tone="info" appearance="soft">
-            <lucide-icon [img]="icons.table" [size]="14" aria-hidden="true"></lucide-icon>
-            {{ 'bonus.overview.badges.rules' | translate: { count: bonusRules().length } }}
-          </ui-badge>
-          <ui-badge tone="success" appearance="soft">
-            <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
+            <lucide-icon
+              [img]="icons.table"
+              [size]="14"
+              aria-hidden="true"
+            ></lucide-icon>
             {{
-              'bonus.overview.badges.participants' | translate: { count: userPicksRows().length }
+              "bonus.overview.badges.rules"
+                | translate: { count: bonusRules().length }
             }}
           </ui-badge>
-          <ui-badge tone="danger" appearance="soft" data-testid="eliminated-count-badge">
-            <lucide-icon [img]="icons.circleX" [size]="14" aria-hidden="true"></lucide-icon>
+          <ui-badge tone="success" appearance="soft">
+            <lucide-icon
+              [img]="icons.users"
+              [size]="14"
+              aria-hidden="true"
+            ></lucide-icon>
             {{
-              'bonus.overview.badges.eliminated' | translate: { count: eliminatedPicksCount() }
+              "bonus.overview.badges.participants"
+                | translate: { count: userPicksRows().length }
+            }}
+          </ui-badge>
+          <ui-badge
+            tone="danger"
+            appearance="soft"
+            data-testid="eliminated-count-badge"
+          >
+            <lucide-icon
+              [img]="icons.circleX"
+              [size]="14"
+              aria-hidden="true"
+            ></lucide-icon>
+            {{
+              "bonus.overview.badges.eliminated"
+                | translate: { count: eliminatedPicksCount() }
             }}
           </ui-badge>
         </div>
@@ -39,7 +60,7 @@
 
       @if (bonusRules().length === 0) {
         <ui-card variant="subtle" padding="lg" class="bonus-empty-state">
-          <p>{{ 'bonus.overview.emptyRules' | translate }}</p>
+          <p>{{ "bonus.overview.emptyRules" | translate }}</p>
         </ui-card>
       } @else {
         <ui-card variant="default" padding="none" class="bonus-table-shell">
@@ -47,7 +68,9 @@
             <table class="bonus-overview-table">
               <thead>
                 <tr>
-                  <th class="user-column">{{ 'bonus.overview.headers.participant' | translate }}</th>
+                  <th class="user-column">
+                    {{ "bonus.overview.headers.participant" | translate }}
+                  </th>
                   @for (rule of bonusRules(); track rule.id) {
                     <th class="bonus-column">{{ rule.name }}</th>
                   }
@@ -66,7 +89,10 @@
                             (error)="onUserAvatarError(userRow.userId)"
                           />
                         } @else {
-                          <div class="user-avatar-placeholder" aria-hidden="true">
+                          <div
+                            class="user-avatar-placeholder"
+                            aria-hidden="true"
+                          >
                             {{ getUserInitial(userRow.username) }}
                           </div>
                         }
@@ -76,28 +102,34 @@
                     @for (rule of bonusRules(); track rule.id) {
                       <td
                         class="pick-cell"
-                        [class.eliminated-pick]="isUserPickEliminated(userRow.userId, rule.id)"
+                        [class.eliminated-pick]="
+                          isUserPickEliminated(userRow.userId, rule.id)
+                        "
                       >
                         @if (getUserPick(userRow.userId, rule.id); as pick) {
                           <div class="team-display">
-                            <img [src]="pick.teamLogo" [alt]="pick.teamName" class="team-logo" />
+                            <img
+                              [src]="pick.teamLogo"
+                              [alt]="pick.teamName"
+                              class="team-logo"
+                            />
                             <span class="team-name">{{ pick.teamName }}</span>
-                            @if (isUserPickEliminated(userRow.userId, rule.id)) {
-                              <ui-badge tone="danger" appearance="soft">{{
-                                'bonus.overview.eliminated' | translate
-                              }}</ui-badge>
-                            }
                           </div>
                         } @else {
-                          <ui-badge tone="neutral" appearance="soft">-</ui-badge>
+                          <ui-badge tone="neutral" appearance="soft"
+                            >-</ui-badge
+                          >
                         }
                       </td>
                     }
                   </tr>
                 } @empty {
                   <tr>
-                    <td [attr.colspan]="bonusRules().length + 1" class="empty-row">
-                      {{ 'bonus.overview.emptyPicks' | translate }}
+                    <td
+                      [attr.colspan]="bonusRules().length + 1"
+                      class="empty-row"
+                    >
+                      {{ "bonus.overview.emptyPicks" | translate }}
                     </td>
                   </tr>
                 }

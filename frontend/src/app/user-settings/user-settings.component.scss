@@ -36,6 +36,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--ts-space-4);
+  margin-top: var(--ts-space-4);
 }
 
 .form-section h2 {
@@ -103,7 +104,9 @@
   font-size: 0.86rem;
   font-weight: 700;
   cursor: pointer;
-  transition: border-color var(--ts-transition-fast), background-color var(--ts-transition-fast),
+  transition:
+    border-color var(--ts-transition-fast),
+    background-color var(--ts-transition-fast),
     transform var(--ts-transition-fast);
 }
 
@@ -149,7 +152,9 @@
   border-radius: var(--ts-radius-sm);
   background: #ffffff;
   color: var(--ts-text-primary);
-  transition: border-color var(--ts-transition-fast), box-shadow var(--ts-transition-fast);
+  transition:
+    border-color var(--ts-transition-fast),
+    box-shadow var(--ts-transition-fast);
 }
 
 .form-group input:focus {

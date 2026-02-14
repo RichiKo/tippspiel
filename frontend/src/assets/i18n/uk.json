@@ -473,7 +473,7 @@
         "editChampionship": "Редагувати чемпіонат"
       },
       "bonus": {
-        "title": "Бонус-правила",
+        "title": "Активний бонус",
         "hide": "Сховати",
         "show": "Показати"
       },
@@ -550,7 +550,7 @@
       "deleteGame": "Видалити матч",
       "teamFallback": "Команда {{id}}",
       "finished": "Завершено",
-      "tipLocked": "Подання прогнозів завершено",
+      "tipLocked": "Прогноз закрито",
       "yourTip": "Твій прогноз"
     },
     "finishedAll": {
@@ -585,9 +585,9 @@
       "headers": {
         "participant": "Учасник",
         "exact": "Точно (3Б)",
-        "goalDiff": "Різниця м'ячів (2Б)",
+        "goalDiff": "Різниця (2Б)",
         "tendency": "Тенденція (1Б)",
-        "missed": "Хибно (0Б)"
+        "missed": "Мімо (0Б)"
       },
       "you": "Ти",
       "errors": {
@@ -628,10 +628,10 @@
       "open": "Відкрито",
       "outcomes": {
         "exact": "Точно",
-        "goalDiff": "Різниця м'ячів",
+        "goalDiff": "Різниця",
         "tendency": "Тенденція",
-        "missed": "Хибно",
-        "notTipped": "Без прогнозу"
+        "missed": "Другий раз",
+        "notTipped": "Не поклав"
       }
     }
   }

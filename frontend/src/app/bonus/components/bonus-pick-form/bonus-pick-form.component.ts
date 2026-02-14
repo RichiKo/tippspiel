@@ -19,6 +19,7 @@ import {
   ChampionFinalistConfig,
 } from '../../types/bonus.interface';
 import { UI_ICONS, UiButtonComponent } from '../../../ui-lib/public-api';
+import { MaterialModule } from '../../../material.module';
 
 interface TeamOption {
   id: string;
@@ -34,6 +35,7 @@ interface TeamOption {
     LucideAngularModule,
     TranslateModule,
     UiButtonComponent,
+    MaterialModule,
   ],
   templateUrl: './bonus-pick-form.component.html',
   styleUrls: ['./bonus-pick-form.component.scss'],

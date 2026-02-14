@@ -3,15 +3,18 @@
     <ui-page-header
       [kicker]="'settings.page.kicker' | translate"
       [title]="'settings.page.title' | translate"
-      [subtitle]="'settings.page.subtitle' | translate"
       [showBack]="true"
       [backLabel]="'settings.page.back'"
       (back)="onCancel()"
     >
       <div uiPageHeaderActions class="settings-actions">
         <ui-badge tone="info" appearance="soft">
-          <lucide-icon [img]="icons.user" [size]="14" aria-hidden="true"></lucide-icon>
-          {{ username() || ('settings.page.kicker' | translate) }}
+          <lucide-icon
+            [img]="icons.user"
+            [size]="14"
+            aria-hidden="true"
+          ></lucide-icon>
+          {{ username() || ("settings.page.kicker" | translate) }}
         </ui-badge>
       </div>
     </ui-page-header>
@@ -19,7 +22,11 @@
     @if (error()) {
       <ui-card variant="subtle" padding="sm" class="alert-error">
         <ui-badge tone="danger" appearance="soft">
-          <lucide-icon [img]="icons.circleX" [size]="14" aria-hidden="true"></lucide-icon>
+          <lucide-icon
+            [img]="icons.circleX"
+            [size]="14"
+            aria-hidden="true"
+          ></lucide-icon>
           {{ error() }}
         </ui-badge>
       </ui-card>
@@ -28,7 +35,11 @@
     @if (success()) {
       <ui-card variant="subtle" padding="sm" class="alert-success">
         <ui-badge tone="success" appearance="soft">
-          <lucide-icon [img]="icons.circleCheckBig" [size]="14" aria-hidden="true"></lucide-icon>
+          <lucide-icon
+            [img]="icons.circleCheckBig"
+            [size]="14"
+            aria-hidden="true"
+          ></lucide-icon>
           {{ success() }}
         </ui-badge>
       </ui-card>
@@ -37,13 +48,20 @@
     <form class="settings-form" (ngSubmit)="onSave()">
       <ui-card variant="default" padding="lg" class="form-section">
         <h2>
-          <lucide-icon [img]="icons.image" [size]="16" aria-hidden="true"></lucide-icon>
-          {{ 'settings.image.title' | translate }}
+          <lucide-icon
+            [img]="icons.image"
+            [size]="16"
+            aria-hidden="true"
+          ></lucide-icon>
+          {{ "settings.image.title" | translate }}
         </h2>
         <div class="image-upload-section">
           <div class="image-preview">
             @if (previewUrl()) {
-              <img [src]="previewUrl()!" [alt]="'settings.image.title' | translate" />
+              <img
+                [src]="previewUrl()!"
+                [alt]="'settings.image.title' | translate"
+              />
             } @else {
               <div class="placeholder-avatar">
                 {{ currentUser()!.username.charAt(0).toUpperCase() }}
@@ -60,22 +78,32 @@
               hidden
             />
             <label for="imageUpload" class="upload-btn">
-              <lucide-icon [img]="icons.upload" [size]="14" aria-hidden="true"></lucide-icon>
-              {{ 'settings.image.select' | translate }}
+              <lucide-icon
+                [img]="icons.upload"
+                [size]="14"
+                aria-hidden="true"
+              ></lucide-icon>
+              {{ "settings.image.select" | translate }}
             </label>
-            <p class="upload-hint">{{ 'settings.image.hint' | translate }}</p>
+            <p class="upload-hint">{{ "settings.image.hint" | translate }}</p>
           </div>
         </div>
       </ui-card>
 
       <ui-card variant="default" padding="lg" class="form-section">
         <h2>
-          <lucide-icon [img]="icons.user" [size]="16" aria-hidden="true"></lucide-icon>
-          {{ 'settings.base.title' | translate }}
+          <lucide-icon
+            [img]="icons.user"
+            [size]="16"
+            aria-hidden="true"
+          ></lucide-icon>
+          {{ "settings.base.title" | translate }}
         </h2>
 
         <div class="form-group">
-          <label for="username">{{ 'settings.base.username' | translate }}</label>
+          <label for="username">{{
+            "settings.base.username" | translate
+          }}</label>
           <input
             type="text"
             id="username"
@@ -86,11 +114,13 @@
             required
             [placeholder]="'settings.base.username' | translate"
           />
-          <small class="form-hint">{{ 'settings.base.usernameHint' | translate }}</small>
+          <small class="form-hint">{{
+            "settings.base.usernameHint" | translate
+          }}</small>
         </div>
 
         <div class="form-group">
-          <label for="email">{{ 'settings.base.email' | translate }}</label>
+          <label for="email">{{ "settings.base.email" | translate }}</label>
           <input
             type="email"
             id="email"
@@ -105,15 +135,21 @@
 
       <ui-card variant="default" padding="lg" class="form-section">
         <h2>
-          <lucide-icon [img]="icons.shield" [size]="16" aria-hidden="true"></lucide-icon>
-          {{ 'settings.password.title' | translate }}
+          <lucide-icon
+            [img]="icons.shield"
+            [size]="16"
+            aria-hidden="true"
+          ></lucide-icon>
+          {{ "settings.password.title" | translate }}
         </h2>
         <p class="section-description">
-          {{ 'settings.password.description' | translate }}
+          {{ "settings.password.description" | translate }}
         </p>
 
         <div class="form-group">
-          <label for="newPassword">{{ 'settings.password.newLabel' | translate }}</label>
+          <label for="newPassword">{{
+            "settings.password.newLabel" | translate
+          }}</label>
           <input
             type="password"
             id="newPassword"
@@ -122,12 +158,14 @@
             name="newPassword"
             [placeholder]="'settings.password.newLabel' | translate"
           />
-          <small class="form-hint">{{ 'settings.password.minHint' | translate }}</small>
+          <small class="form-hint">{{
+            "settings.password.minHint" | translate
+          }}</small>
         </div>
 
         <div class="form-group">
           <label for="confirmPassword">{{
-            'settings.password.confirmLabel' | translate
+            "settings.password.confirmLabel" | translate
           }}</label>
           <input
             type="password"
@@ -139,7 +177,9 @@
             [class.invalid]="!passwordsMatch()"
           />
           @if (!passwordsMatch() && confirmPassword()) {
-            <small class="form-error">{{ 'settings.password.mismatch' | translate }}</small>
+            <small class="form-error">{{
+              "settings.password.mismatch" | translate
+            }}</small>
           }
         </div>
       </ui-card>
@@ -151,19 +191,23 @@
           (click)="onCancel()"
           [disabled]="isLoading()"
         >
-          {{ 'common.cancel' | translate }}
+          {{ "common.cancel" | translate }}
         </ui-button>
 
         <ui-button type="submit" [disabled]="!isFormValid() || isLoading()">
-          <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
+          <lucide-icon
+            [img]="icons.save"
+            [size]="14"
+            aria-hidden="true"
+          ></lucide-icon>
           @if (isLoading()) {
             @if (isUploadingImage()) {
-              <span>{{ 'settings.actions.uploadingImage' | translate }}</span>
+              <span>{{ "settings.actions.uploadingImage" | translate }}</span>
             } @else {
-              <span>{{ 'settings.actions.saving' | translate }}</span>
+              <span>{{ "settings.actions.saving" | translate }}</span>
             }
           } @else {
-            <span>{{ 'common.save' | translate }}</span>
+            <span>{{ "common.save" | translate }}</span>
           }
         </ui-button>
       </div>

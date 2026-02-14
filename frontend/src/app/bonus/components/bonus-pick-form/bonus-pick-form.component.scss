@@ -148,30 +148,20 @@
 
 .team-select {
   width: 100%;
+}
+
+.team-select-field {
+  width: 100%;
   min-height: 50px;
-  padding: 0 14px;
-  border: 1px solid #cfd8e1;
-  border-radius: var(--ts-radius-md);
-  background: #ffffff;
-  color: #0f172a;
-  font-family: inherit;
   font-size: 1rem;
-  transition: border-color var(--ts-transition-fast), box-shadow var(--ts-transition-fast);
-}
 
-.team-select:hover:not(:disabled) {
-  border-color: rgba(15, 118, 110, 0.48);
-}
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
 
-.team-select:focus-visible {
-  outline: 2px solid var(--ts-focus-ring);
-  outline-offset: 2px;
-}
-
-.team-select:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  background: #f8fafc;
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    border-radius: var(--ts-radius-md);
+  }
 }
 
 .selected-team-display {
@@ -275,7 +265,7 @@
     gap: 10px;
   }
 
-  .team-select {
+  .team-select-field {
     min-height: 46px;
     font-size: 0.94rem;
   }
@@ -305,7 +295,7 @@
     animation: none !important;
   }
 
-  .team-select {
+  .team-select-field {
     transition: none !important;
   }
 }

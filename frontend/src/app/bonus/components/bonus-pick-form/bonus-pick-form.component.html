@@ -70,24 +70,28 @@
       <div class="team-selection">
         <label class="selection-label">{{ 'bonus.pickForm.selectLabel' | translate }}</label>
         @if (shouldShowSelect(rule.id)) {
-          <select
-            class="team-select"
-            [value]="getSelectedTeamId(rule.id) || ''"
-            (change)="onTeamSelect(rule, $any($event.target).value)"
-            [disabled]="!isBeforeDeadline(rule) || isLoading()"
-          >
-            <option value="" disabled>{{ 'bonus.pickForm.selectOption' | translate }}</option>
-            @for (team of availableTeams(); track team.id) {
-              <option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
-                {{
-                  team.name +
-                    (isEliminatedTeam(team.id)
-                      ? (' ' + ('bonus.pickForm.eliminatedSuffix' | translate))
-                      : '')
-                }}
-              </option>
-            }
-          </select>
+          <mat-form-field appearance="outline" class="team-select-field">
+            <mat-select
+              class="team-select"
+              [value]="getSelectedTeamId(rule.id) || null"
+              (selectionChange)="onTeamSelect(rule, $event.value)"
+              [disabled]="!isBeforeDeadline(rule) || isLoading()"
+            >
+              <mat-option [value]="null" disabled>
+                {{ 'bonus.pickForm.selectOption' | translate }}
+              </mat-option>
+              @for (team of availableTeams(); track team.id) {
+                <mat-option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
+                  {{
+                    team.name +
+                      (isEliminatedTeam(team.id)
+                        ? (' ' + ('bonus.pickForm.eliminatedSuffix' | translate))
+                        : '')
+                  }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         } @else {
           @if (getSelectedTeam(rule.id); as selectedTeam) {
             <div class="selected-team-display">

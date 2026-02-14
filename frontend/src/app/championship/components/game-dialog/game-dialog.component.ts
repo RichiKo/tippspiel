@@ -1,88 +1,160 @@
-import { Component, signal, output, input, effect } from '@angular/core';
+import { Component, output, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { CreateGameDto, UpdateGameDto, UpdateGameResultDto, Game } from '../../types/game.interface';
+import {
+  CreateGameDto,
+  UpdateGameDto,
+  UpdateGameResultDto,
+  Game,
+} from '../../types/game.interface';
 import { Team } from '../../../teams/types/team.interface';
+import { MaterialModule } from '../../../material.module';
 
 @Component({
   selector: 'app-game-dialog',
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MaterialModule],
   template: `
     <div class="dialog-overlay" *ngIf="visible()" (click)="onCancel()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
-        <h2>{{
-          gameId()
-            ? ('championship.dialogs.game.titleEdit' | translate)
-            : ('championship.dialogs.game.titleCreate' | translate)
-        }}</h2>
-        
+        <h2>
+          {{
+            gameId()
+              ? ('championship.dialogs.game.titleEdit' | translate)
+              : ('championship.dialogs.game.titleCreate' | translate)
+          }}
+        </h2>
+
         <form (ngSubmit)="onSubmit()">
           <div class="form-field">
-            <label>{{ 'championship.dialogs.game.homeTeamLabel' | translate }}</label>
-            <select [(ngModel)]="homeTeamId" name="homeTeamId" required>
-              <option value="">{{ 'championship.dialogs.game.selectTeamOption' | translate }}</option>
-              @for (team of teams(); track team.id) {
-                <option [value]="team.id" [disabled]="isTeamDisabled(team.id, 'home')">
-                  {{
-                    team.name +
-                      (isTeamDisabled(team.id, 'home')
-                        ? (' ' + ('championship.dialogs.game.eliminatedSuffix' | translate))
-                        : '')
-                  }}
-                </option>
-              }
-            </select>
+            <label>{{
+              'championship.dialogs.game.homeTeamLabel' | translate
+            }}</label>
+            <mat-form-field appearance="outline" class="select-field">
+              <mat-select
+                [(ngModel)]="homeTeamId"
+                name="homeTeamId"
+                panelClass="game-dialog-team-select-panel"
+                required
+              >
+                <mat-option [value]="''">
+                  {{ 'championship.dialogs.game.selectTeamOption' | translate }}
+                </mat-option>
+                @for (team of teams(); track team.id) {
+                  <mat-option
+                    [value]="team.id"
+                    [disabled]="isTeamDisabled(team.id, 'home')"
+                  >
+                    {{
+                      team.name +
+                        (isTeamDisabled(team.id, 'home')
+                          ? ' ' +
+                            ('championship.dialogs.game.eliminatedSuffix'
+                              | translate)
+                          : '')
+                    }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
 
           <div class="form-field">
-            <label>{{ 'championship.dialogs.game.awayTeamLabel' | translate }}</label>
-            <select [(ngModel)]="awayTeamId" name="awayTeamId" required>
-              <option value="">{{ 'championship.dialogs.game.selectTeamOption' | translate }}</option>
-              @for (team of teams(); track team.id) {
-                <option [value]="team.id" [disabled]="isTeamDisabled(team.id, 'away')">
-                  {{
-                    team.name +
-                      (isTeamDisabled(team.id, 'away')
-                        ? (' ' + ('championship.dialogs.game.eliminatedSuffix' | translate))
-                        : '')
-                  }}
-                </option>
-              }
-            </select>
+            <label>{{
+              'championship.dialogs.game.awayTeamLabel' | translate
+            }}</label>
+            <mat-form-field appearance="outline" class="select-field">
+              <mat-select
+                [(ngModel)]="awayTeamId"
+                name="awayTeamId"
+                panelClass="game-dialog-team-select-panel"
+                required
+              >
+                <mat-option [value]="''">
+                  {{ 'championship.dialogs.game.selectTeamOption' | translate }}
+                </mat-option>
+                @for (team of teams(); track team.id) {
+                  <mat-option
+                    [value]="team.id"
+                    [disabled]="isTeamDisabled(team.id, 'away')"
+                  >
+                    {{
+                      team.name +
+                        (isTeamDisabled(team.id, 'away')
+                          ? ' ' +
+                            ('championship.dialogs.game.eliminatedSuffix'
+                              | translate)
+                          : '')
+                    }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
 
           <div class="form-field">
-            <label>{{ 'championship.dialogs.game.kickoffLabel' | translate }}</label>
-            <input 
-              type="datetime-local" 
-              [(ngModel)]="kickoffTime" 
-              name="kickoffTime"
-              step="900"
-              required
-            />
+            <label>{{
+              'championship.dialogs.game.kickoffLabel' | translate
+            }}</label>
+            <div class="form-row kickoff-row">
+              <mat-form-field appearance="outline" class="select-field">
+                <input
+                  matInput
+                  [matDatepicker]="kickoffDatepicker"
+                  [(ngModel)]="kickoffDate"
+                  name="kickoffDate"
+                  required
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="kickoffDatepicker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #kickoffDatepicker></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="select-field">
+                <input
+                  matInput
+                  [matTimepicker]="kickoffTimepicker"
+                  [(ngModel)]="kickoffTime"
+                  name="kickoffTime"
+                  required
+                />
+                <mat-timepicker-toggle
+                  matSuffix
+                  [for]="kickoffTimepicker"
+                ></mat-timepicker-toggle>
+                <mat-timepicker #kickoffTimepicker interval="15m"></mat-timepicker>
+              </mat-form-field>
+            </div>
           </div>
 
           @if (gameId()) {
             <div class="form-section">
-              <h3>{{ 'championship.dialogs.game.resultSection' | translate }}</h3>
-              
+              <h3>
+                {{ 'championship.dialogs.game.resultSection' | translate }}
+              </h3>
+
               <div class="form-row">
                 <div class="form-field">
-                  <label>{{ 'championship.dialogs.game.homeGoalsLabel' | translate }}</label>
-                  <input 
-                    type="number" 
-                    [(ngModel)]="homeScore" 
+                  <label>{{
+                    'championship.dialogs.game.homeGoalsLabel' | translate
+                  }}</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="homeScore"
                     name="homeScore"
                     min="0"
                   />
                 </div>
 
                 <div class="form-field">
-                  <label>{{ 'championship.dialogs.game.awayGoalsLabel' | translate }}</label>
-                  <input 
-                    type="number" 
-                    [(ngModel)]="awayScore" 
+                  <label>{{
+                    'championship.dialogs.game.awayGoalsLabel' | translate
+                  }}</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="awayScore"
                     name="awayScore"
                     min="0"
                   />
@@ -91,9 +163,9 @@ import { Team } from '../../../teams/types/team.interface';
 
               <div class="form-field checkbox-field">
                 <label>
-                  <input 
-                    type="checkbox" 
-                    [(ngModel)]="isClosed" 
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="isClosed"
                     name="isClosed"
                   />
                   {{ 'championship.dialogs.game.closedLabel' | translate }}
@@ -118,126 +190,141 @@ import { Team } from '../../../teams/types/team.interface';
       </div>
     </div>
   `,
-  styles: [`
-    .dialog-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .dialog-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      min-width: 400px;
-      max-width: 90vw;
-      max-height: 90vh;
-      overflow-y: auto;
-
-      h2 {
-        margin: 0 0 1.5rem 0;
-      }
-
-      h3 {
-        margin: 1.5rem 0 1rem 0;
-        font-size: 1.1rem;
-        color: #666;
-      }
-
-      .form-section {
-        border-top: 1px solid #e0e0e0;
-        padding-top: 1rem;
-      }
-
-      .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-      }
-
-      .form-field {
-        margin-bottom: 1.5rem;
-
-        label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-        }
-
-        input, select {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #e0e0e0;
-          border-radius: 4px;
-          font-size: 1rem;
-
-          &:focus {
-            outline: none;
-            border-color: #1976d2;
-          }
-        }
-
-        &.checkbox-field {
-          label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-
-            input[type="checkbox"] {
-              width: auto;
-              cursor: pointer;
-            }
-          }
-        }
-      }
-
-      .dialog-actions {
+  styles: [
+    `
+      .dialog-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
         display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-        margin-top: 2rem;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
 
-        button {
-          padding: 0.75rem 1.5rem;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 1rem;
+      .dialog-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        min-width: 400px;
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow-y: auto;
 
-          &.cancel-btn {
-            background: #e0e0e0;
-            color: #333;
+        h2 {
+          margin: 0 0 1.5rem 0;
+        }
 
-            &:hover {
-              background: #d0d0d0;
+        h3 {
+          margin: 1.5rem 0 1rem 0;
+          font-size: 1.1rem;
+          color: #666;
+        }
+
+        .form-section {
+          border-top: 1px solid #e0e0e0;
+          padding-top: 1rem;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        .form-field {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+          }
+
+          input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1rem;
+
+            &:focus {
+              outline: none;
+              border-color: #1976d2;
             }
           }
 
-          &.submit-btn {
-            background: #1976d2;
-            color: white;
+          .select-field {
+            width: 100%;
+            margin-bottom: 0;
 
-            &:hover:not(:disabled) {
-              background: #1565c0;
+            ::ng-deep .mat-mdc-text-field-wrapper {
+              background: #fff;
             }
 
-            &:disabled {
-              background: #bdbdbd;
-              cursor: not-allowed;
+            ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+              display: none;
+            }
+          }
+
+          &.checkbox-field {
+            label {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              cursor: pointer;
+
+              input[type='checkbox'] {
+                width: auto;
+                cursor: pointer;
+              }
+            }
+          }
+        }
+
+        .dialog-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+          margin-top: 2rem;
+
+          button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+
+            &.cancel-btn {
+              background: #e0e0e0;
+              color: #333;
+
+              &:hover {
+                background: #d0d0d0;
+              }
+            }
+
+            &.submit-btn {
+              background: #1976d2;
+              color: white;
+
+              &:hover:not(:disabled) {
+                background: #1565c0;
+              }
+
+              &:disabled {
+                background: #bdbdbd;
+                cursor: not-allowed;
+              }
             }
           }
         }
       }
-    }
-  `],
+    `,
+  ],
 })
 export class GameDialogComponent {
   visible = input<boolean>(false);
@@ -251,7 +338,8 @@ export class GameDialogComponent {
 
   homeTeamId = '';
   awayTeamId = '';
-  kickoffTime = '';
+  kickoffDate: Date | null = null;
+  kickoffTime: Date | null = null;
   homeScore: number | null = null;
   awayScore: number | null = null;
   isClosed = false;
@@ -262,7 +350,9 @@ export class GameDialogComponent {
       if (game) {
         this.homeTeamId = game.homeTeamId;
         this.awayTeamId = game.awayTeamId;
-        this.kickoffTime = this.formatDateTimeLocal(new Date(game.kickoffTime));
+        const kickoff = new Date(game.kickoffTime);
+        this.kickoffDate = kickoff;
+        this.kickoffTime = kickoff;
         this.homeScore = game.homeScore;
         this.awayScore = game.awayScore;
         this.isClosed = game.isClosed;
@@ -271,7 +361,13 @@ export class GameDialogComponent {
   }
 
   isValid() {
-    return this.homeTeamId && this.awayTeamId && this.kickoffTime && this.homeTeamId !== this.awayTeamId;
+    return (
+      this.homeTeamId &&
+      this.awayTeamId &&
+      this.kickoffDate &&
+      this.kickoffTime &&
+      this.homeTeamId !== this.awayTeamId
+    );
   }
 
   isTeamDisabled(teamId: string, side: 'home' | 'away') {
@@ -280,20 +376,24 @@ export class GameDialogComponent {
       return false;
     }
 
-    return side === 'home' ? this.homeTeamId !== teamId : this.awayTeamId !== teamId;
+    return side === 'home'
+      ? this.homeTeamId !== teamId
+      : this.awayTeamId !== teamId;
   }
 
   onSubmit() {
     if (!this.isValid()) return;
+    const kickoffTime = this.combineKickoffDateTime();
+    if (!kickoffTime) return;
 
     if (this.gameId()) {
       // Edit mode: send both game data and result
       const gameDto: UpdateGameDto = {
         homeTeamId: this.homeTeamId,
         awayTeamId: this.awayTeamId,
-        kickoffTime: new Date(this.kickoffTime),
+        kickoffTime,
       };
-      
+
       const resultDto: UpdateGameResultDto = {
         homeScore: this.homeScore ?? 0,
         awayScore: this.awayScore ?? 0,
@@ -307,11 +407,11 @@ export class GameDialogComponent {
       const dto: CreateGameDto = {
         homeTeamId: this.homeTeamId,
         awayTeamId: this.awayTeamId,
-        kickoffTime: new Date(this.kickoffTime),
+        kickoffTime,
       };
       this.confirmed.emit(dto);
     }
-    
+
     this.reset();
   }
 
@@ -323,18 +423,26 @@ export class GameDialogComponent {
   private reset() {
     this.homeTeamId = '';
     this.awayTeamId = '';
-    this.kickoffTime = '';
+    this.kickoffDate = null;
+    this.kickoffTime = null;
     this.homeScore = null;
     this.awayScore = null;
     this.isClosed = false;
   }
 
-  private formatDateTimeLocal(date: Date): string {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  private combineKickoffDateTime(): Date | null {
+    if (!this.kickoffDate || !this.kickoffTime) {
+      return null;
+    }
+
+    const kickoff = new Date(this.kickoffDate);
+    kickoff.setHours(
+      this.kickoffTime.getHours(),
+      this.kickoffTime.getMinutes(),
+      0,
+      0,
+    );
+    return kickoff;
   }
+
 }

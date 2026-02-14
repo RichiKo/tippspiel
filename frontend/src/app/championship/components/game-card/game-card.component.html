@@ -67,28 +67,30 @@
             </button>
           </div>
         } @else {
-          <div class="tip-input">
-            <input
-              type="number"
-              [value]="homeGoals() ?? ''"
-              (input)="onHomeGoalsChange($event)"
-              min="0"
-              placeholder="-"
-              class="goal-input"
-            />
-            <span class="colon">:</span>
-            <input
-              type="number"
-              [value]="awayGoals() ?? ''"
-              (input)="onAwayGoalsChange($event)"
-              min="0"
-              placeholder="-"
-              class="goal-input"
-            />
-            <button 
+          <div class="tip-editor">
+            <div class="tip-input">
+              <input
+                type="number"
+                [value]="homeGoals() ?? ''"
+                (input)="onHomeGoalsChange($event)"
+                min="0"
+                placeholder="-"
+                class="goal-input"
+              />
+              <span class="colon">:</span>
+              <input
+                type="number"
+                [value]="awayGoals() ?? ''"
+                (input)="onAwayGoalsChange($event)"
+                min="0"
+                placeholder="-"
+                class="goal-input"
+              />
+            </div>
+            <button
               type="button"
               class="save-tip-btn"
-              (click)="saveTip()" 
+              (click)="saveTip()"
               [disabled]="!canSaveTip()"
             >
               {{ 'common.save' | translate }}

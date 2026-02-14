@@ -43,11 +43,13 @@
 
       <div class="form-group">
         <label for="origin">{{ 'teams.form.originLabel' | translate }}</label>
-        <select id="origin" formControlName="origin">
-          @for (origin of originOptions; track origin) {
-            <option [value]="origin">{{ getOriginLabel(origin) }}</option>
-          }
-        </select>
+        <mat-form-field appearance="outline" class="select-field">
+          <mat-select id="origin" formControlName="origin">
+            @for (origin of originOptions; track origin) {
+              <mat-option [value]="origin">{{ getOriginLabel(origin) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       </div>
 
       <div class="form-group">

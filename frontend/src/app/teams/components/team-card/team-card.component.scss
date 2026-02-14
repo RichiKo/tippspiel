@@ -55,8 +55,7 @@
   color: #2f3c4c;
 }
 
-.form-group input,
-.form-group select {
+.form-group input {
   width: 100%;
   min-height: 42px;
   padding: 10px 12px;
@@ -67,11 +66,19 @@
   transition: border-color var(--ts-transition-fast), box-shadow var(--ts-transition-fast);
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus {
   outline: none;
   border-color: var(--ts-primary-700);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.select-field {
+  width: 100%;
+  margin: 0;
+}
+
+.select-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
 }
 
 @media (max-width: 767px) {

@@ -20,6 +20,7 @@ import { PersistingService } from '../../../auth/services/persisisting.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 import { TeamService } from '../../services/team.service';
+import { MaterialModule } from '../../../material.module';
 import {
   UI_ICONS,
   UiBadgeComponent,
@@ -39,6 +40,7 @@ import {
     UiBadgeComponent,
     UiButtonComponent,
     UiCardComponent,
+    MaterialModule,
     TranslateModule,
   ],
   templateUrl: './team-card.component.html',

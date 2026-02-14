@@ -43,10 +43,16 @@
         <div class="form-row">
           <div class="form-group">
             <label>{{ 'bonus.admin.form.typeLabel' | translate }}</label>
-            <select formControlName="type" class="form-control">
-              <option [value]="BonusRuleType.CHAMPION">{{ 'bonus.admin.type.champion' | translate }}</option>
-              <option [value]="BonusRuleType.CHAMPION_FINALIST">{{ 'bonus.admin.type.championFinalist' | translate }}</option>
-            </select>
+            <mat-form-field appearance="outline" class="form-control-mat">
+              <mat-select formControlName="type">
+                <mat-option [value]="BonusRuleType.CHAMPION">
+                  {{ 'bonus.admin.type.champion' | translate }}
+                </mat-option>
+                <mat-option [value]="BonusRuleType.CHAMPION_FINALIST">
+                  {{ 'bonus.admin.type.championFinalist' | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
 
           <div class="form-group">
@@ -288,71 +294,81 @@
               @if (evaluationPhase() === 'none') {
                 <div class="form-group">
                   <label>{{ 'bonus.admin.evaluate.finalist1' | translate }}</label>
-                  <select formControlName="finalistTeam1Id" class="form-select">
-                    <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
-                    @for (team of availableTeams(); track team.id) {
-                      <option [value]="team.id">{{ team.name }}</option>
-                    }
-                  </select>
+                  <mat-form-field appearance="outline" class="form-select-field">
+                    <mat-select formControlName="finalistTeam1Id">
+                      <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
+                      @for (team of availableTeams(); track team.id) {
+                        <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
                 </div>
 
                 <div class="form-group">
                   <label>{{ 'bonus.admin.evaluate.finalist2' | translate }}</label>
-                  <select formControlName="finalistTeam2Id" class="form-select">
-                    <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
-                    @for (team of availableTeams(); track team.id) {
-                      <option [value]="team.id">{{ team.name }}</option>
-                    }
-                  </select>
+                  <mat-form-field appearance="outline" class="form-select-field">
+                    <mat-select formControlName="finalistTeam2Id">
+                      <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
+                      @for (team of availableTeams(); track team.id) {
+                        <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
                 </div>
               } @else {
                 <div class="form-group">
                   <label>{{ 'bonus.admin.evaluate.finalist1Locked' | translate }}</label>
-                  <select
-                    formControlName="finalistTeam1Id"
-                    class="form-select"
-                    [disabled]="true"
-                  >
-                    @for (team of availableTeams(); track team.id) {
-                      <option [value]="team.id">{{ team.name }}</option>
-                    }
-                  </select>
+                  <mat-form-field appearance="outline" class="form-select-field">
+                    <mat-select
+                      formControlName="finalistTeam1Id"
+                      [disabled]="true"
+                    >
+                      @for (team of availableTeams(); track team.id) {
+                        <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
                 </div>
 
                 <div class="form-group">
                   <label>{{ 'bonus.admin.evaluate.finalist2Locked' | translate }}</label>
-                  <select
-                    formControlName="finalistTeam2Id"
-                    class="form-select"
-                    [disabled]="true"
-                  >
-                    @for (team of availableTeams(); track team.id) {
-                      <option [value]="team.id">{{ team.name }}</option>
-                    }
-                  </select>
+                  <mat-form-field appearance="outline" class="form-select-field">
+                    <mat-select
+                      formControlName="finalistTeam2Id"
+                      [disabled]="true"
+                    >
+                      @for (team of availableTeams(); track team.id) {
+                        <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
                 </div>
               }
 
               @if (evaluationPhase() !== 'none') {
                 <div class="form-group">
                   <label>{{ 'bonus.admin.evaluate.champion' | translate }}</label>
-                  <select formControlName="championTeamId" class="form-select">
-                    <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
-                    @for (team of getChampionOptions(); track team.id) {
-                      <option [value]="team.id">{{ team.name }}</option>
-                    }
-                  </select>
+                  <mat-form-field appearance="outline" class="form-select-field">
+                    <mat-select formControlName="championTeamId">
+                      <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
+                      @for (team of getChampionOptions(); track team.id) {
+                        <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
                 </div>
               }
             } @else {
               <div class="form-group">
                 <label>{{ 'bonus.admin.evaluate.champion' | translate }}</label>
-                <select formControlName="championTeamId" class="form-select">
-                  <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
-                  @for (team of availableTeams(); track team.id) {
-                    <option [value]="team.id">{{ team.name }}</option>
-                  }
-                </select>
+                <mat-form-field appearance="outline" class="form-select-field">
+                  <mat-select formControlName="championTeamId">
+                    <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
+                    @for (team of availableTeams(); track team.id) {
+                      <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
               </div>
             }
           </div>

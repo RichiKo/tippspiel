@@ -3,7 +3,8 @@
   border: 1px solid #dbe3ea;
   border-radius: 14px;
   padding: 1rem 1.1rem;
-  transition: border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+  transition:
+    border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
     transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -157,11 +158,17 @@
   font-size: 0.88rem;
 }
 
+.tip-editor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .tip-input {
   display: flex;
   gap: 0.4rem;
   align-items: center;
-  flex-wrap: wrap;
   justify-content: center;
 }
 
@@ -174,7 +181,8 @@
   border: 1px solid #cfd8e1;
   border-radius: 9px;
   background: #f8fbfd;
-  transition: border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+  transition:
+    border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
     background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -320,8 +328,8 @@
   }
 
   .team img {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
 
   .game-score {
@@ -400,8 +408,8 @@
   }
 
   .team img {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
 
   .game-score {

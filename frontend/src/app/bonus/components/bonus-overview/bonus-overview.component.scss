@@ -185,7 +185,7 @@
   }
 
   .bonus-overview-table {
-    min-width: 680px;
+    min-width: 560px;
   }
 
   .bonus-overview-table thead th,
@@ -209,5 +209,88 @@
 
   .team-name {
     font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .bonus-overview-view {
+    padding: 10px;
+  }
+
+  .table-wrapper {
+    overflow-x: hidden;
+  }
+
+  .bonus-overview-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .bonus-overview-table thead th,
+  .bonus-overview-table tbody td {
+    padding: 8px 4px;
+  }
+
+  .bonus-overview-table thead th {
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .bonus-overview-table thead th.user-column,
+  .bonus-overview-table tbody td.user-cell {
+    width: 42%;
+    min-width: 0;
+    position: static;
+  }
+
+  .bonus-overview-table thead th.bonus-column,
+  .bonus-overview-table tbody td.pick-cell {
+    width: 58%;
+    min-width: 0;
+  }
+
+  .user-info {
+    width: 100%;
+    min-width: 0;
+    gap: 4px;
+  }
+
+  .username {
+    display: inline-block;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.76rem;
+  }
+
+  .team-display {
+    width: 100%;
+    min-width: 0;
+    gap: 4px;
+  }
+
+  .team-logo {
+    width: 22px;
+    height: 22px;
+  }
+
+  .team-name {
+    display: inline-block;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.74rem;
+  }
+
+  .bonus-overview-table tbody td ui-badge {
+    transform: scale(0.82);
+    transform-origin: center;
   }
 }
