@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ChampionshipDetailComponent } from './championship-detail.component';
 import { ChampionshipService } from '../dashboard/services/championship.service';
@@ -179,7 +180,7 @@ describe('ChampionshipDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChampionshipDetailComponent],
+      imports: [ChampionshipDetailComponent, TranslateModule.forRoot()],
       providers: [
         {
           provide: ActivatedRoute,

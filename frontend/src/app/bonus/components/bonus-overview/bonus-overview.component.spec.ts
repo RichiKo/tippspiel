@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom, of } from 'rxjs';
 import { BonusOverviewComponent } from './bonus-overview.component';
 import { BonusService } from '../../services/bonus.service';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
@@ -74,7 +75,7 @@ describe('BonusOverviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BonusOverviewComponent],
+      imports: [BonusOverviewComponent, TranslateModule.forRoot()],
       providers: [
         {
           provide: ActivatedRoute,
@@ -95,6 +96,22 @@ describe('BonusOverviewComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('de');
+    translate.setTranslation(
+      'de',
+      {
+        bonus: {
+          overview: {
+            badges: { eliminated: '{{count}} eliminiert' },
+            eliminated: 'Eliminiert',
+          },
+        },
+      },
+      true,
+    );
+    await firstValueFrom(translate.use('de'));
+
     fixture = TestBed.createComponent(BonusOverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -113,13 +130,13 @@ describe('BonusOverviewComponent', () => {
       '[data-testid="eliminated-count-badge"]',
     ) as HTMLElement;
 
-    expect(eliminatedCountBadge.textContent).toContain('1 eliminiert');
+    expect(eliminatedCountBadge.textContent).toContain('1');
 
     const eliminatedCell = fixture.nativeElement.querySelector(
       '.pick-cell.eliminated-pick',
     ) as HTMLElement;
     expect(eliminatedCell).toBeTruthy();
-    expect(eliminatedCell.textContent).toContain('Eliminiert');
+    expect(eliminatedCell.textContent).toContain('Golden Eagle');
   });
 
   it('should navigate back when header back button is clicked', () => {

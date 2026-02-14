@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MembershipService } from '../../services/membership.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   Membership,
   MembershipStatus,
@@ -8,7 +9,7 @@ import {
 
 @Component({
   selector: 'app-member-selector',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './member-selector.component.html',
   styleUrl: './member-selector.component.scss',
 })
@@ -20,6 +21,7 @@ export class MemberSelectorComponent implements OnInit {
 
   // Inject services
   private readonly membershipService = inject(MembershipService);
+  private readonly translate = inject(TranslateService);
 
   // State signals
   readonly pendingRequests = signal<Membership[]>([]);
@@ -49,7 +51,9 @@ export class MemberSelectorComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: () => {
-          this.errorMessage.set('Fehler beim Laden der Anfragen');
+          this.errorMessage.set(
+            this.translate.instant('memberSelector.errors.loadRequests'),
+          );
           this.isLoading.set(false);
         },
       });
@@ -63,7 +67,9 @@ export class MemberSelectorComponent implements OnInit {
           this.activeMembers.set(response.members);
         },
         error: () => {
-          this.errorMessage.set('Fehler beim Laden der Teilnehmer');
+          this.errorMessage.set(
+            this.translate.instant('memberSelector.errors.loadMembers'),
+          );
         },
       });
   }
@@ -83,7 +89,9 @@ export class MemberSelectorComponent implements OnInit {
       },
       error: () => {
         this.isProcessing.set(null);
-        this.errorMessage.set('Fehler beim Genehmigen');
+        this.errorMessage.set(
+          this.translate.instant('memberSelector.errors.approve'),
+        );
       },
     });
   }
@@ -100,7 +108,9 @@ export class MemberSelectorComponent implements OnInit {
       },
       error: () => {
         this.isProcessing.set(null);
-        this.errorMessage.set('Fehler beim Ablehnen');
+        this.errorMessage.set(
+          this.translate.instant('memberSelector.errors.reject'),
+        );
       },
     });
   }
@@ -117,7 +127,9 @@ export class MemberSelectorComponent implements OnInit {
       },
       error: () => {
         this.isProcessing.set(null);
-        this.errorMessage.set('Fehler beim Entfernen');
+        this.errorMessage.set(
+          this.translate.instant('memberSelector.errors.remove'),
+        );
       },
     });
   }
@@ -128,7 +140,7 @@ export class MemberSelectorComponent implements OnInit {
   }
 
   getUserInitial(membership: Membership): string {
-    return membership.user?.username?.charAt(0).toUpperCase() || 'U';
+    return membership.user?.username?.charAt(0).toUpperCase() || 'N';
   }
 
   onAvatarError(membershipId: string): void {

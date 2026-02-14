@@ -6,10 +6,11 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
 import { ChampionshipService } from '../../services/championship.service';
 import { MembershipService } from '../../../shared/services/membership.service';
 import { MembershipStatus } from '../../../shared/types/membership.interface';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-championship-card',
-  imports: [RouterModule, ConfirmationDialogComponent],
+  imports: [RouterModule, ConfirmationDialogComponent, TranslateModule],
   templateUrl: './championship-card.component.html',
   styleUrl: './championship-card.component.scss',
 })
@@ -20,6 +21,7 @@ export class ChampionshipCardComponent implements OnInit {
   private readonly championshipService = inject(ChampionshipService);
   private readonly membershipService = inject(MembershipService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   readonly currentUser = this.persistingService.currentUser;
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
@@ -38,8 +40,8 @@ export class ChampionshipCardComponent implements OnInit {
   readonly joinConfirmMessage = computed(() => {
     const championship = this.championship();
     return championship?.isPublic
-      ? 'Möchtest du an diesem Championship teilnehmen?'
-      : 'Möchtest du den Beitritt zu diesem privaten Championship anfragen?';
+      ? this.translate.instant('championshipCard.join.publicMessage')
+      : this.translate.instant('championshipCard.join.privateMessage');
   });
 
   // Expose MembershipStatus enum for template

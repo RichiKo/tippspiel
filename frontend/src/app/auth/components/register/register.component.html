@@ -1,35 +1,35 @@
 <form class="auth-form" [formGroup]="form" (ngSubmit)="onRegister()">
   <div class="field-grid">
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Benutzername</mat-label>
+      <mat-label>{{ 'auth.register.usernameLabel' | translate }}</mat-label>
       <input matInput formControlName="username" autocomplete="username" />
       @if (shouldShowError('username')) {
         <mat-error>
           {{
             form.controls.username.hasError('required')
-              ? 'Benutzername ist erforderlich.'
-              : 'Mindestens 3 Zeichen erforderlich.'
+              ? ('auth.register.usernameRequired' | translate)
+              : ('auth.register.usernameMinLength' | translate)
           }}
         </mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>E-Mail</mat-label>
+      <mat-label>{{ 'auth.register.emailLabel' | translate }}</mat-label>
       <input matInput formControlName="email" type="email" autocomplete="email" />
       @if (shouldShowError('email')) {
         <mat-error>
           {{
             form.controls.email.hasError('required')
-              ? 'E-Mail ist erforderlich.'
-              : 'Bitte gib eine gueltige E-Mail ein.'
+              ? ('auth.register.emailRequired' | translate)
+              : ('auth.register.emailInvalid' | translate)
           }}
         </mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Passwort</mat-label>
+      <mat-label>{{ 'auth.register.passwordLabel' | translate }}</mat-label>
       <input
         matInput
         formControlName="password"
@@ -40,7 +40,11 @@
         type="button"
         mat-icon-button
         matSuffix
-        [attr.aria-label]="showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'"
+        [attr.aria-label]="
+          showPassword
+            ? ('auth.register.passwordHide' | translate)
+            : ('auth.register.passwordShow' | translate)
+        "
         (click)="showPassword = !showPassword"
       >
         <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
@@ -49,15 +53,15 @@
         <mat-error>
           {{
             form.controls.password.hasError('required')
-              ? 'Passwort ist erforderlich.'
-              : 'Mindestens 8 Zeichen erforderlich.'
+              ? ('auth.register.passwordRequired' | translate)
+              : ('auth.register.passwordMinLength' | translate)
           }}
         </mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Passwort bestaetigen</mat-label>
+      <mat-label>{{ 'auth.register.confirmPasswordLabel' | translate }}</mat-label>
       <input
         matInput
         formControlName="confirmPassword"
@@ -69,7 +73,9 @@
         mat-icon-button
         matSuffix
         [attr.aria-label]="
-          showConfirmPassword ? 'Passwort verbergen' : 'Passwort anzeigen'
+          showConfirmPassword
+            ? ('auth.register.passwordHide' | translate)
+            : ('auth.register.passwordShow' | translate)
         "
         (click)="showConfirmPassword = !showConfirmPassword"
       >
@@ -78,7 +84,7 @@
         }}</mat-icon>
       </button>
       @if (shouldShowError('confirmPassword')) {
-        <mat-error>Bitte bestaetige dein Passwort.</mat-error>
+        <mat-error>{{ 'auth.register.confirmPasswordRequired' | translate }}</mat-error>
       }
     </mat-form-field>
   </div>
@@ -105,18 +111,21 @@
     [disabled]="isSubmitting"
   >
     <mat-icon>person_add</mat-icon>
-    {{ isSubmitting ? 'Bitte warten...' : 'Registrieren' }}
+    {{
+      isSubmitting
+        ? ('auth.register.submitting' | translate)
+        : ('auth.register.submit' | translate)
+    }}
   </button>
 
   <div class="login-link">
-    Schon einen Account?
+    {{ 'auth.register.hasAccount' | translate }}
     <button type="button" class="switch-link" (click)="toLogin()">
-      Jetzt einloggen
+      {{ 'auth.register.toLogin' | translate }}
     </button>
   </div>
 
   <p class="auth-note">
-    Mit der Registrierung bestaetigst du, dass du Tipps nur vor Spielbeginn
-    abgibst.
+    {{ 'auth.register.note' | translate }}
   </p>
 </form>

@@ -1,44 +1,59 @@
 import { Component, signal, output, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { CreateGameDto, UpdateGameDto, UpdateGameResultDto, Game } from '../../types/game.interface';
 import { Team } from '../../../teams/types/team.interface';
 
 @Component({
   selector: 'app-game-dialog',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="dialog-overlay" *ngIf="visible()" (click)="onCancel()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
-        <h2>{{ gameId() ? 'Spiel bearbeiten' : 'Neues Spiel' }}</h2>
+        <h2>{{
+          gameId()
+            ? ('championship.dialogs.game.titleEdit' | translate)
+            : ('championship.dialogs.game.titleCreate' | translate)
+        }}</h2>
         
         <form (ngSubmit)="onSubmit()">
           <div class="form-field">
-            <label>Heimteam</label>
+            <label>{{ 'championship.dialogs.game.homeTeamLabel' | translate }}</label>
             <select [(ngModel)]="homeTeamId" name="homeTeamId" required>
-              <option value="">-- Wähle Team --</option>
+              <option value="">{{ 'championship.dialogs.game.selectTeamOption' | translate }}</option>
               @for (team of teams(); track team.id) {
                 <option [value]="team.id" [disabled]="isTeamDisabled(team.id, 'home')">
-                  {{ team.name }}{{ isTeamDisabled(team.id, 'home') ? ' (ausgestiegen)' : '' }}
+                  {{
+                    team.name +
+                      (isTeamDisabled(team.id, 'home')
+                        ? (' ' + ('championship.dialogs.game.eliminatedSuffix' | translate))
+                        : '')
+                  }}
                 </option>
               }
             </select>
           </div>
 
           <div class="form-field">
-            <label>Auswärtsteam</label>
+            <label>{{ 'championship.dialogs.game.awayTeamLabel' | translate }}</label>
             <select [(ngModel)]="awayTeamId" name="awayTeamId" required>
-              <option value="">-- Wähle Team --</option>
+              <option value="">{{ 'championship.dialogs.game.selectTeamOption' | translate }}</option>
               @for (team of teams(); track team.id) {
                 <option [value]="team.id" [disabled]="isTeamDisabled(team.id, 'away')">
-                  {{ team.name }}{{ isTeamDisabled(team.id, 'away') ? ' (ausgestiegen)' : '' }}
+                  {{
+                    team.name +
+                      (isTeamDisabled(team.id, 'away')
+                        ? (' ' + ('championship.dialogs.game.eliminatedSuffix' | translate))
+                        : '')
+                  }}
                 </option>
               }
             </select>
           </div>
 
           <div class="form-field">
-            <label>Anstoßzeit</label>
+            <label>{{ 'championship.dialogs.game.kickoffLabel' | translate }}</label>
             <input 
               type="datetime-local" 
               [(ngModel)]="kickoffTime" 
@@ -50,11 +65,11 @@ import { Team } from '../../../teams/types/team.interface';
 
           @if (gameId()) {
             <div class="form-section">
-              <h3>Ergebnis</h3>
+              <h3>{{ 'championship.dialogs.game.resultSection' | translate }}</h3>
               
               <div class="form-row">
                 <div class="form-field">
-                  <label>Tore Heim</label>
+                  <label>{{ 'championship.dialogs.game.homeGoalsLabel' | translate }}</label>
                   <input 
                     type="number" 
                     [(ngModel)]="homeScore" 
@@ -64,7 +79,7 @@ import { Team } from '../../../teams/types/team.interface';
                 </div>
 
                 <div class="form-field">
-                  <label>Tore Auswärts</label>
+                  <label>{{ 'championship.dialogs.game.awayGoalsLabel' | translate }}</label>
                   <input 
                     type="number" 
                     [(ngModel)]="awayScore" 
@@ -81,7 +96,7 @@ import { Team } from '../../../teams/types/team.interface';
                     [(ngModel)]="isClosed" 
                     name="isClosed"
                   />
-                  Spiel beendet
+                  {{ 'championship.dialogs.game.closedLabel' | translate }}
                 </label>
               </div>
             </div>
@@ -89,10 +104,14 @@ import { Team } from '../../../teams/types/team.interface';
 
           <div class="dialog-actions">
             <button type="button" class="cancel-btn" (click)="onCancel()">
-              Abbrechen
+              {{ 'common.cancel' | translate }}
             </button>
             <button type="submit" class="submit-btn" [disabled]="!isValid()">
-              {{ gameId() ? 'Aktualisieren' : 'Erstellen' }}
+              {{
+                gameId()
+                  ? ('championship.dialogs.game.update' | translate)
+                  : ('championship.dialogs.game.create' | translate)
+              }}
             </button>
           </div>
         </form>

@@ -1,7 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
+import { firstValueFrom, of } from 'rxjs';
 import { TeamsComponent } from './teams.component';
 import { TeamService } from './services/team.service';
 import { PersistingService } from '../auth/services/persisisting.service';
@@ -50,7 +56,15 @@ describe('TeamsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TeamsComponent],
+      imports: [
+        TeamsComponent,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader,
+          },
+        }),
+      ],
       providers: [
         { provide: TeamService, useValue: mockTeamService },
         { provide: PersistingService, useValue: mockPersistingService },
@@ -59,14 +73,40 @@ describe('TeamsComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('de');
+    translate.setTranslation(
+      'uk',
+      {
+        teams: {
+          page: {
+            title: 'Команди',
+            backLabel: 'Назад до панелі',
+          },
+          form: {
+            addButton: 'Додати команду',
+          },
+          list: {
+            title: 'Усі команди (1)',
+          },
+          origin: {
+            ENGLAND: 'Англія',
+          },
+        },
+      },
+      true,
+    );
+    await firstValueFrom(translate.use('uk'));
+
     fixture = TestBed.createComponent(TeamsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should render migrated teams header and table', () => {
+  it('should render translated teams header and table', () => {
     expect(component).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('ui-page-header')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('Команди');
+    expect(fixture.nativeElement.textContent).toContain('Додати команду');
     expect(fixture.nativeElement.querySelector('.teams-table')).toBeTruthy();
   });
 

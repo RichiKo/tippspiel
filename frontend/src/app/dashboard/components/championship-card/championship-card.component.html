@@ -22,13 +22,17 @@
         [class.meta-pill--active]="championship()?.isActive"
         [class.meta-pill--inactive]="!championship()?.isActive"
       >
-        {{ championship()?.isActive ? 'Aktiv' : 'Inaktiv' }}
+        {{
+          championship()?.isActive
+            ? ('championshipCard.status.active' | translate)
+            : ('championshipCard.status.inactive' | translate)
+        }}
       </span>
       @if (championship()?.isPublic) {
-        <span class="meta-pill">Öffentlich</span>
+        <span class="meta-pill">{{ 'championshipCard.visibility.public' | translate }}</span>
       }
       @if (!championship()?.isPublic) {
-        <span class="meta-pill">Privat</span>
+        <span class="meta-pill">{{ 'championshipCard.visibility.private' | translate }}</span>
       }
     </div>
 
@@ -36,32 +40,35 @@
       <div class="admin-request-indicator">
         <span class="admin-request-dot" aria-hidden="true"></span>
         <span>
-          {{ pendingRequestsCount() }} neue Anfrage{{ pendingRequestsCount() === 1 ? '' : 'n' }}
+          {{
+            'championshipCard.pendingRequests'
+              | translate : { count: pendingRequestsCount() }
+          }}
         </span>
       </div>
     }
 
     @if (!championship()?.isActive) {
-      <p class="championship-ended-note">Championship beendet</p>
+      <p class="championship-ended-note">{{ 'championshipCard.ended' | translate }}</p>
     }
 
     @if (membershipStatus() === MembershipStatus.PENDING) {
       <div class="membership-status pending">
         <span class="status-icon" aria-hidden="true">⏳</span>
-        <span class="status-text">Deine Anfrage wurde noch nicht freigegeben</span>
+        <span class="status-text">{{ 'championshipCard.membership.pending' | translate }}</span>
       </div>
     }
     @if (membershipStatus() === MembershipStatus.REJECTED) {
       <div class="membership-status rejected">
         <span class="status-icon" aria-hidden="true">❌</span>
-        <span class="status-text">Beitritt abgelehnt</span>
+        <span class="status-text">{{ 'championshipCard.membership.rejected' | translate }}</span>
         <button
           type="button"
           class="retry-btn"
           (click)="onReRequestClick($event)"
           [disabled]="isJoining()"
         >
-          Erneut anfragen
+          {{ 'championshipCard.membership.retry' | translate }}
         </button>
       </div>
     }
@@ -72,10 +79,10 @@
           [routerLink]="['/dashboard/championship', championship()?.id, 'edit']"
           class="edit-link"
         >
-          Bearbeiten
+          {{ 'common.edit' | translate }}
         </a>
         <button type="button" class="delete-btn" (click)="onDeleteClick()">
-          Löschen
+          {{ 'common.delete' | translate }}
         </button>
       </div>
     }
@@ -83,24 +90,28 @@
 
   <app-confirmation-dialog
     [visible]="showDeleteDialog()"
-    [title]="'Löschen bestätigen'"
-    [message]="
-      'Möchtest du die Championship »' +
-      (championship()?.name ?? '') +
-      '« wirklich löschen?'
-    "
-    [confirmLabel]="'Löschen'"
-    [cancelLabel]="'Abbrechen'"
+    [title]="'championshipCard.deleteDialog.title'"
+    [message]="'championshipCard.deleteDialog.message' | translate : { name: championship()?.name ?? '' }"
+    [confirmLabel]="'common.delete'"
+    [cancelLabel]="'common.cancel'"
     (confirmed)="handleDeleteConfirm()"
     (cancelled)="handleDeleteCancel()"
   />
 
   <app-confirmation-dialog
     [visible]="showJoinConfirmDialog()"
-    [title]="championship()?.isPublic ? 'Mitspielen?' : 'Beitritt anfragen?'"
+    [title]="
+      championship()?.isPublic
+        ? 'championshipCard.join.publicTitle'
+        : 'championshipCard.join.privateTitle'
+    "
     [message]="joinConfirmMessage()"
-    [confirmLabel]="championship()?.isPublic ? 'Ja, mitspielen' : 'Ja, anfragen'"
-    [cancelLabel]="'Abbrechen'"
+    [confirmLabel]="
+      championship()?.isPublic
+        ? 'championshipCard.join.publicConfirm'
+        : 'championshipCard.join.privateConfirm'
+    "
+    [cancelLabel]="'common.cancel'"
     (confirmed)="handleJoinConfirm()"
     (cancelled)="showJoinConfirmDialog.set(false)"
   />

@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MyFinishedEntry } from '../../utils/spieltag-views.util';
 
 interface MyKickoffGroup {
@@ -14,12 +16,14 @@ interface MyKickoffGroup {
 
 @Component({
   selector: 'app-finished-games-my-view',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './finished-games-my-view.component.html',
   styleUrl: './finished-games-my-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinishedGamesMyViewComponent {
+  private readonly translate = inject(TranslateService);
+
   entries = input.required<MyFinishedEntry[]>();
 
   readonly groupedEntries = computed<MyKickoffGroup[]>(() => {
@@ -52,21 +56,19 @@ export class FinishedGamesMyViewComponent {
 
   formatKickoff(kickoffTime: Date): string {
     const date = new Date(kickoffTime);
-    const weekdays = [
-      'Sonntag',
-      'Montag',
-      'Dienstag',
-      'Mittwoch',
-      'Donnerstag',
-      'Freitag',
-      'Samstag',
-    ];
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${weekdays[date.getDay()]}, ${day}.${month}.${year} · ${hours}:${minutes} Uhr`;
+    const locale = this.translate.currentLang === 'de' ? 'de-DE' : 'uk-UA';
+    const dateLabel = new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+    const timeLabel = new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
+    return `${dateLabel} · ${timeLabel}`;
   }
 
   getTeamInitials(name: string): string {

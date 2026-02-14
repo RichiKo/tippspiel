@@ -1,11 +1,11 @@
 <div class="team-selector">
   <div class="selector-header">
-    <h3>Teams auswählen</h3>
+    <h3>{{ 'teamSelector.title' | translate }}</h3>
     <div class="filter-row">
       <div class="search-box">
         <input
           type="text"
-          placeholder="Team suchen..."
+          [placeholder]="'teamSelector.searchPlaceholder' | translate"
           [value]="searchTerm()"
           (input)="onSearchChange($any($event.target).value)"
           [disabled]="disabled()"
@@ -13,7 +13,7 @@
         />
       </div>
       <div class="origin-box">
-        <label for="originFilter">Herkunft</label>
+        <label for="originFilter">{{ 'teamSelector.originLabel' | translate }}</label>
         <select
           id="originFilter"
           class="origin-select"
@@ -21,9 +21,9 @@
           (change)="onOriginChange($any($event.target).value)"
           [disabled]="disabled()"
         >
-          <option value="ALL">Alle</option>
+          <option value="ALL">{{ 'teamSelector.allOrigins' | translate }}</option>
           @for (origin of originOptions; track origin) {
-            <option [value]="origin">{{ originLabels[origin] }}</option>
+            <option [value]="origin">{{ getOriginLabel(origin) }}</option>
           }
         </select>
       </div>
@@ -37,9 +37,11 @@
   <div class="selector-content">
     <!-- Selected Teams -->
     <div class="selected-section">
-      <h4>Ausgewählte Teams ({{ selectedTeams().length }})</h4>
+      <h4>
+        {{ 'teamSelector.selectedTitle' | translate : { count: selectedTeams().length } }}
+      </h4>
       @if (selectedTeams().length === 0) {
-      <div class="empty-state">Noch keine Teams ausgewählt</div>
+      <div class="empty-state">{{ 'teamSelector.selectedEmpty' | translate }}</div>
       } @else {
       <div class="team-list">
         @for (team of selectedTeams(); track team.id) {
@@ -62,7 +64,7 @@
               (change)="onActiveChange(team.id, $any($event.target).checked)"
               [disabled]="disabled()"
             />
-            <span>Aktiv</span>
+            <span>{{ 'teamSelector.active' | translate }}</span>
           </label>
           }
           <button
@@ -70,7 +72,7 @@
             class="remove-btn"
             (click)="onRemoveTeam(team.id)"
             [disabled]="disabled()"
-            title="Team entfernen"
+            [title]="'teamSelector.remove' | translate"
           >
             ✕
           </button>
@@ -82,13 +84,19 @@
 
     <!-- Available Teams -->
     <div class="available-section">
-      <h4>Verfügbare Teams ({{ availableTeams().length }})</h4>
+      <h4>
+        {{ 'teamSelector.availableTitle' | translate : { count: availableTeams().length } }}
+      </h4>
       @if (isLoading()) {
-      <div class="loading">Lade Teams...</div>
+      <div class="loading">{{ 'teamSelector.loading' | translate }}</div>
       } @else if (availableTeams().length === 0) {
       <div class="empty-state">
-        @if (searchTerm()) { Keine Teams gefunden für "{{ searchTerm() }}" }
-        @else { Alle Teams sind bereits ausgewählt }
+        @if (searchTerm()) {
+          {{ 'teamSelector.searchEmpty' | translate : { term: searchTerm() } }}
+        }
+        @else {
+          {{ 'teamSelector.availableEmpty' | translate }}
+        }
       </div>
       } @else {
       <div class="team-list">
@@ -109,7 +117,7 @@
             class="add-btn"
             (click)="onAddTeam(team.id)"
             [disabled]="disabled()"
-            title="Team hinzufügen"
+            [title]="'teamSelector.add' | translate"
           >
             +
           </button>

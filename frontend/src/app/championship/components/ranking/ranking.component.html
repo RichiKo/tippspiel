@@ -1,7 +1,7 @@
 <section class="ranking-view">
   @if (isLoading()) {
     <ui-card variant="default" padding="lg">
-      <p class="ranking-feedback">Laden...</p>
+      <p class="ranking-feedback">{{ 'championship.ranking.loading' | translate }}</p>
     </ui-card>
   } @else if (error()) {
     <ui-card variant="default" padding="lg">
@@ -10,11 +10,11 @@
   } @else {
     <ui-card variant="elevated" padding="lg" class="ranking-shell">
       <ui-page-header
-        kicker="Analyse"
-        title="Pruef-Kalkulation"
+        [kicker]="'championship.ranking.page.kicker' | translate"
+        [title]="'championship.ranking.page.title' | translate"
         [subtitle]="championship()?.name ?? null"
         [showBack]="true"
-        backLabel="Zurueck zur Championship"
+        [backLabel]="'championship.ranking.page.backLabel' | translate"
         (back)="backToChampionship()"
       >
         <div uiPageHeaderActions class="ranking-actions">
@@ -31,7 +31,10 @@
 
       <p class="games-info" data-testid="games-info">
         <lucide-icon [img]="icons.calculator" [size]="15" aria-hidden="true"></lucide-icon>
-        <span>{{ closedGames() }} von {{ totalGames() }} Spielen ausgewertet</span>
+        <span>{{
+          'championship.ranking.gamesInfo'
+            | translate: { closed: closedGames(), total: totalGames() }
+        }}</span>
       </p>
 
       <ui-card variant="default" padding="none" class="ranking-table-shell">
@@ -39,11 +42,11 @@
           <table class="ranking-table">
             <thead>
               <tr>
-                <th>Teilnehmer</th>
-                <th>Exakt (3P)</th>
-                <th>Differenz (2P)</th>
-                <th>Tendenz (1P)</th>
-                <th>Missed (0P)</th>
+                <th>{{ 'championship.ranking.headers.participant' | translate }}</th>
+                <th>{{ 'championship.ranking.headers.exact' | translate }}</th>
+                <th>{{ 'championship.ranking.headers.goalDiff' | translate }}</th>
+                <th>{{ 'championship.ranking.headers.tendency' | translate }}</th>
+                <th>{{ 'championship.ranking.headers.missed' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -56,7 +59,9 @@
                     <div class="username-cell">
                       <span class="username-text">{{ ranking.user.username }}</span>
                       @if (isCurrentUser(ranking.userId)) {
-                        <ui-badge tone="info" appearance="soft">Du</ui-badge>
+                        <ui-badge tone="info" appearance="soft">{{
+                          'championship.ranking.you' | translate
+                        }}</ui-badge>
                       }
                     </div>
                   </td>

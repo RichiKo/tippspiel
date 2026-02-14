@@ -1,5 +1,5 @@
 <div class="image-upload-container">
-  <div class="upload-label">{{ label() }}</div>
+  <div class="upload-label">{{ label() | translate }}</div>
 
   @if (hasImage()) {
     <div class="image-preview-box">
@@ -35,7 +35,7 @@
       @if (isUploading()) {
         <div class="loading-state">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Wird hochgeladen...</p>
+          <p>{{ 'imageUpload.uploading' | translate }}</p>
         </div>
       } @else {
         <button
@@ -45,9 +45,11 @@
           (click)="fileInput.click()"
         >
           <mat-icon>cloud_upload</mat-icon>
-          Bild auswählen
+          {{ 'imageUpload.selectButton' | translate }}
         </button>
-        <p class="upload-hint">Max. {{ maxSizeMB() }}MB (JPG, PNG, WebP)</p>
+        <p class="upload-hint">
+          {{ 'imageUpload.hint' | translate : { size: maxSizeMB() } }}
+        </p>
       }
     </div>
   }

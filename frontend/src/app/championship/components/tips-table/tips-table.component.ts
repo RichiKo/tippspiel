@@ -1,15 +1,18 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tip } from '../../types/tip.interface';
 import { UiBadgeComponent, type UiBadgeTone } from '../../../ui-lib/public-api';
 
 @Component({
   selector: 'app-tips-table',
-  imports: [CommonModule, UiBadgeComponent],
+  imports: [CommonModule, TranslateModule, UiBadgeComponent],
   templateUrl: './tips-table.component.html',
   styleUrl: './tips-table.component.scss',
 })
 export class TipsTableComponent {
+  private readonly translate = inject(TranslateService);
+
   tips = input.required<Tip[]>();
   currentUserId = input.required<number>();
   isClosed = input<boolean>(false);
@@ -27,14 +30,16 @@ export class TipsTableComponent {
   });
 
   getOutcomeLabel(outcomeType: string | null): string {
-    const labels: Record<string, string> = {
-      exact: 'Exakt',
-      goalDiff: 'Tordifferenz',
-      tendency: 'Tendenz',
-      missed: 'Falsch',
-      notTipped: 'Nicht getippt',
+    const labelKeys: Record<string, string> = {
+      exact: 'championship.tipsTable.outcomes.exact',
+      goalDiff: 'championship.tipsTable.outcomes.goalDiff',
+      tendency: 'championship.tipsTable.outcomes.tendency',
+      missed: 'championship.tipsTable.outcomes.missed',
+      notTipped: 'championship.tipsTable.outcomes.notTipped',
     };
-    return labels[outcomeType || ''] || '-';
+
+    const key = labelKeys[outcomeType || ''];
+    return key ? this.translate.instant(key) : '-';
   }
 
   getOutcomeTone(outcomeType: string | null): UiBadgeTone {

@@ -1,14 +1,16 @@
 <div class="spieltags-table-view">
-  <p class="table-meta">{{ evaluatedGamesCount() }} gewertete Spiele</p>
+  <p class="table-meta">
+    {{ 'championship.spieltagTable.evaluatedGames' | translate: { count: evaluatedGamesCount() } }}
+  </p>
 
   @if (rows().length > 0) {
     <div class="table-wrapper">
       <table class="spieltags-table">
         <thead>
           <tr>
-            <th class="rank-col">Platz</th>
-            <th>Teilnehmer</th>
-            <th class="num-col">Punkte (Spiele)</th>
+            <th class="rank-col">{{ 'championship.spieltagTable.headers.rank' | translate }}</th>
+            <th>{{ 'championship.spieltagTable.headers.participant' | translate }}</th>
+            <th class="num-col">{{ 'championship.spieltagTable.headers.gamePoints' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +34,6 @@
       </table>
     </div>
   } @else {
-    <p class="table-empty">Noch keine gewerteten Spiele.</p>
+    <p class="table-empty">{{ 'championship.spieltagTable.empty' | translate }}</p>
   }
 </div>

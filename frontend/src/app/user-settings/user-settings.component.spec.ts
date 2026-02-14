@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { UserSettingsComponent } from './user-settings.component';
 import { PersistingService } from '../auth/services/persisisting.service';
@@ -43,7 +44,7 @@ describe('UserSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserSettingsComponent],
+      imports: [UserSettingsComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Router, useValue: { navigate: navigateSpy } },
         { provide: PersistingService, useValue: mockPersistingService },

@@ -3,12 +3,13 @@ import { Component, inject, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from '../../../material.module';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { PersistingService } from '../../services/persisisting.service';
 
 @Component({
   selector: 'ts-register',
-  imports: [MaterialModule, ReactiveFormsModule],
+  imports: [MaterialModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
@@ -17,6 +18,7 @@ export class RegisterComponent {
   router = inject(Router);
   fb = inject(FormBuilder);
   persistingService = inject(PersistingService);
+  translate = inject(TranslateService);
 
   switchMode = output<void>();
 
@@ -47,7 +49,9 @@ export class RegisterComponent {
     const { username, email, password, confirmPassword } =
       this.form.getRawValue();
     if (password !== confirmPassword) {
-      this.passwordMismatchError = 'Die Passwoerter stimmen nicht ueberein.';
+      this.passwordMismatchError = this.translate.instant(
+        'auth.register.errors.passwordMismatch',
+      );
       return;
     }
 
@@ -59,10 +63,11 @@ export class RegisterComponent {
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 409) {
-          this.authError = 'Benutzername oder E-Mail ist bereits vergeben.';
+          this.authError = this.translate.instant(
+            'auth.register.errors.conflict',
+          );
         } else {
-          this.authError =
-            'Registrierung ist momentan nicht moeglich. Bitte versuche es erneut.';
+          this.authError = this.translate.instant('auth.register.errors.general');
         }
         this.isSubmitting = false;
       },

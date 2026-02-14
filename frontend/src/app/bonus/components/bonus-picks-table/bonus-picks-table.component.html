@@ -1,10 +1,12 @@
 <div class="bonus-picks-table">
-  <h3 class="table-title">Alle Tipps: {{ bonusRuleName() }}</h3>
+  <h3 class="table-title">
+    {{ 'bonus.picksTable.title' | translate: { ruleName: bonusRuleName() } }}
+  </h3>
 
   @if (isLoading()) {
     <div class="loading-spinner">
       <div class="spinner"></div>
-      <p>Lade Tipps...</p>
+      <p>{{ 'bonus.picksTable.loading' | translate }}</p>
     </div>
   }
 
@@ -17,18 +19,20 @@
 
   @if (!isLoading() && !errorMessage() && allPicks().length === 0) {
     <div class="no-picks">
-      <p>Es wurden noch keine Tipps abgegeben.</p>
+      <p>{{ 'bonus.picksTable.empty' | translate }}</p>
     </div>
   }
 
   @if (!isLoading() && !errorMessage() && allPicks().length > 0) {
     <div class="picks-summary">
-      <h4>Zusammenfassung</h4>
+      <h4>{{ 'bonus.picksTable.summaryTitle' | translate }}</h4>
       <div class="summary-grid">
         @for (teamData of getUniqueTeams(); track teamData.teamId) {
           <div class="summary-item">
             <span class="team-name">{{ teamData.teamName }}</span>
-            <span class="team-count">{{ teamData.count }} Tipp(s)</span>
+            <span class="team-count">{{
+              'bonus.picksTable.pickCount' | translate: { count: teamData.count }
+            }}</span>
           </div>
         }
       </div>
@@ -38,9 +42,9 @@
       <table class="picks-table">
         <thead>
           <tr>
-            <th>Benutzer</th>
-            <th>Gewähltes Team</th>
-            <th>Zeitpunkt</th>
+            <th>{{ 'bonus.picksTable.headers.user' | translate }}</th>
+            <th>{{ 'bonus.picksTable.headers.team' | translate }}</th>
+            <th>{{ 'bonus.picksTable.headers.time' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -83,7 +87,9 @@
     </div>
 
     <div class="picks-stats">
-      <span class="stats-text">Gesamt: {{ allPicks().length }} Tipp(s)</span>
+      <span class="stats-text">{{
+        'bonus.picksTable.total' | translate: { count: allPicks().length }
+      }}</span>
     </div>
   }
 </div>

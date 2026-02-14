@@ -9,6 +9,7 @@ import {
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Championship } from '../dashboard/types/championship.interface';
 import { Round, CreateRoundDto } from './types/round.interface';
 import {
@@ -51,6 +52,7 @@ import { UI_ICONS, UiButtonComponent } from '../ui-lib/public-api';
     CommonModule,
     LucideAngularModule,
     RouterModule,
+    TranslateModule,
     GameCardComponent,
     RoundDialogComponent,
     GameDialogComponent,
@@ -74,6 +76,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
   private readonly rankingService = inject(RankingService);
   private readonly persistingService = inject(PersistingService);
   private readonly bonusService = inject(BonusService);
+  private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
   rounds = signal<Round[]>([]);
@@ -309,8 +312,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
         next: (data) => {
           this.teams.set(data);
         },
-        error: (err) => {
-          console.error('Teams konnten nicht geladen werden');
+        error: () => {
+          this.error.set(
+            this.translate.instant('championship.detail.errors.loadTeams'),
+          );
         },
       });
   }
@@ -333,8 +338,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
         next: (data) => {
           this.championship.set(data);
         },
-        error: (err) => {
-          this.error.set('Championship konnte nicht geladen werden');
+        error: () => {
+          this.error.set(
+            this.translate.instant('championship.detail.errors.loadChampionship'),
+          );
           this.isLoading.set(false);
         },
       });
@@ -350,8 +357,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
         }
         this.isLoading.set(false);
       },
-      error: (err) => {
-        this.error.set('Spieltage konnten nicht geladen werden');
+      error: () => {
+        this.error.set(
+          this.translate.instant('championship.detail.errors.loadRounds'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -384,8 +393,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
           this.loadUserTips();
           this.loadTipsForStartedGames();
         },
-        error: (err) => {
-          this.error.set('Spiele konnten nicht geladen werden');
+        error: () => {
+          this.error.set(
+            this.translate.instant('championship.detail.errors.loadGames'),
+          );
         },
       });
   }
@@ -405,12 +416,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
           currentTips.set(game.id, tips);
           this.gameTips.set(new Map(currentTips));
         },
-        error: (err) => {
-          console.error(
-            `Fehler beim Laden der Tipps für Spiel ${game.id}`,
-            err,
-          );
-        },
+        error: () => {},
       });
     });
   }
@@ -427,9 +433,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
           tips.forEach((tip) => tipsMap.set(tip.gameId, tip));
           this.userTips.set(tipsMap);
         },
-        error: (err) => {
-          console.error('Tipps konnten nicht geladen werden', err);
-        },
+        error: () => {},
       });
   }
 
@@ -460,9 +464,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
         currentTips.set(tip.gameId, savedTip);
         this.userTips.set(new Map(currentTips));
       },
-      error: (err) => {
-        this.error.set('Tipp konnte nicht gespeichert werden');
-        console.error('Tipp-Fehler:', err);
+      error: () => {
+        this.error.set(
+          this.translate.instant('championship.detail.errors.saveTip'),
+        );
       },
     });
   }
@@ -478,8 +483,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
         this.rounds.set([...currentRounds, round]);
         this.showRoundDialog.set(false);
       },
-      error: (err) => {
-        this.error.set('Spieltag konnte nicht erstellt werden');
+      error: () => {
+        this.error.set(
+          this.translate.instant('championship.detail.errors.createRound'),
+        );
         this.showRoundDialog.set(false);
       },
     });
@@ -549,14 +556,18 @@ export class ChampionshipDetailComponent implements OnDestroy {
               this.showGameDialog.set(false);
               this.selectedGame.set(null);
             },
-            error: (err) => {
-              this.error.set('Ergebnis konnte nicht aktualisiert werden');
+            error: () => {
+              this.error.set(
+                this.translate.instant('championship.detail.errors.updateResult'),
+              );
               this.showGameDialog.set(false);
             },
           });
         },
-        error: (err) => {
-          this.error.set('Spiel konnte nicht aktualisiert werden');
+        error: () => {
+          this.error.set(
+            this.translate.instant('championship.detail.errors.updateGame'),
+          );
           this.showGameDialog.set(false);
         },
       });
@@ -573,8 +584,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
           this.games.set(sortedGames);
           this.showGameDialog.set(false);
         },
-        error: (err) => {
-          this.error.set('Spiel konnte nicht erstellt werden');
+        error: () => {
+          this.error.set(
+            this.translate.instant('championship.detail.errors.createGame'),
+          );
           this.showGameDialog.set(false);
         },
       });
@@ -607,8 +620,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
         this.showDeleteConfirm.set(false);
         this.gameToDelete.set(null);
       },
-      error: (err) => {
-        this.error.set('Spiel konnte nicht gelöscht werden');
+      error: () => {
+        this.error.set(
+          this.translate.instant('championship.detail.errors.deleteGame'),
+        );
         this.showDeleteConfirm.set(false);
         this.gameToDelete.set(null);
       },
@@ -634,21 +649,13 @@ export class ChampionshipDetailComponent implements OnDestroy {
   }
 
   formatGameDateHeader(date: Date): string {
-    const weekdays = [
-      'Sonntag',
-      'Montag',
-      'Dienstag',
-      'Mittwoch',
-      'Donnerstag',
-      'Freitag',
-      'Samstag',
-    ];
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const weekday = weekdays[date.getDay()];
-
-    return `${weekday}, ${day}.${month}.${year}`;
+    const locale = this.translate.currentLang === 'de' ? 'de-DE' : 'uk-UA';
+    return new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
   }
 
   private formatDate(date: Date): string {

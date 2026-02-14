@@ -1,4 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 import { UiPageHeaderComponent } from './ui-page-header.component';
 
 describe('UiPageHeaderComponent', () => {
@@ -7,8 +14,22 @@ describe('UiPageHeaderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UiPageHeaderComponent],
+      imports: [
+        UiPageHeaderComponent,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader,
+          },
+        }),
+      ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('de');
+    translate.setTranslation('de', { common: { back: 'Zurueck' } }, true);
+    translate.setTranslation('uk', { common: { back: 'Повернутися' } }, true);
+    await firstValueFrom(translate.use('uk'));
 
     fixture = TestBed.createComponent(UiPageHeaderComponent);
     component = fixture.componentInstance;
@@ -37,5 +58,16 @@ describe('UiPageHeaderComponent', () => {
     backButton.click();
 
     expect(backSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render translated default back label', () => {
+    fixture.componentRef.setInput('showBack', true);
+    fixture.detectChanges();
+
+    const backButtonText = fixture.nativeElement.querySelector(
+      '.ui-page-header__back button',
+    )?.textContent as string;
+
+    expect(backButtonText).toContain('Повернутися');
   });
 });

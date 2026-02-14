@@ -9,10 +9,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   Team,
   TeamOrigin,
-  TEAM_ORIGIN_LABELS,
   TEAM_ORIGIN_OPTIONS,
 } from './types/team.interface';
 import { TeamService } from './services/team.service';
@@ -40,6 +40,7 @@ import {
     UiButtonComponent,
     UiCardComponent,
     UiPageHeaderComponent,
+    TranslateModule,
   ],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss',
@@ -50,6 +51,7 @@ export class TeamsComponent {
   private readonly router = inject(Router);
   private readonly teamService = inject(TeamService);
   private readonly persistingService = inject(PersistingService);
+  private readonly translate = inject(TranslateService);
 
   readonly teams = signal<Team[]>([]);
   readonly isLoading = signal(false);
@@ -66,7 +68,6 @@ export class TeamsComponent {
 
   readonly icons = UI_ICONS;
   readonly originOptions = TEAM_ORIGIN_OPTIONS;
-  readonly originLabels = TEAM_ORIGIN_LABELS;
 
   readonly isAdmin = computed(
     () => this.persistingService.currentUser()?.role === 'admin',
@@ -120,7 +121,7 @@ export class TeamsComponent {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Teams konnten nicht geladen werden.');
+        this.errorMessage.set(this.translate.instant('teams.errors.loadFailed'));
         this.isLoading.set(false);
         this.teams.set([]);
       },
@@ -161,7 +162,7 @@ export class TeamsComponent {
         this.loadTeams();
       },
       error: () => {
-        this.errorMessage.set('Team konnte nicht erstellt werden.');
+        this.errorMessage.set(this.translate.instant('teams.errors.createFailed'));
         this.isLoading.set(false);
       },
     });
@@ -225,14 +226,14 @@ export class TeamsComponent {
         this.loadTeams();
       },
       error: () => {
-        this.errorMessage.set('Team konnte nicht aktualisiert werden.');
+        this.errorMessage.set(this.translate.instant('teams.errors.updateFailed'));
         this.isSaving.set(false);
       },
     });
   }
 
   getOriginLabel(origin: TeamOrigin): string {
-    return this.originLabels[origin];
+    return this.translate.instant(`teams.origin.${origin}`);
   }
 
   onDeleteClick(team: Team): void {
@@ -261,7 +262,7 @@ export class TeamsComponent {
         this.loadTeams();
       },
       error: () => {
-        this.errorMessage.set('Team konnte nicht geloescht werden.');
+        this.errorMessage.set(this.translate.instant('teams.errors.deleteFailed'));
         this.isLoading.set(false);
         this.showDeleteDialog.set(false);
         this.teamToDelete.set(null);

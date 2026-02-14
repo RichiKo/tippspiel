@@ -8,6 +8,7 @@ import { ImageUploadComponent } from '../../../shared/components/image-upload/im
 import { TeamSelectorComponent } from '../../../shared/components/team-selector/team-selector.component';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-championship',
@@ -17,6 +18,7 @@ import { switchMap } from 'rxjs/operators';
     ReactiveFormsModule,
     ImageUploadComponent,
     TeamSelectorComponent,
+    TranslateModule,
   ],
   templateUrl: './add-championship.component.html',
   styleUrl: './add-championship.component.scss',
@@ -25,6 +27,7 @@ export class AddChampionshipComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly championshipService = inject(ChampionshipService);
+  private readonly translate = inject(TranslateService);
 
   readonly form = this.fb.group({
     name: this.fb.nonNullable.control('', [
@@ -103,7 +106,9 @@ export class AddChampionshipComponent {
         },
         error: () => {
           this.isLoading.set(false);
-          this.errorMessage.set('Championship konnte nicht erstellt werden.');
+          this.errorMessage.set(
+            this.translate.instant('championshipForm.errors.createFailed'),
+          );
         },
       });
   }

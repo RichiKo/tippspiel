@@ -2,13 +2,20 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { PersistingService } from '../../../auth/services/persisisting.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { UI_ICONS } from '../../../ui-lib/public-api';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, RouterModule, LucideAngularModule, ConfirmationDialogComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    LucideAngularModule,
+    ConfirmationDialogComponent,
+    TranslateModule,
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -9,6 +9,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Championship } from '../../../dashboard/types/championship.interface';
 import {
   BonusColumn,
@@ -31,6 +32,7 @@ import {
   imports: [
     CommonModule,
     LucideAngularModule,
+    TranslateModule,
     UiBadgeComponent,
     UiCardComponent,
     UiPageHeaderComponent,
@@ -45,6 +47,7 @@ export class StandingsComponent {
   private readonly championshipService = inject(ChampionshipService);
   private readonly rankingService = inject(RankingService);
   private readonly persistingService = inject(PersistingService);
+  private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
   bonusColumns = signal<BonusColumn[]>([]);
@@ -101,7 +104,9 @@ export class StandingsComponent {
         this.championship.set(championship);
       },
       error: () => {
-        this.error.set('Fehler beim Laden der Championship-Daten.');
+        this.error.set(
+          this.translate.instant('championship.standings.errors.loadChampionship'),
+        );
       },
     });
   }
@@ -114,7 +119,9 @@ export class StandingsComponent {
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('Fehler beim Laden der Ergebnis-Tabelle.');
+        this.error.set(
+          this.translate.instant('championship.standings.errors.loadStandings'),
+        );
         this.isLoading.set(false);
       },
     });

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { TeamSelectorComponent } from './team-selector.component';
 import { TeamService } from '../../../teams/services/team.service';
@@ -39,7 +40,7 @@ describe('TeamSelectorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TeamSelectorComponent],
+      imports: [TeamSelectorComponent, TranslateModule.forRoot()],
       providers: [{ provide: TeamService, useValue: mockTeamService }],
     }).compileComponents();
 
@@ -68,4 +69,3 @@ describe('TeamSelectorComponent', () => {
     expect(component.availableTeams()[0].shortName).toBe('FCB');
   });
 });
-

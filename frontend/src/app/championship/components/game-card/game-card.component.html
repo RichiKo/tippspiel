@@ -9,19 +9,19 @@
           type="button"
           class="edit-game-btn"
           (click)="onEditGame()"
-          aria-label="Spiel bearbeiten"
-          title="Bearbeiten"
+          [attr.aria-label]="'championship.gameCard.editGame' | translate"
+          [attr.title]="'common.edit' | translate"
         >
-          Bearbeiten
+          {{ 'common.edit' | translate }}
         </button>
         <button
           type="button"
           class="delete-game-btn"
           (click)="onDeleteGame()"
-          aria-label="Spiel löschen"
-          title="Löschen"
+          [attr.aria-label]="'championship.gameCard.deleteGame' | translate"
+          [attr.title]="'common.delete' | translate"
         >
-          Löschen
+          {{ 'common.delete' | translate }}
         </button>
       </div>
     }
@@ -33,7 +33,9 @@
         <span>{{ game().homeTeam?.name }}</span>
         <img [src]="game().homeTeam?.logoUrl" [alt]="game().homeTeam?.name" />
       } @else {
-        <span>Team {{ game().homeTeamId }}</span>
+        <span>{{
+          'championship.gameCard.teamFallback' | translate: { id: game().homeTeamId }
+        }}</span>
       }
     </div>
 
@@ -41,15 +43,16 @@
       @if (game().isClosed) {
         <div class="final-score">
           <span class="score">{{ game().homeScore }} : {{ game().awayScore }}</span>
-          <small class="status closed">Beendet</small>
+          <small class="status closed">{{ 'championship.gameCard.finished' | translate }}</small>
         </div>
       } @else if (isTipLocked()) {
         <div class="tip-locked-info">
-          <span class="tip-locked">Tippabgabe beendet</span>
+          <span class="tip-locked">{{ 'championship.gameCard.tipLocked' | translate }}</span>
         </div>
         @if (tip()) {
           <small class="user-tip">
-            Dein Tipp: {{ tip()?.homeTeamGoals }} : {{ tip()?.awayTeamGoals }}
+            {{ 'championship.gameCard.yourTip' | translate }}: {{ tip()?.homeTeamGoals }} :
+            {{ tip()?.awayTeamGoals }}
           </small>
         }
       } @else {
@@ -57,10 +60,10 @@
           <div class="tip-display">
             <div class="saved-tip">
               <span class="tip-value">{{ tip()?.homeTeamGoals }} : {{ tip()?.awayTeamGoals }}</span>
-              <small class="tip-label">Dein Tipp</small>
+              <small class="tip-label">{{ 'championship.gameCard.yourTip' | translate }}</small>
             </div>
             <button type="button" class="edit-tip-btn" (click)="enterEditMode()">
-              Bearbeiten
+              {{ 'common.edit' | translate }}
             </button>
           </div>
         } @else {
@@ -88,7 +91,7 @@
               (click)="saveTip()" 
               [disabled]="!canSaveTip()"
             >
-              Speichern
+              {{ 'common.save' | translate }}
             </button>
           </div>
         }
@@ -100,7 +103,9 @@
         <img [src]="game().awayTeam?.logoUrl" [alt]="game().awayTeam?.name" />
         <span>{{ game().awayTeam?.name }}</span>
       } @else {
-        <span>Team {{ game().awayTeamId }}</span>
+        <span>{{
+          'championship.gameCard.teamFallback' | translate: { id: game().awayTeamId }
+        }}</span>
       }
     </div>
   </div>

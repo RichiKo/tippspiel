@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { UpdateUserDto, UserService } from '../shared/services/user.service';
 import {
@@ -31,6 +32,7 @@ import {
     UiButtonComponent,
     UiCardComponent,
     UiPageHeaderComponent,
+    TranslateModule,
   ],
   templateUrl: './user-settings.component.html',
   styleUrl: './user-settings.component.scss',
@@ -40,6 +42,7 @@ export class UserSettingsComponent {
   private readonly router = inject(Router);
   private readonly persistingService = inject(PersistingService);
   private readonly userService = inject(UserService);
+  private readonly translate = inject(TranslateService);
 
   readonly currentUser = this.persistingService.currentUser;
   readonly icons = UI_ICONS;
@@ -102,12 +105,12 @@ export class UserSettingsComponent {
     const file = input.files[0];
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      this.error.set('Nur JPG, PNG und WebP Dateien sind erlaubt.');
+      this.error.set(this.translate.instant('settings.errors.fileType'));
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      this.error.set('Die Datei ist zu gross. Maximal 2MB sind erlaubt.');
+      this.error.set(this.translate.instant('settings.errors.fileSize'));
       return;
     }
 
@@ -155,7 +158,7 @@ export class UserSettingsComponent {
 
       await firstValueFrom(this.userService.updateUser(updateData));
 
-      this.success.set('Einstellungen erfolgreich gespeichert!');
+      this.success.set(this.translate.instant('settings.success.saved'));
       this.isLoading.set(false);
 
       this.currentPassword.set('');
@@ -169,7 +172,8 @@ export class UserSettingsComponent {
     } catch (error: unknown) {
       const typedError = error as { error?: { message?: string } };
       this.error.set(
-        typedError.error?.message || 'Fehler beim Speichern der Einstellungen.',
+        typedError.error?.message ||
+          this.translate.instant('settings.errors.saveFailed'),
       );
       this.isLoading.set(false);
       this.isUploadingImage.set(false);

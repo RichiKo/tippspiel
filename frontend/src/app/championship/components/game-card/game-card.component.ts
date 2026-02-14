@@ -1,17 +1,20 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Game } from '../../types/game.interface';
 import { Tip, CreateTipDto } from '../../types/tip.interface';
 import { TipsTableComponent } from '../tips-table/tips-table.component';
 
 @Component({
   selector: 'app-game-card',
-  imports: [CommonModule, FormsModule, TipsTableComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, TipsTableComponent],
   templateUrl: './game-card.component.html',
   styleUrl: './game-card.component.scss',
 })
 export class GameCardComponent {
+  private readonly translate = inject(TranslateService);
+
   game = input.required<Game>();
   tip = input<Tip | undefined>();
   gameTips = input<Tip[]>([]);
@@ -102,8 +105,11 @@ export class GameCardComponent {
 
   formatKickoffTime(kickoffTime: Date): string {
     const date = new Date(kickoffTime);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes} Uhr`;
+    const locale = this.translate.currentLang === 'de' ? 'de-DE' : 'uk-UA';
+    return new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
   }
 }

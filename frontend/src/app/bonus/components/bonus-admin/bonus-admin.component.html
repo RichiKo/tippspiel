@@ -1,6 +1,6 @@
 <div class="bonus-admin">
   <div class="admin-header">
-    <h2>Bonus-Regeln Verwaltung</h2>
+    <h2>{{ 'bonus.admin.pageTitle' | translate }}</h2>
     <button
       type="button"
       class="btn-create"
@@ -8,9 +8,9 @@
       [disabled]="isLoading()"
     >
       @if (!showCreateForm()) {
-        + Neue Bonus-Regel
+        {{ 'bonus.admin.actions.newRule' | translate }}
       } @else {
-        Abbrechen
+        {{ 'common.cancel' | translate }}
       }
     </button>
   </div>
@@ -26,7 +26,7 @@
     <div class="error-message">
       <span class="error-icon">⚠️</span>
       <div class="error-content">
-        <strong>Fehler:</strong>
+        <strong>{{ 'bonus.admin.errorLabel' | translate }}</strong>
         <p>{{ errorMessage() }}</p>
       </div>
     </div>
@@ -34,23 +34,27 @@
 
   @if (showCreateForm() || showEditForm()) {
     <div class="create-form-container">
-      <h3>{{ showEditForm() ? 'Bonus-Regel bearbeiten' : 'Neue Bonus-Regel erstellen' }}</h3>
+      <h3>{{
+        showEditForm()
+          ? ('bonus.admin.form.titleEdit' | translate)
+          : ('bonus.admin.form.titleCreate' | translate)
+      }}</h3>
       <form [formGroup]="createForm" (ngSubmit)="showEditForm() ? onUpdateBonus() : onCreateBonus()">
         <div class="form-row">
           <div class="form-group">
-            <label>Typ</label>
+            <label>{{ 'bonus.admin.form.typeLabel' | translate }}</label>
             <select formControlName="type" class="form-control">
-              <option [value]="BonusRuleType.CHAMPION">Champion</option>
-              <option [value]="BonusRuleType.CHAMPION_FINALIST">Champion + Finalist</option>
+              <option [value]="BonusRuleType.CHAMPION">{{ 'bonus.admin.type.champion' | translate }}</option>
+              <option [value]="BonusRuleType.CHAMPION_FINALIST">{{ 'bonus.admin.type.championFinalist' | translate }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Name</label>
+            <label>{{ 'bonus.admin.form.nameLabel' | translate }}</label>
             <input
               type="text"
               formControlName="name"
-              placeholder="z.B. Bundesliga Champion 2024/25"
+              [placeholder]="'bonus.admin.form.namePlaceholder' | translate"
               class="form-control"
             />
           </div>
@@ -58,7 +62,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Deadline</label>
+            <label>{{ 'bonus.admin.form.deadlineLabel' | translate }}</label>
             <input
               type="datetime-local"
               formControlName="deadline"
@@ -68,7 +72,7 @@
           </div>
 
           <div class="form-group">
-            <label>Champion-Punkte</label>
+            <label>{{ 'bonus.admin.form.championPointsLabel' | translate }}</label>
             <input
               type="number"
               formControlName="championPoints"
@@ -79,7 +83,7 @@
 
           @if (createForm.value.type === BonusRuleType.CHAMPION_FINALIST) {
             <div class="form-group">
-              <label>Finalist-Punkte</label>
+              <label>{{ 'bonus.admin.form.finalistPointsLabel' | translate }}</label>
               <input
                 type="number"
                 formControlName="finalistPoints"
@@ -97,14 +101,14 @@
             (click)="onCancelForm()"
             [disabled]="isLoading()"
           >
-            Abbrechen
+            {{ 'common.cancel' | translate }}
           </button>
           <button
             type="submit"
             class="btn-submit"
             [disabled]="createForm.invalid || isLoading()"
           >
-            {{ showEditForm() ? 'Speichern' : 'Erstellen' }}
+            {{ showEditForm() ? ('common.save' | translate) : ('bonus.admin.actions.create' | translate) }}
           </button>
         </div>
       </form>
@@ -114,14 +118,14 @@
   @if (isLoading()) {
     <div class="loading-spinner">
       <div class="spinner"></div>
-      <p>Lade...</p>
+      <p>{{ 'bonus.admin.loading' | translate }}</p>
     </div>
   }
 
   <div class="rules-list">
     @if (bonusRules().length === 0 && !isLoading()) {
       <div class="no-rules">
-        <p>Keine Bonus-Regeln gefunden.</p>
+        <p>{{ 'bonus.admin.empty' | translate }}</p>
       </div>
     }
 
@@ -142,7 +146,7 @@
                 (click)="onEditRule(rule)"
                 [disabled]="isLoading()"
               >
-                Bearbeiten
+                {{ 'common.edit' | translate }}
               </button>
               <button
                 type="button"
@@ -150,7 +154,7 @@
                 (click)="onPublishRule(rule)"
                 [disabled]="isLoading()"
               >
-                Veröffentlichen
+                {{ 'bonus.admin.actions.publish' | translate }}
               </button>
               <button
                 type="button"
@@ -158,7 +162,7 @@
                 (click)="onDeleteRule(rule)"
                 [disabled]="isLoading()"
               >
-                Löschen
+                {{ 'common.delete' | translate }}
               </button>
             }
             @if (
@@ -173,7 +177,7 @@
                   (click)="onEditRule(rule)"
                   [disabled]="isLoading()"
                 >
-                  Bearbeiten
+                  {{ 'common.edit' | translate }}
                 </button>
               }
               <button
@@ -182,7 +186,11 @@
                 (click)="onOpenEvaluateDialog(rule)"
                 [disabled]="isLoading()"
               >
-                {{ rule.status === BonusRuleStatus.PARTIALLY_EVALUATED ? 'Champion auswerten' : 'Auswerten' }}
+                {{
+                  rule.status === BonusRuleStatus.PARTIALLY_EVALUATED
+                    ? ('bonus.admin.actions.evaluateChampion' | translate)
+                    : ('bonus.admin.actions.evaluate' | translate)
+                }}
               </button>
               <button
                 type="button"
@@ -190,7 +198,7 @@
                 (click)="onDeleteRule(rule)"
                 [disabled]="isLoading()"
               >
-                Löschen
+                {{ 'common.delete' | translate }}
               </button>
             }
             @if (rule.status === BonusRuleStatus.EVALUATED) {
@@ -200,7 +208,7 @@
                 (click)="onEditRule(rule)"
                 [disabled]="isLoading()"
               >
-                Bearbeiten
+                {{ 'common.edit' | translate }}
               </button>
               <button
                 type="button"
@@ -208,7 +216,7 @@
                 (click)="onOpenEvaluateDialog(rule)"
                 [disabled]="isLoading()"
               >
-                Erneut auswerten
+                {{ 'bonus.admin.actions.reEvaluate' | translate }}
               </button>
               <button
                 type="button"
@@ -216,7 +224,7 @@
                 (click)="onDeleteRule(rule)"
                 [disabled]="isLoading()"
               >
-                Löschen
+                {{ 'common.delete' | translate }}
               </button>
             }
           </div>
@@ -224,21 +232,23 @@
 
         <div class="rule-details">
           <div class="detail">
-            <span class="label">Typ:</span>
+            <span class="label">{{ 'bonus.admin.details.type' | translate }}</span>
             <span>{{ getTypeLabel(rule.type) }}</span>
           </div>
           <div class="detail">
-            <span class="label">Deadline:</span>
+            <span class="label">{{ 'bonus.admin.details.deadline' | translate }}</span>
             <span>{{ rule.deadline | date: 'dd.MM.yyyy HH:mm' }}</span>
           </div>
           <div class="detail">
-            <span class="label">Picks:</span>
+            <span class="label">{{ 'bonus.admin.details.picks' | translate }}</span>
             <span>{{ rule.picks?.length || 0 }}</span>
           </div>
           @if (rule.status === BonusRuleStatus.EVALUATED) {
             <div class="detail">
-              <span class="label">Ausgewertet:</span>
-              <span>{{ rule.evaluations?.length || 0 }} Punkte vergeben</span>
+              <span class="label">{{ 'bonus.admin.details.evaluated' | translate }}</span>
+              <span>{{
+                'bonus.admin.details.pointsAwarded' | translate: { count: rule.evaluations?.length || 0 }
+              }}</span>
             </div>
           }
         </div>
@@ -250,7 +260,9 @@
     <div class="dialog-overlay" (click)="closeEvaluateDialog()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
         <div class="dialog-header">
-          <h3>Bonus auswerten: {{ currentEvaluatingRule()!.name }}</h3>
+          <h3>{{
+            'bonus.admin.evaluate.title' | translate: { name: currentEvaluatingRule()!.name }
+          }}</h3>
           <button
             type="button"
             class="close-btn"
@@ -264,7 +276,7 @@
           <div class="error-message">
             <span class="error-icon">⚠️</span>
             <div class="error-content">
-              <strong>Fehler:</strong>
+              <strong>{{ 'bonus.admin.errorLabel' | translate }}</strong>
               <p>{{ errorMessage() }}</p>
             </div>
           </div>
@@ -275,9 +287,9 @@
             @if (currentEvaluatingRule()!.type === BonusRuleType.CHAMPION_FINALIST) {
               @if (evaluationPhase() === 'none') {
                 <div class="form-group">
-                  <label>Finalist 1</label>
+                  <label>{{ 'bonus.admin.evaluate.finalist1' | translate }}</label>
                   <select formControlName="finalistTeam1Id" class="form-select">
-                    <option value="">-- Team auswählen --</option>
+                    <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
                     @for (team of availableTeams(); track team.id) {
                       <option [value]="team.id">{{ team.name }}</option>
                     }
@@ -285,9 +297,9 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Finalist 2</label>
+                  <label>{{ 'bonus.admin.evaluate.finalist2' | translate }}</label>
                   <select formControlName="finalistTeam2Id" class="form-select">
-                    <option value="">-- Team auswählen --</option>
+                    <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
                     @for (team of availableTeams(); track team.id) {
                       <option [value]="team.id">{{ team.name }}</option>
                     }
@@ -295,7 +307,7 @@
                 </div>
               } @else {
                 <div class="form-group">
-                  <label>Finalist 1 (fixiert)</label>
+                  <label>{{ 'bonus.admin.evaluate.finalist1Locked' | translate }}</label>
                   <select
                     formControlName="finalistTeam1Id"
                     class="form-select"
@@ -308,7 +320,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Finalist 2 (fixiert)</label>
+                  <label>{{ 'bonus.admin.evaluate.finalist2Locked' | translate }}</label>
                   <select
                     formControlName="finalistTeam2Id"
                     class="form-select"
@@ -323,9 +335,9 @@
 
               @if (evaluationPhase() !== 'none') {
                 <div class="form-group">
-                  <label>Champion-Team</label>
+                  <label>{{ 'bonus.admin.evaluate.champion' | translate }}</label>
                   <select formControlName="championTeamId" class="form-select">
-                    <option value="">-- Team auswählen --</option>
+                    <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
                     @for (team of getChampionOptions(); track team.id) {
                       <option [value]="team.id">{{ team.name }}</option>
                     }
@@ -334,9 +346,9 @@
               }
             } @else {
               <div class="form-group">
-                <label>Champion-Team</label>
+                <label>{{ 'bonus.admin.evaluate.champion' | translate }}</label>
                 <select formControlName="championTeamId" class="form-select">
-                  <option value="">-- Team auswählen --</option>
+                  <option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</option>
                   @for (team of availableTeams(); track team.id) {
                     <option [value]="team.id">{{ team.name }}</option>
                   }
@@ -352,7 +364,7 @@
               (click)="closeEvaluateDialog()"
               [disabled]="isLoading()"
             >
-              Abbrechen
+              {{ 'common.cancel' | translate }}
             </button>
             <button
               type="submit"
@@ -360,11 +372,11 @@
               [disabled]="evaluateForm.invalid || isLoading()"
             >
               @if (currentEvaluatingRule()!.type === BonusRuleType.CHAMPION_FINALIST && evaluationPhase() === 'none') {
-                Finalisten auswerten
+                {{ 'bonus.admin.actions.evaluateFinalists' | translate }}
               } @else if (currentEvaluatingRule()!.type === BonusRuleType.CHAMPION_FINALIST) {
-                Champion auswerten
+                {{ 'bonus.admin.actions.evaluateChampion' | translate }}
               } @else {
-                Auswerten
+                {{ 'bonus.admin.actions.evaluate' | translate }}
               }
             </button>
           </div>
@@ -375,20 +387,20 @@
 
   <app-confirmation-dialog
     [visible]="!!publishRuleToConfirm()"
-    [title]="'Bonus-Regel veröffentlichen'"
+    [title]="'bonus.admin.confirm.publishTitle' | translate"
     [message]="getPublishConfirmMessage()"
-    [confirmLabel]="'Veröffentlichen'"
-    [cancelLabel]="'Abbrechen'"
+    [confirmLabel]="'bonus.admin.actions.publish' | translate"
+    [cancelLabel]="'common.cancel' | translate"
     (confirmed)="onPublishConfirmed()"
     (cancelled)="onPublishCancelled()"
   />
 
   <app-confirmation-dialog
     [visible]="!!deleteRuleToConfirm()"
-    [title]="'Bonus-Regel löschen'"
+    [title]="'bonus.admin.confirm.deleteTitle' | translate"
     [message]="getDeleteConfirmMessage()"
-    [confirmLabel]="'Löschen'"
-    [cancelLabel]="'Abbrechen'"
+    [confirmLabel]="'common.delete' | translate"
+    [cancelLabel]="'common.cancel' | translate"
     (confirmed)="onDeleteConfirmed()"
     (cancelled)="onDeleteCancelled()"
   />

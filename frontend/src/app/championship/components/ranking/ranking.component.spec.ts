@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { RankingComponent } from './ranking.component';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../services/ranking.service';
@@ -89,7 +91,7 @@ describe('RankingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RankingComponent],
+      imports: [RankingComponent, TranslateModule.forRoot()],
       providers: [
         {
           provide: ActivatedRoute,
@@ -111,6 +113,22 @@ describe('RankingComponent', () => {
         { provide: PersistingService, useValue: mockPersistingService },
       ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('de');
+    translate.setTranslation(
+      'de',
+      {
+        championship: {
+          ranking: {
+            gamesInfo: '{{closed}} von {{total}} Spielen ausgewertet',
+            you: 'Du',
+          },
+        },
+      },
+      true,
+    );
+    await firstValueFrom(translate.use('de'));
 
     fixture = TestBed.createComponent(RankingComponent);
     component = fixture.componentInstance;

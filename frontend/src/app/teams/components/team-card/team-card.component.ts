@@ -10,10 +10,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   Team,
   TeamOrigin,
-  TEAM_ORIGIN_LABELS,
   TEAM_ORIGIN_OPTIONS,
 } from '../../types/team.interface';
 import { PersistingService } from '../../../auth/services/persisisting.service';
@@ -39,6 +39,7 @@ import {
     UiBadgeComponent,
     UiButtonComponent,
     UiCardComponent,
+    TranslateModule,
   ],
   templateUrl: './team-card.component.html',
   styleUrl: './team-card.component.scss',
@@ -53,10 +54,10 @@ export class TeamCardComponent {
   private readonly persistingService = inject(PersistingService);
   private readonly fb = inject(FormBuilder);
   private readonly teamService = inject(TeamService);
+  private readonly translate = inject(TranslateService);
 
   readonly icons = UI_ICONS;
   readonly originOptions = TEAM_ORIGIN_OPTIONS;
-  readonly originLabels = TEAM_ORIGIN_LABELS;
   readonly isAdmin = computed(
     () => this.persistingService.currentUser()?.role === 'admin',
   );
@@ -140,7 +141,7 @@ export class TeamCardComponent {
   }
 
   getOriginLabel(origin: TeamOrigin): string {
-    return this.originLabels[origin];
+    return this.translate.instant(`teams.origin.${origin}`);
   }
 
   onDeleteClick(): void {

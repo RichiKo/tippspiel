@@ -1,20 +1,22 @@
 <section class="teams-view">
   <ui-card variant="elevated" padding="lg" class="teams-shell">
     <ui-page-header
-      kicker="Verwaltung"
-      title="Teams"
-      subtitle="Erstelle und pflege alle Teams zentral"
+      [kicker]="'teams.page.kicker' | translate"
+      [title]="'teams.page.title' | translate"
+      [subtitle]="'teams.page.subtitle' | translate"
       [showBack]="true"
-      backLabel="Zurueck zum Dashboard"
+      [backLabel]="'teams.page.backLabel'"
       (back)="backToDashboard()"
     >
       <div uiPageHeaderActions class="teams-actions">
         <ui-badge tone="info" appearance="soft">
           <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
-          {{ teams().length }} Teams
+          {{ 'teams.page.countBadge' | translate : { count: teams().length } }}
         </ui-badge>
         @if (isAdmin()) {
-          <ui-badge tone="success" appearance="soft">Admin</ui-badge>
+          <ui-badge tone="success" appearance="soft">{{
+            'teams.page.adminBadge' | translate
+          }}</ui-badge>
         }
       </div>
     </ui-page-header>
@@ -30,43 +32,43 @@
 
     @if (isAdmin()) {
       <ui-card variant="default" padding="lg" class="add-team-section">
-        <h2>Neues Team hinzufuegen</h2>
+        <h2>{{ 'teams.form.newTeamTitle' | translate }}</h2>
         <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
           <div class="form-layout">
             <div class="form-inputs">
               <div class="form-group">
-                <label for="name">Name*</label>
+                <label for="name">{{ 'teams.form.nameLabel' | translate }}</label>
                 <input
                   id="name"
                   type="text"
                   formControlName="name"
                   maxlength="100"
-                  placeholder="z.B. Arsenal FC"
+                  [placeholder]="'teams.form.namePlaceholder' | translate"
                 />
                 @if (submitted() && form.controls.name.errors?.['required']) {
-                  <div class="error">Name ist erforderlich.</div>
+                  <div class="error">{{ 'teams.form.nameRequired' | translate }}</div>
                 }
               </div>
 
               <div class="form-group">
-                <label for="shortName">Kurzname*</label>
+                <label for="shortName">{{ 'teams.form.shortNameLabel' | translate }}</label>
                 <input
                   id="shortName"
                   type="text"
                   formControlName="shortName"
                   maxlength="10"
-                  placeholder="z.B. ARS"
+                  [placeholder]="'teams.form.shortNamePlaceholder' | translate"
                 />
                 @if (submitted() && form.controls.shortName.errors?.['required']) {
-                  <div class="error">Kurzname ist erforderlich.</div>
+                  <div class="error">{{ 'teams.form.shortNameRequired' | translate }}</div>
                 }
               </div>
 
               <div class="form-group">
-                <label for="origin">Herkunft*</label>
+                <label for="origin">{{ 'teams.form.originLabel' | translate }}</label>
                 <select id="origin" formControlName="origin">
                   @for (origin of originOptions; track origin) {
-                    <option [value]="origin">{{ originLabels[origin] }}</option>
+                    <option [value]="origin">{{ getOriginLabel(origin) }}</option>
                   }
                 </select>
               </div>
@@ -75,34 +77,34 @@
             <div class="form-upload">
               <app-image-upload
                 [uploadCategory]="'teams'"
-                [label]="'Team-Logo*'"
+                [label]="'teams.form.logoLabel' | translate"
                 [currentImageUrl]="uploadedLogoUrl()"
                 (imageUploaded)="onImageUploaded($event)"
                 (uploadError)="onUploadError($event)"
               />
               @if (submitted() && form.controls.logoUrl.errors?.['required']) {
-                <div class="error">Logo ist erforderlich.</div>
+                <div class="error">{{ 'teams.form.logoRequired' | translate }}</div>
               }
             </div>
           </div>
 
           <ui-button type="submit" [disabled]="isLoading() || form.invalid">
             <lucide-icon [img]="icons.upload" [size]="14" aria-hidden="true"></lucide-icon>
-            Team hinzufuegen
+            {{ 'teams.form.addButton' | translate }}
           </ui-button>
         </form>
       </ui-card>
     }
 
     <ui-card variant="default" padding="lg" class="teams-list">
-      <h2>Alle Teams ({{ teams().length }})</h2>
+      <h2>{{ 'teams.list.title' | translate : { count: teams().length } }}</h2>
 
       @if (isLoading() && teams().length === 0) {
-        <p class="loading">Lade Teams...</p>
+        <p class="loading">{{ 'teams.list.loading' | translate }}</p>
       }
 
       @if (!isLoading() && teams().length === 0) {
-        <p class="empty-state">Noch keine Teams vorhanden.</p>
+        <p class="empty-state">{{ 'teams.list.empty' | translate }}</p>
       }
 
       @if (teams().length > 0) {
@@ -110,13 +112,13 @@
           <table class="teams-table">
             <thead>
               <tr>
-                <th>Logo</th>
-                <th>Name</th>
-                <th>Kurzname</th>
-                <th>Herkunft</th>
-                <th>Erstellt am</th>
+                <th>{{ 'teams.list.table.logo' | translate }}</th>
+                <th>{{ 'teams.list.table.name' | translate }}</th>
+                <th>{{ 'teams.list.table.shortName' | translate }}</th>
+                <th>{{ 'teams.list.table.origin' | translate }}</th>
+                <th>{{ 'teams.list.table.createdAt' | translate }}</th>
                 @if (isAdmin()) {
-                  <th>Aktionen</th>
+                  <th>{{ 'teams.list.table.actions' | translate }}</th>
                 }
               </tr>
             </thead>
@@ -151,7 +153,7 @@
                     <td>
                       <select [formControl]="editForm.controls.origin" class="edit-input">
                         @for (origin of originOptions; track origin) {
-                          <option [value]="origin">{{ originLabels[origin] }}</option>
+                          <option [value]="origin">{{ getOriginLabel(origin) }}</option>
                         }
                       </select>
                     </td>
@@ -164,7 +166,7 @@
                           [disabled]="editForm.invalid || isSaving()"
                         >
                           <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
-                          Speichern
+                          {{ 'teams.edit.save' | translate }}
                         </ui-button>
                         <ui-button
                           variant="secondary"
@@ -172,7 +174,7 @@
                           (click)="onCancelEdit()"
                           [disabled]="isSaving()"
                         >
-                          Abbrechen
+                          {{ 'teams.edit.cancel' | translate }}
                         </ui-button>
                       </td>
                     }
@@ -194,10 +196,10 @@
                     @if (isAdmin()) {
                       <td class="actions-cell">
                         <ui-button variant="secondary" size="sm" (click)="onEditClick(team)">
-                          Bearbeiten
+                          {{ 'teams.list.actions.edit' | translate }}
                         </ui-button>
                         <ui-button variant="danger" size="sm" (click)="onDeleteClick(team)">
-                          Loeschen
+                          {{ 'teams.list.actions.delete' | translate }}
                         </ui-button>
                       </td>
                     }
@@ -213,14 +215,10 @@
 
   <app-confirmation-dialog
     [visible]="showDeleteDialog()"
-    [title]="'Team loeschen'"
-    [message]="
-      'Moechtest du das Team »' +
-      (teamToDelete()?.name ?? '') +
-      '« wirklich loeschen?'
-    "
-    [confirmLabel]="'Loeschen'"
-    [cancelLabel]="'Abbrechen'"
+    [title]="'teams.deleteDialog.title' | translate"
+    [message]="'teams.deleteDialog.message' | translate : { name: teamToDelete()?.name ?? '' }"
+    [confirmLabel]="'common.delete' | translate"
+    [cancelLabel]="'common.cancel' | translate"
     (confirmed)="handleDeleteConfirm()"
     (cancelled)="handleDeleteCancel()"
   />

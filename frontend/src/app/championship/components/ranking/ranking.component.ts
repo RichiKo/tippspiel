@@ -9,6 +9,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Championship } from '../../../dashboard/types/championship.interface';
 import { Ranking } from '../../types/ranking.interface';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
@@ -29,6 +30,7 @@ import {
   imports: [
     CommonModule,
     LucideAngularModule,
+    TranslateModule,
     UiBadgeComponent,
     UiCardComponent,
     UiPageHeaderComponent,
@@ -44,6 +46,7 @@ export class RankingComponent {
   private readonly rankingService = inject(RankingService);
   private readonly gameService = inject(GameService);
   private readonly persistingService = inject(PersistingService);
+  private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
   rankings = signal<Ranking[]>([]);
@@ -120,7 +123,9 @@ export class RankingComponent {
         this.championship.set(championship);
       },
       error: () => {
-        this.error.set('Fehler beim Laden der Championship-Daten.');
+        this.error.set(
+          this.translate.instant('championship.ranking.errors.loadChampionship'),
+        );
       },
     });
   }
@@ -132,7 +137,9 @@ export class RankingComponent {
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('Fehler beim Laden der Rangliste.');
+        this.error.set(
+          this.translate.instant('championship.ranking.errors.loadRanking'),
+        );
         this.isLoading.set(false);
       },
     });

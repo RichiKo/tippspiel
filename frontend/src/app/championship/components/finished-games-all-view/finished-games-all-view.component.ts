@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   input,
   output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GameCardComponent } from '../game-card/game-card.component';
 import { Game } from '../../types/game.interface';
 import { Tip, CreateTipDto } from '../../types/tip.interface';
@@ -12,12 +14,14 @@ import { KickoffGroup } from '../../utils/spieltag-views.util';
 
 @Component({
   selector: 'app-finished-games-all-view',
-  imports: [CommonModule, GameCardComponent],
+  imports: [CommonModule, TranslateModule, GameCardComponent],
   templateUrl: './finished-games-all-view.component.html',
   styleUrl: './finished-games-all-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinishedGamesAllViewComponent {
+  private readonly translate = inject(TranslateService);
+
   groupedGames = input.required<KickoffGroup[]>();
   userTipsMap = input.required<Map<string, Tip>>();
   gameTipsMap = input.required<Map<string, Tip[]>>();
@@ -43,22 +47,19 @@ export class FinishedGamesAllViewComponent {
 
   formatKickoffHeader(kickoffTime: Date): string {
     const date = new Date(kickoffTime);
-    const weekdays = [
-      'Sonntag',
-      'Montag',
-      'Dienstag',
-      'Mittwoch',
-      'Donnerstag',
-      'Freitag',
-      'Samstag',
-    ];
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const weekday = weekdays[date.getDay()];
+    const locale = this.translate.currentLang === 'de' ? 'de-DE' : 'uk-UA';
+    const dateLabel = new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+    const timeLabel = new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
 
-    return `${weekday}, ${day}.${month}.${year} · ${hours}:${minutes} Uhr`;
+    return `${dateLabel} · ${timeLabel}`;
   }
 }

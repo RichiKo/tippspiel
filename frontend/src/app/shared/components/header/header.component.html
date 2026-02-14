@@ -4,7 +4,7 @@
       <div class="header-left">
         <button class="logo-btn" (click)="navigateToDashboard()">
           <lucide-icon class="logo-icon" [img]="icons.trophy" [size]="20" aria-hidden="true" />
-          <span class="logo-text">Tipp-Spiel</span>
+          <span class="logo-text">{{ 'header.brand' | translate }}</span>
         </button>
       </div>
 
@@ -23,15 +23,15 @@
         <button
           class="settings-btn desktop-only"
           (click)="navigateToSettings()"
-          title="Einstellungen"
-          aria-label="Einstellungen"
+          [title]="'header.settings' | translate"
+          [attr.aria-label]="'header.settings' | translate"
         >
           <lucide-icon [img]="icons.settings" [size]="18" aria-hidden="true" />
         </button>
 
         <button class="logout-btn desktop-only" (click)="onLogoutClick()">
           <lucide-icon [img]="icons.logOut" [size]="16" aria-hidden="true" />
-          Abmelden
+          {{ 'header.logout' | translate }}
         </button>
 
         <button
@@ -39,7 +39,11 @@
           class="mobile-menu-toggle mobile-only"
           (click)="onMobileMenuToggle()"
           [attr.aria-expanded]="isMobileMenuOpen()"
-          [attr.aria-label]="isMobileMenuOpen() ? 'Menü schließen' : 'Menü öffnen'"
+          [attr.aria-label]="
+            isMobileMenuOpen()
+              ? ('header.menu.close' | translate)
+              : ('header.menu.open' | translate)
+          "
         >
           <lucide-icon [img]="icons.ellipsisVertical" [size]="18" aria-hidden="true" />
         </button>
@@ -50,18 +54,18 @@
       <button
         type="button"
         class="mobile-menu-backdrop mobile-only"
-        aria-label="Menü schließen"
+        [attr.aria-label]="'header.menu.close' | translate"
         (click)="onMobileMenuClose()"
       ></button>
 
       <div class="mobile-menu mobile-only">
         <button type="button" class="mobile-menu-item" (click)="navigateToSettings()">
           <lucide-icon [img]="icons.settings" [size]="16" aria-hidden="true" />
-          Einstellungen
+          {{ 'header.settings' | translate }}
         </button>
         <button type="button" class="mobile-menu-item danger" (click)="onLogoutClick()">
           <lucide-icon [img]="icons.logOut" [size]="16" aria-hidden="true" />
-          Abmelden
+          {{ 'header.logout' | translate }}
         </button>
       </div>
     }
@@ -71,10 +75,10 @@
 
 <app-confirmation-dialog
   [visible]="showLogoutConfirm()"
-  [title]="'Abmelden'"
-  [message]="'Möchtest du dich wirklich abmelden?'"
-  [confirmLabel]="'Abmelden'"
-  [cancelLabel]="'Abbrechen'"
+  [title]="'header.logoutDialog.title' | translate"
+  [message]="'header.logoutDialog.message' | translate"
+  [confirmLabel]="'header.logoutDialog.confirm' | translate"
+  [cancelLabel]="'header.logoutDialog.cancel' | translate"
   (confirmed)="onLogoutConfirmed()"
   (cancelled)="onLogoutCancelled()"
 />

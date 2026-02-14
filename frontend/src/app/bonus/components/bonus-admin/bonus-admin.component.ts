@@ -12,6 +12,7 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BonusService } from '../../services/bonus.service';
 import {
   BonusRule,
@@ -36,6 +37,7 @@ interface TeamOption {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    TranslateModule,
     ConfirmationDialogComponent,
   ],
   templateUrl: './bonus-admin.component.html',
@@ -44,6 +46,7 @@ interface TeamOption {
 export class BonusAdminComponent {
   private readonly bonusService = inject(BonusService);
   private readonly fb = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
 
   championshipId = input.required<string>();
   availableTeams = input.required<TeamOption[]>();
@@ -98,9 +101,10 @@ export class BonusAdminComponent {
         this.bonusRules.set(rules);
         this.isLoading.set(false);
       },
-      error: (error) => {
-        console.error('Error loading bonus rules:', error);
-        this.errorMessage.set('Fehler beim Laden der Bonus-Regeln.');
+      error: () => {
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.loadRules'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -133,7 +137,9 @@ export class BonusAdminComponent {
 
     this.bonusService.createBonusRule(dto).subscribe({
       next: () => {
-        this.successMessage.set('Bonus-Regel erfolgreich erstellt!');
+        this.successMessage.set(
+          this.translate.instant('bonus.admin.success.created'),
+        );
         this.showCreateForm.set(false);
         this.createForm.reset({
           type: BonusRuleType.CHAMPION,
@@ -143,9 +149,10 @@ export class BonusAdminComponent {
         this.loadBonusRules();
         setTimeout(() => this.successMessage.set(null), 3000);
       },
-      error: (error) => {
-        console.error('Error creating bonus rule:', error);
-        this.errorMessage.set('Fehler beim Erstellen der Bonus-Regel.');
+      error: () => {
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.createRule'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -196,7 +203,9 @@ export class BonusAdminComponent {
 
     this.bonusService.updateBonusRule(rule.id, dto).subscribe({
       next: () => {
-        this.successMessage.set('Bonus-Regel erfolgreich aktualisiert!');
+        this.successMessage.set(
+          this.translate.instant('bonus.admin.success.updated'),
+        );
         this.showEditForm.set(false);
         this.editingRule.set(null);
         this.createForm.reset({
@@ -207,9 +216,10 @@ export class BonusAdminComponent {
         this.loadBonusRules();
         setTimeout(() => this.successMessage.set(null), 3000);
       },
-      error: (error) => {
-        console.error('Error updating bonus rule:', error);
-        this.errorMessage.set('Fehler beim Aktualisieren der Bonus-Regel.');
+      error: () => {
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.updateRule'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -244,13 +254,16 @@ export class BonusAdminComponent {
     this.isLoading.set(true);
     this.bonusService.publishBonusRule(rule.id).subscribe({
       next: () => {
-        this.successMessage.set('Bonus-Regel veröffentlicht!');
+        this.successMessage.set(
+          this.translate.instant('bonus.admin.success.published'),
+        );
         this.loadBonusRules();
         setTimeout(() => this.successMessage.set(null), 3000);
       },
-      error: (error) => {
-        console.error('Error publishing rule:', error);
-        this.errorMessage.set('Fehler beim Veröffentlichen.');
+      error: () => {
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.publishRule'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -274,13 +287,16 @@ export class BonusAdminComponent {
     this.isLoading.set(true);
     this.bonusService.deleteBonusRule(rule.id).subscribe({
       next: () => {
-        this.successMessage.set('Bonus-Regel gelöscht!');
+        this.successMessage.set(
+          this.translate.instant('bonus.admin.success.deleted'),
+        );
         this.loadBonusRules();
         setTimeout(() => this.successMessage.set(null), 3000);
       },
-      error: (error) => {
-        console.error('Error deleting rule:', error);
-        this.errorMessage.set('Fehler beim Löschen.');
+      error: () => {
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.deleteRule'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -289,14 +305,18 @@ export class BonusAdminComponent {
   getPublishConfirmMessage(): string {
     const rule = this.publishRuleToConfirm();
     return rule
-      ? `Möchtest du die Bonus-Regel "${rule.name}" wirklich veröffentlichen?`
+      ? this.translate.instant('bonus.admin.confirm.publishMessage', {
+          name: rule.name,
+        })
       : '';
   }
 
   getDeleteConfirmMessage(): string {
     const rule = this.deleteRuleToConfirm();
     return rule
-      ? `Möchtest du die Bonus-Regel "${rule.name}" wirklich löschen?`
+      ? this.translate.instant('bonus.admin.confirm.deleteMessage', {
+          name: rule.name,
+        })
       : '';
   }
 
@@ -315,14 +335,12 @@ export class BonusAdminComponent {
       next: (picks) => {
         this.allPicks.set(picks);
       },
-      error: (error) => {
-        console.error('Error loading picks:', error);
-      },
+      error: () => {},
     });
 
     // Pre-fill form with current evaluation result.
     if (rule.type === BonusRuleType.CHAMPION_FINALIST) {
-      this.bonusService.getEvaluationResult(rule.id).subscribe({
+        this.bonusService.getEvaluationResult(rule.id).subscribe({
         next: (result) => {
           this.evaluationPhase.set(result.phase);
           const finalistIds = Array.isArray(result.finalistTeamIds)
@@ -334,9 +352,7 @@ export class BonusAdminComponent {
             finalistTeam2Id: finalistIds[1] ?? '',
           });
         },
-        error: (error) => {
-          console.error('Error loading evaluation result:', error);
-        },
+        error: () => {},
       });
     } else if (rule.status === BonusRuleStatus.EVALUATED) {
       this.bonusService.getEvaluationResult(rule.id).subscribe({
@@ -345,9 +361,7 @@ export class BonusAdminComponent {
             championTeamId: result.championTeamId ?? '',
           });
         },
-        error: (error) => {
-          console.error('Error loading evaluation result:', error);
-        },
+        error: () => {},
       });
     }
   }
@@ -367,18 +381,22 @@ export class BonusAdminComponent {
 
       if (phase === 'none') {
         if (!finalist1 || !finalist2) {
-          this.errorMessage.set('Bitte wähle beide Finalisten aus.');
+          this.errorMessage.set(
+            this.translate.instant('bonus.admin.errors.selectBothFinalists'),
+          );
           return;
         }
         if (finalist1 === finalist2) {
-          this.errorMessage.set('Finalist 1 und Finalist 2 müssen unterschiedlich sein.');
+          this.errorMessage.set(
+            this.translate.instant('bonus.admin.errors.finalistsMustDiffer'),
+          );
           return;
         }
         dto.finalistTeamIds = [finalist1, finalist2];
       } else {
         if (!champion) {
           this.errorMessage.set(
-            'Bitte wähle den Champion aus den beiden Finalisten aus.',
+            this.translate.instant('bonus.admin.errors.selectChampionFromFinalists'),
           );
           return;
         }
@@ -387,7 +405,9 @@ export class BonusAdminComponent {
     } else {
       const champion = formValue.championTeamId?.trim() || '';
       if (!champion) {
-        this.errorMessage.set('Bitte wähle den Champion aus.');
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.selectChampion'),
+        );
         return;
       }
       dto.championTeamId = champion;
@@ -399,7 +419,9 @@ export class BonusAdminComponent {
     this.bonusService.evaluateBonus(rule.id, dto).subscribe({
       next: (result) => {
         this.successMessage.set(
-          `Auswertung abgeschlossen! ${result.evaluationsCreated} Punkte vergeben.`,
+          this.translate.instant('bonus.admin.success.evaluated', {
+            count: result.evaluationsCreated,
+          }),
         );
         this.showEvaluateDialog.set(false);
         this.currentEvaluatingRule.set(null);
@@ -407,8 +429,10 @@ export class BonusAdminComponent {
         setTimeout(() => this.successMessage.set(null), 5000);
       },
       error: (error) => {
-        console.error('Error evaluating bonus:', error);
-        const errorMsg = error?.error?.message || error?.message || 'Unbekannter Fehler bei der Auswertung';
+        const errorMsg =
+          error?.error?.message ||
+          error?.message ||
+          this.translate.instant('bonus.admin.errors.evaluateUnknown');
         this.errorMessage.set(errorMsg);
         this.isLoading.set(false);
       },
@@ -442,15 +466,15 @@ export class BonusAdminComponent {
   getStatusLabel(status: BonusRuleStatus): string {
     switch (status) {
       case BonusRuleStatus.DRAFT:
-        return 'Entwurf';
+        return this.translate.instant('bonus.admin.status.draft');
       case BonusRuleStatus.PUBLISHED:
-        return 'Veröffentlicht';
+        return this.translate.instant('bonus.admin.status.published');
       case BonusRuleStatus.LOCKED:
-        return 'Gesperrt';
+        return this.translate.instant('bonus.admin.status.locked');
       case BonusRuleStatus.PARTIALLY_EVALUATED:
-        return 'Finalisten ausgewertet';
+        return this.translate.instant('bonus.admin.status.partiallyEvaluated');
       case BonusRuleStatus.EVALUATED:
-        return 'Ausgewertet';
+        return this.translate.instant('bonus.admin.status.evaluated');
       default:
         return status;
     }
@@ -459,9 +483,9 @@ export class BonusAdminComponent {
   getTypeLabel(type: BonusRuleType): string {
     switch (type) {
       case BonusRuleType.CHAMPION:
-        return 'Champion';
+        return this.translate.instant('bonus.admin.type.champion');
       case BonusRuleType.CHAMPION_FINALIST:
-        return 'Champion + Finalist';
+        return this.translate.instant('bonus.admin.type.championFinalist');
       default:
         return type;
     }

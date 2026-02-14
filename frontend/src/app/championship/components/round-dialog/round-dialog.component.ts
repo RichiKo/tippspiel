@@ -1,30 +1,35 @@
 import { Component, signal, output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { CreateRoundDto } from '../../types/round.interface';
 
 @Component({
   selector: 'app-round-dialog',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="dialog-overlay" *ngIf="visible()" (click)="onCancel()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
-        <h2>{{ roundId() ? 'Spieltag bearbeiten' : 'Neuer Spieltag' }}</h2>
+        <h2>{{
+          roundId()
+            ? ('championship.dialogs.round.titleEdit' | translate)
+            : ('championship.dialogs.round.titleCreate' | translate)
+        }}</h2>
         
         <form (ngSubmit)="onSubmit()">
           <div class="form-field">
-            <label>Name</label>
+            <label>{{ 'championship.dialogs.round.nameLabel' | translate }}</label>
             <input 
               type="text" 
               [(ngModel)]="name" 
               name="name"
-              placeholder="z.B. Vorrunde 1"
+              [placeholder]="'championship.dialogs.round.namePlaceholder' | translate"
               required
             />
           </div>
 
           <div class="form-field">
-            <label>Startdatum</label>
+            <label>{{ 'championship.dialogs.round.startDateLabel' | translate }}</label>
             <input 
               type="date" 
               [(ngModel)]="startDate" 
@@ -34,7 +39,7 @@ import { CreateRoundDto } from '../../types/round.interface';
           </div>
 
           <div class="form-field">
-            <label>Enddatum (optional)</label>
+            <label>{{ 'championship.dialogs.round.endDateLabel' | translate }}</label>
             <input 
               type="date" 
               [(ngModel)]="endDate" 
@@ -44,10 +49,14 @@ import { CreateRoundDto } from '../../types/round.interface';
 
           <div class="dialog-actions">
             <button type="button" class="cancel-btn" (click)="onCancel()">
-              Abbrechen
+              {{ 'common.cancel' | translate }}
             </button>
             <button type="submit" class="submit-btn">
-              {{ roundId() ? 'Aktualisieren' : 'Erstellen' }}
+              {{
+                roundId()
+                  ? ('championship.dialogs.round.update' | translate)
+                  : ('championship.dialogs.round.create' | translate)
+              }}
             </button>
           </div>
         </form>

@@ -1,6 +1,6 @@
 <div class="member-selector">
   <div class="selector-header">
-    <h3>Teilnehmer verwalten</h3>
+    <h3>{{ 'memberSelector.title' | translate }}</h3>
   </div>
 
   @if (errorMessage()) {
@@ -11,9 +11,11 @@
     <!-- Active Members (optional) -->
     @if (showActiveMembers()) {
       <div class="active-section">
-        <h4>Aktive Teilnehmer ({{ activeMembers().length }})</h4>
+        <h4>
+          {{ 'memberSelector.activeTitle' | translate : { count: activeMembers().length } }}
+        </h4>
         @if (activeMembers().length === 0) {
-          <div class="empty-state">Keine aktiven Teilnehmer</div>
+          <div class="empty-state">{{ 'memberSelector.activeEmpty' | translate }}</div>
         } @else {
           <div class="member-list">
             @for (membership of activeMembers(); track membership.id) {
@@ -21,7 +23,7 @@
                 @if (shouldRenderAvatarImage(membership)) {
                   <img
                     [src]="membership.user?.image || ''"
-                    [alt]="membership.user?.username || 'Nutzeravatar'"
+                    [alt]="membership.user?.username || ('memberSelector.avatarAlt' | translate)"
                     class="user-avatar"
                     (error)="onAvatarError(membership.id)"
                   />
@@ -39,7 +41,7 @@
                   class="remove-btn"
                   (click)="onRemove(membership.id)"
                   [disabled]="disabled() || isProcessing() === membership.id"
-                  title="Entfernen"
+                  [title]="'memberSelector.remove' | translate"
                 >
                   ✕
                 </button>
@@ -52,11 +54,13 @@
 
     <!-- Pending Requests -->
     <div class="pending-section">
-      <h4>Anfragen ({{ pendingRequests().length }})</h4>
+      <h4>
+        {{ 'memberSelector.requestsTitle' | translate : { count: pendingRequests().length } }}
+      </h4>
       @if (isLoading()) {
-        <div class="loading">Lade Anfragen...</div>
+        <div class="loading">{{ 'memberSelector.loading' | translate }}</div>
       } @else if (pendingRequests().length === 0) {
-        <div class="empty-state">Keine offenen Anfragen</div>
+        <div class="empty-state">{{ 'memberSelector.requestsEmpty' | translate }}</div>
       } @else {
         <div class="member-list">
           @for (membership of pendingRequests(); track membership.id) {
@@ -64,7 +68,7 @@
               @if (shouldRenderAvatarImage(membership)) {
                 <img
                   [src]="membership.user?.image || ''"
-                  [alt]="membership.user?.username || 'Nutzeravatar'"
+                  [alt]="membership.user?.username || ('memberSelector.avatarAlt' | translate)"
                   class="user-avatar"
                   (error)="onAvatarError(membership.id)"
                 />
@@ -83,7 +87,7 @@
                   class="approve-btn"
                   (click)="onApprove(membership.id)"
                   [disabled]="disabled() || isProcessing() === membership.id"
-                  title="Genehmigen"
+                  [title]="'memberSelector.approve' | translate"
                 >
                   ✅
                 </button>
@@ -92,7 +96,7 @@
                   class="reject-btn"
                   (click)="onReject(membership.id)"
                   [disabled]="disabled() || isProcessing() === membership.id"
-                  title="Ablehnen"
+                  [title]="'memberSelector.reject' | translate"
                 >
                   ❌
                 </button>

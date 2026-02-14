@@ -1,20 +1,20 @@
 <form class="auth-form" [formGroup]="form" (ngSubmit)="onLogin()">
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>E-Mail</mat-label>
+    <mat-label>{{ 'auth.login.emailLabel' | translate }}</mat-label>
     <input matInput formControlName="email" type="email" autocomplete="email" />
     @if (shouldShowError('email')) {
       <mat-error>
         {{
           form.controls.email.hasError('required')
-            ? 'E-Mail ist erforderlich.'
-            : 'Bitte gib eine gueltige E-Mail ein.'
+            ? ('auth.login.emailRequired' | translate)
+            : ('auth.login.emailInvalid' | translate)
         }}
       </mat-error>
     }
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Passwort</mat-label>
+    <mat-label>{{ 'auth.login.passwordLabel' | translate }}</mat-label>
     <input
       matInput
       formControlName="password"
@@ -25,7 +25,11 @@
       type="button"
       mat-icon-button
       matSuffix
-      [attr.aria-label]="showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'"
+      [attr.aria-label]="
+        showPassword
+          ? ('auth.login.passwordHide' | translate)
+          : ('auth.login.passwordShow' | translate)
+      "
       (click)="showPassword = !showPassword"
     >
       <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
@@ -34,8 +38,8 @@
       <mat-error>
         {{
           form.controls.password.hasError('required')
-            ? 'Passwort ist erforderlich.'
-            : 'Mindestens 6 Zeichen erforderlich.'
+            ? ('auth.login.passwordRequired' | translate)
+            : ('auth.login.passwordMinLength' | translate)
         }}
       </mat-error>
     }
@@ -52,13 +56,13 @@
     [disabled]="isSubmitting"
   >
     <mat-icon>login</mat-icon>
-    {{ isSubmitting ? 'Bitte warten...' : 'Einloggen' }}
+    {{ isSubmitting ? ('auth.login.submitting' | translate) : ('auth.login.submit' | translate) }}
   </button>
 
   <p class="auth-meta">
-    Noch kein Account?
+    {{ 'auth.login.noAccount' | translate }}
     <button type="button" class="switch-link" (click)="toRegister()">
-      Jetzt registrieren
+      {{ 'auth.login.registerNow' | translate }}
     </button>
   </p>
 </form>

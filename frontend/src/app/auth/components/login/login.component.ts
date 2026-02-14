@@ -9,10 +9,11 @@ import {
 } from '@angular/forms';
 import { PersistingService } from '../../services/persisisting.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'ts-login',
-  imports: [MaterialModule, ReactiveFormsModule],
+  imports: [MaterialModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -21,6 +22,7 @@ export class LoginComponent {
   persistingService = inject(PersistingService);
   router = inject(Router);
   fb = inject(FormBuilder);
+  translate = inject(TranslateService);
 
   switchMode = output<void>();
 
@@ -53,10 +55,11 @@ export class LoginComponent {
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 401) {
-          this.authError = 'E-Mail oder Passwort ist nicht korrekt.';
+          this.authError = this.translate.instant(
+            'auth.login.errors.invalidCredentials',
+          );
         } else {
-          this.authError =
-            'Login ist momentan nicht moeglich. Bitte versuche es erneut.';
+          this.authError = this.translate.instant('auth.login.errors.general');
         }
         this.isSubmitting = false;
       },

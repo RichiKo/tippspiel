@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BonusService } from '../../services/bonus.service';
 import {
   BonusRule,
@@ -27,13 +28,20 @@ interface TeamOption {
 
 @Component({
   selector: 'app-bonus-pick-form',
-  imports: [CommonModule, FormsModule, LucideAngularModule, UiButtonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    TranslateModule,
+    UiButtonComponent,
+  ],
   templateUrl: './bonus-pick-form.component.html',
   styleUrls: ['./bonus-pick-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BonusPickFormComponent {
   private readonly bonusService = inject(BonusService);
+  private readonly translate = inject(TranslateService);
 
   championshipId = input.required<string>();
   availableTeams = input.required<TeamOption[]>();
@@ -66,7 +74,9 @@ export class BonusPickFormComponent {
     const deadline = new Date(rule.deadline).getTime();
     const diff = deadline - now;
 
-    if (diff <= 0) return 'Abgelaufen';
+    if (diff <= 0) {
+      return this.translate.instant('bonus.pickForm.deadlineExpired');
+    }
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -80,10 +90,15 @@ export class BonusPickFormComponent {
   getConfigPoints(rule: BonusRule): string {
     if (rule.type === BonusRuleType.CHAMPION) {
       const config = rule.config as ChampionConfig;
-      return `${config.championPoints} Punkte`;
+      return this.translate.instant('bonus.pickForm.pointsChampion', {
+        points: config.championPoints,
+      });
     } else {
       const config = rule.config as ChampionFinalistConfig;
-      return `Champion: ${config.championPoints}P | Finalist: ${config.finalistPoints}P`;
+      return this.translate.instant('bonus.pickForm.pointsChampionFinalist', {
+        championPoints: config.championPoints,
+        finalistPoints: config.finalistPoints,
+      });
     }
   }
 
@@ -138,7 +153,7 @@ export class BonusPickFormComponent {
       },
       error: () => {
         this.errorMessage.set(
-          'Fehler beim Laden der Bonus-Regeln. Bitte versuche es später erneut.',
+          this.translate.instant('bonus.pickForm.errors.loadRules'),
         );
         this.isLoading.set(false);
       },
@@ -176,7 +191,7 @@ export class BonusPickFormComponent {
       },
       error: () => {
         this.errorMessage.set(
-          'Fehler beim Speichern deiner Auswahl. Bitte versuche es erneut.',
+          this.translate.instant('bonus.pickForm.errors.savePick'),
         );
         this.isLoading.set(false);
       },

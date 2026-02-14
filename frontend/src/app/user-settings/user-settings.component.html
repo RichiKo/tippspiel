@@ -1,17 +1,17 @@
 <section class="settings-view">
   <ui-card variant="elevated" padding="lg" class="settings-shell">
     <ui-page-header
-      kicker="Profil"
-      title="Benutzer-Einstellungen"
-      subtitle="Verwalte Profilbild, Zugangsdaten und Sicherheit"
+      [kicker]="'settings.page.kicker' | translate"
+      [title]="'settings.page.title' | translate"
+      [subtitle]="'settings.page.subtitle' | translate"
       [showBack]="true"
-      backLabel="Zurueck zum Dashboard"
+      [backLabel]="'settings.page.back'"
       (back)="onCancel()"
     >
       <div uiPageHeaderActions class="settings-actions">
         <ui-badge tone="info" appearance="soft">
           <lucide-icon [img]="icons.user" [size]="14" aria-hidden="true"></lucide-icon>
-          {{ username() || 'Profil' }}
+          {{ username() || ('settings.page.kicker' | translate) }}
         </ui-badge>
       </div>
     </ui-page-header>
@@ -38,12 +38,12 @@
       <ui-card variant="default" padding="lg" class="form-section">
         <h2>
           <lucide-icon [img]="icons.image" [size]="16" aria-hidden="true"></lucide-icon>
-          Profilbild
+          {{ 'settings.image.title' | translate }}
         </h2>
         <div class="image-upload-section">
           <div class="image-preview">
             @if (previewUrl()) {
-              <img [src]="previewUrl()!" alt="Profilbild" />
+              <img [src]="previewUrl()!" [alt]="'settings.image.title' | translate" />
             } @else {
               <div class="placeholder-avatar">
                 {{ currentUser()!.username.charAt(0).toUpperCase() }}
@@ -61,9 +61,9 @@
             />
             <label for="imageUpload" class="upload-btn">
               <lucide-icon [img]="icons.upload" [size]="14" aria-hidden="true"></lucide-icon>
-              Bild auswaehlen
+              {{ 'settings.image.select' | translate }}
             </label>
-            <p class="upload-hint">JPG, PNG oder WebP (max. 2MB)</p>
+            <p class="upload-hint">{{ 'settings.image.hint' | translate }}</p>
           </div>
         </div>
       </ui-card>
@@ -71,11 +71,11 @@
       <ui-card variant="default" padding="lg" class="form-section">
         <h2>
           <lucide-icon [img]="icons.user" [size]="16" aria-hidden="true"></lucide-icon>
-          Basis-Informationen
+          {{ 'settings.base.title' | translate }}
         </h2>
 
         <div class="form-group">
-          <label for="username">Benutzername</label>
+          <label for="username">{{ 'settings.base.username' | translate }}</label>
           <input
             type="text"
             id="username"
@@ -84,13 +84,13 @@
             name="username"
             maxlength="30"
             required
-            placeholder="Benutzername"
+            [placeholder]="'settings.base.username' | translate"
           />
-          <small class="form-hint">Maximal 30 Zeichen</small>
+          <small class="form-hint">{{ 'settings.base.usernameHint' | translate }}</small>
         </div>
 
         <div class="form-group">
-          <label for="email">E-Mail</label>
+          <label for="email">{{ 'settings.base.email' | translate }}</label>
           <input
             type="email"
             id="email"
@@ -106,38 +106,40 @@
       <ui-card variant="default" padding="lg" class="form-section">
         <h2>
           <lucide-icon [img]="icons.shield" [size]="16" aria-hidden="true"></lucide-icon>
-          Passwort aendern
+          {{ 'settings.password.title' | translate }}
         </h2>
         <p class="section-description">
-          Lass die Felder leer, wenn du das Passwort nicht aendern moechtest.
+          {{ 'settings.password.description' | translate }}
         </p>
 
         <div class="form-group">
-          <label for="newPassword">Neues Passwort</label>
+          <label for="newPassword">{{ 'settings.password.newLabel' | translate }}</label>
           <input
             type="password"
             id="newPassword"
             [(ngModel)]="newPassword"
             [ngModelOptions]="{ updateOn: 'change' }"
             name="newPassword"
-            placeholder="Neues Passwort"
+            [placeholder]="'settings.password.newLabel' | translate"
           />
-          <small class="form-hint">Mindestens 6 Zeichen</small>
+          <small class="form-hint">{{ 'settings.password.minHint' | translate }}</small>
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword">Passwort bestaetigen</label>
+          <label for="confirmPassword">{{
+            'settings.password.confirmLabel' | translate
+          }}</label>
           <input
             type="password"
             id="confirmPassword"
             [(ngModel)]="confirmPassword"
             [ngModelOptions]="{ updateOn: 'change' }"
             name="confirmPassword"
-            placeholder="Passwort wiederholen"
+            [placeholder]="'settings.password.confirmLabel' | translate"
             [class.invalid]="!passwordsMatch()"
           />
           @if (!passwordsMatch() && confirmPassword()) {
-            <small class="form-error">Passwoerter stimmen nicht ueberein</small>
+            <small class="form-error">{{ 'settings.password.mismatch' | translate }}</small>
           }
         </div>
       </ui-card>
@@ -149,19 +151,19 @@
           (click)="onCancel()"
           [disabled]="isLoading()"
         >
-          Abbrechen
+          {{ 'common.cancel' | translate }}
         </ui-button>
 
         <ui-button type="submit" [disabled]="!isFormValid() || isLoading()">
           <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
           @if (isLoading()) {
             @if (isUploadingImage()) {
-              <span>Bild wird hochgeladen...</span>
+              <span>{{ 'settings.actions.uploadingImage' | translate }}</span>
             } @else {
-              <span>Speichern...</span>
+              <span>{{ 'settings.actions.saving' | translate }}</span>
             }
           } @else {
-            <span>Speichern</span>
+            <span>{{ 'common.save' | translate }}</span>
           }
         </ui-button>
       </div>

@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UploadService } from '../../services/upload.service';
 
 @Component({
@@ -21,6 +22,7 @@ import { UploadService } from '../../services/upload.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslateModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './image-upload.component.html',
@@ -28,11 +30,12 @@ import { UploadService } from '../../services/upload.service';
 })
 export class ImageUploadComponent {
   private readonly uploadService = inject(UploadService);
+  private readonly translate = inject(TranslateService);
 
   // Inputs
   uploadCategory = input.required<'teams' | 'users' | 'championships'>();
   currentImageUrl = input<string | null>(null);
-  label = input<string>('Bild hochladen');
+  label = input<string>('imageUpload.label');
   maxSizeMB = input<number>(2);
 
   // Outputs
@@ -81,13 +84,15 @@ export class ImageUploadComponent {
     // Check file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      return 'Ungültiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP';
+      return this.translate.instant('imageUpload.errors.fileType');
     }
 
     // Check file size
     const maxSizeBytes = this.maxSizeMB() * 1024 * 1024;
     if (file.size > maxSizeBytes) {
-      return `Datei ist zu groß. Maximal ${this.maxSizeMB()}MB sind erlaubt`;
+      return this.translate.instant('imageUpload.errors.fileSize', {
+        size: this.maxSizeMB(),
+      });
     }
 
     return null;
@@ -113,7 +118,8 @@ export class ImageUploadComponent {
       error: (error) => {
         this.isUploading.set(false);
         const errorMsg =
-          error.error?.message || 'Fehler beim Hochladen des Bildes';
+          error.error?.message ||
+          this.translate.instant('imageUpload.errors.uploadFailed');
         this.errorMessage.set(errorMsg);
         this.uploadError.emit(errorMsg);
         this.previewUrl.set(null);

@@ -1,6 +1,6 @@
 <div class="championship-detail">
   @if (isLoading()) {
-    <div class="loading">Lädt...</div>
+    <div class="loading">{{ 'championship.detail.loading' | translate }}</div>
   } @else if (error()) {
     <div class="error">{{ error() }}</div>
   } @else {
@@ -23,7 +23,9 @@
                 class="action-link__icon"
                 aria-hidden="true"
               ></lucide-icon>
-              <span class="action-link__label">Prüf-Kalkulation</span>
+              <span class="action-link__label">{{
+                'championship.detail.links.ranking' | translate
+              }}</span>
             </a>
             <a [routerLink]="['/championship', championshipId, 'standings']" class="standings-link">
               <lucide-icon
@@ -32,7 +34,9 @@
                 class="action-link__icon"
                 aria-hidden="true"
               ></lucide-icon>
-              <span class="action-link__label">Ergebnis-Tabelle</span>
+              <span class="action-link__label">{{
+                'championship.detail.links.standings' | translate
+              }}</span>
             </a>
             <a [routerLink]="['/championship', championshipId, 'bonus-overview']" class="bonus-link">
               <lucide-icon
@@ -41,7 +45,9 @@
                 class="action-link__icon"
                 aria-hidden="true"
               ></lucide-icon>
-              <span class="action-link__label">Bonus-Übersicht</span>
+              <span class="action-link__label">{{
+                'championship.detail.links.bonusOverview' | translate
+              }}</span>
             </a>
             @if (isAdmin()) {
               <a
@@ -54,7 +60,9 @@
                   class="action-link__icon"
                   aria-hidden="true"
                 ></lucide-icon>
-                <span class="action-link__label">Championship bearbeiten</span>
+                <span class="action-link__label">{{
+                  'championship.detail.links.editChampionship' | translate
+                }}</span>
               </a>
             }
           </div>
@@ -65,7 +73,7 @@
     @if (hasActiveBonusRules()) {
       <section class="bonus-section-full">
         <div class="bonus-section-header">
-          <h2>Bonus-Regeln</h2>
+          <h2>{{ 'championship.detail.bonus.title' | translate }}</h2>
           @if (isMobileView()) {
             <button
               type="button"
@@ -73,7 +81,11 @@
               (click)="toggleBonusSection()"
               [attr.aria-expanded]="isBonusExpanded()"
             >
-              {{ isBonusExpanded() ? 'Ausblenden' : 'Anzeigen' }}
+              {{
+                isBonusExpanded()
+                  ? ('championship.detail.bonus.hide' | translate)
+                  : ('championship.detail.bonus.show' | translate)
+              }}
             </button>
           }
         </div>
@@ -98,7 +110,7 @@
         [attr.aria-expanded]="isRoundDrawerOpen()"
         (click)="toggleRoundDrawer()"
       >
-        <span class="round-drawer-fab-label">Spieltage</span>
+        <span class="round-drawer-fab-label">{{ 'championship.detail.rounds.title' | translate }}</span>
       </button>
     }
 
@@ -108,16 +120,17 @@
           @if (rounds().length > 0) {
             @if (selectedRound(); as round) {
               <p class="mobile-selected-round">
-                Aktiver Spieltag: <strong>{{ round.name }} - {{ formatRoundDate(round) }}</strong>
+                {{ 'championship.detail.rounds.activeRound' | translate }}:
+                <strong>{{ round.name }} - {{ formatRoundDate(round) }}</strong>
               </p>
             }
           } @else {
-            <p class="mobile-no-rounds">Keine Spieltage vorhanden</p>
+            <p class="mobile-no-rounds">{{ 'championship.detail.rounds.empty' | translate }}</p>
           }
 
           @if (isAdmin()) {
             <button type="button" class="create-round-btn" (click)="onCreateRound()">
-              + Neuer Spieltag
+              {{ 'championship.detail.actions.newRound' | translate }}
             </button>
           }
         </div>
@@ -127,7 +140,7 @@
         <aside class="rounds-sidebar">
           @if (isAdmin()) {
             <button type="button" class="create-round-btn" (click)="onCreateRound()">
-              + Neuer Spieltag
+              {{ 'championship.detail.actions.newRound' | translate }}
             </button>
           }
 
@@ -143,7 +156,7 @@
                 <small class="round-date">{{ formatRoundDate(round) }}</small>
               </button>
             } @empty {
-              <p class="no-rounds">Keine Spieltage vorhanden</p>
+              <p class="no-rounds">{{ 'championship.detail.rounds.empty' | translate }}</p>
             }
           </div>
         </aside>
@@ -155,15 +168,19 @@
             <h2>{{ round.name }}</h2>
             @if (isAdmin()) {
               <ui-button type="button" class="add-game-btn" size="lg" (click)="onAddGame()">
-                + Spiel hinzufügen
+                {{ 'championship.detail.actions.addGame' | translate }}
               </ui-button>
             }
           </div>
 
           <section class="finished-games-section">
-            <h3 class="finished-games-title">Ausgewertete Spiele</h3>
+            <h3 class="finished-games-title">{{ 'championship.detail.sections.finishedGames' | translate }}</h3>
             @if (finishedGames().length > 0) {
-              <div class="spieltag-view-toggle" role="tablist" aria-label="Spieltag Ansichten">
+              <div
+                class="spieltag-view-toggle"
+                role="tablist"
+                [attr.aria-label]="'championship.detail.views.ariaLabel' | translate"
+              >
                 <button
                   type="button"
                   role="tab"
@@ -172,7 +189,7 @@
                   [class.is-active]="selectedView() === 'myGames'"
                   (click)="setSelectedView('myGames')"
                 >
-                  Meine Spiele
+                  {{ 'championship.detail.views.myGames' | translate }}
                 </button>
                 <button
                   type="button"
@@ -182,7 +199,7 @@
                   [class.is-active]="selectedView() === 'allGames'"
                   (click)="setSelectedView('allGames')"
                 >
-                  Alle Tipps
+                  {{ 'championship.detail.views.allTips' | translate }}
                 </button>
                 <button
                   type="button"
@@ -192,7 +209,7 @@
                   [class.is-active]="selectedView() === 'table'"
                   (click)="setSelectedView('table')"
                 >
-                  Spieltags-Tabelle
+                  {{ 'championship.detail.views.table' | translate }}
                 </button>
               </div>
 
@@ -229,13 +246,13 @@
                 }
               </div>
             } @else {
-              <p class="section-inline-info">Momentan gibt es noch keine Ergebnisse.</p>
+              <p class="section-inline-info">{{ 'championship.detail.sections.noFinishedResults' | translate }}</p>
             }
           </section>
 
           @if (openGamesGroupedByDate().length > 0) {
             <section class="open-games-section">
-              <h3 class="open-games-title">Offene Spiele</h3>
+              <h3 class="open-games-title">{{ 'championship.detail.sections.openGames' | translate }}</h3>
               <div class="games-list">
                 @for (group of openGamesGroupedByDate(); track group.date) {
                   <div class="game-group">
@@ -259,11 +276,11 @@
             </section>
           } @else {
             <p class="section-inline-info section-inline-info--subtle">
-              Momentan gibt es keine offenen Spiele.
+              {{ 'championship.detail.sections.noOpenGames' | translate }}
             </p>
           }
         } @else {
-          <p class="no-selection">Wähle einen Spieltag aus</p>
+          <p class="no-selection">{{ 'championship.detail.selectRound' | translate }}</p>
         }
       </main>
     </div>
@@ -281,7 +298,7 @@
         class="round-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Spieltage Auswahl"
+        [attr.aria-label]="'championship.detail.rounds.drawerLabel' | translate"
         [class.open]="isRoundDrawerOpen()"
         [class.is-dragging]="isDrawerDragging"
         [attr.aria-hidden]="!isRoundDrawerOpen()"
@@ -296,12 +313,12 @@
         >
           <div class="round-drawer-title">
             <span class="round-drawer-title-icon" aria-hidden="true"></span>
-            <span>Spieltage</span>
+            <span>{{ 'championship.detail.rounds.title' | translate }}</span>
           </div>
           <button
             type="button"
             class="round-drawer-close"
-            aria-label="Spieltage schließen"
+            [attr.aria-label]="'championship.detail.rounds.close' | translate"
             (click)="closeRoundDrawer()"
           >
             ×
@@ -320,7 +337,7 @@
               <small class="round-drawer-item-date">{{ formatRoundDate(round) }}</small>
             </button>
           } @empty {
-            <p class="round-drawer-empty">Keine Spieltage vorhanden</p>
+            <p class="round-drawer-empty">{{ 'championship.detail.rounds.empty' | translate }}</p>
           }
         </div>
       </aside>
@@ -345,10 +362,10 @@
 
   <app-confirmation-dialog
     [visible]="showDeleteConfirm()"
-    [title]="'Spiel löschen'"
-    [message]="'Möchtest du dieses Spiel wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
-    [confirmLabel]="'Löschen'"
-    [cancelLabel]="'Abbrechen'"
+    [title]="'championship.detail.deleteDialog.title' | translate"
+    [message]="'championship.detail.deleteDialog.message' | translate"
+    [confirmLabel]="'common.delete' | translate"
+    [cancelLabel]="'common.cancel' | translate"
     (confirmed)="onDeleteGameConfirmed()"
     (cancelled)="onDeleteGameCancelled()"
   />

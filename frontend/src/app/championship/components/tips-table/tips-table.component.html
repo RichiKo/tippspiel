@@ -3,26 +3,29 @@
     <table class="tips-table__table">
       <thead>
         <tr>
-          <th>Teilnehmer</th>
-          <th>Tipp</th>
-          <th>Punkte</th>
-          <th>Ergebnis</th>
+          <th>{{ 'championship.tipsTable.headers.participant' | translate }}</th>
+          <th>{{ 'championship.tipsTable.headers.tip' | translate }}</th>
+          <th>{{ 'championship.tipsTable.headers.points' | translate }}</th>
+          <th>{{ 'championship.tipsTable.headers.result' | translate }}</th>
         </tr>
       </thead>
       <tbody>
         @for (tip of sortedTips(); track tip.id) {
           <tr [class.current-user]="isCurrentUser(tip.userId)">
-            <td class="username" data-label="Teilnehmer">
-              {{ tip.user?.username || 'Unbekannt' }}
+            <td
+              class="username"
+              [attr.data-label]="'championship.tipsTable.headers.participant' | translate"
+            >
+              {{ tip.user?.username || ('championship.tipsTable.unknownUser' | translate) }}
             </td>
-            <td class="tip-score" data-label="Tipp">
+            <td class="tip-score" [attr.data-label]="'championship.tipsTable.headers.tip' | translate">
               @if (tip.homeTeamGoals !== null && tip.awayTeamGoals !== null) {
                 {{ tip.homeTeamGoals }} : {{ tip.awayTeamGoals }}
               } @else {
                 <span class="no-tip">-</span>
               }
             </td>
-            <td class="points" data-label="Punkte">
+            <td class="points" [attr.data-label]="'championship.tipsTable.headers.points' | translate">
               @if (isClosed()) {
                 <ui-badge [tone]="getPointsTone(tip.points ?? 0)" appearance="soft">
                   {{ tip.points ?? 0 }}
@@ -31,13 +34,15 @@
                 <ui-badge tone="neutral" appearance="soft">-</ui-badge>
               }
             </td>
-            <td class="outcome" data-label="Ergebnis">
+            <td class="outcome" [attr.data-label]="'championship.tipsTable.headers.result' | translate">
               @if (isClosed()) {
                 <ui-badge [tone]="getOutcomeTone(tip.outcomeType)" appearance="soft">
                   {{ getOutcomeLabel(tip.outcomeType) }}
                 </ui-badge>
               } @else {
-                <ui-badge tone="neutral" appearance="soft">Offen</ui-badge>
+                <ui-badge tone="neutral" appearance="soft">{{
+                  'championship.tipsTable.open' | translate
+                }}</ui-badge>
               }
             </td>
           </tr>

@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom, of } from 'rxjs';
 import { StandingsComponent } from './standings.component';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../services/ranking.service';
@@ -90,7 +91,7 @@ describe('StandingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StandingsComponent],
+      imports: [StandingsComponent, TranslateModule.forRoot()],
       providers: [
         {
           provide: ActivatedRoute,
@@ -111,6 +112,23 @@ describe('StandingsComponent', () => {
         { provide: PersistingService, useValue: mockPersistingService },
       ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('de');
+    translate.setTranslation(
+      'de',
+      {
+        championship: {
+          standings: {
+            headers: {
+              total: 'Gesamt',
+            },
+          },
+        },
+      },
+      true,
+    );
+    await firstValueFrom(translate.use('de'));
 
     fixture = TestBed.createComponent(StandingsComponent);
     component = fixture.componentInstance;

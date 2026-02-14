@@ -1,5 +1,5 @@
 <div class="add-championship-container">
-  <h2>Neue Championship anlegen</h2>
+  <h2>{{ 'championshipForm.create.title' | translate }}</h2>
 
   @if (errorMessage()) {
   <div class="error-banner">
@@ -8,7 +8,7 @@
   }
   <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
     <div class="form-group">
-      <label for="name">Name*</label>
+      <label for="name">{{ 'championshipForm.fields.name' | translate }}</label>
       <input
         id="name"
         type="text"
@@ -17,31 +17,31 @@
         required
       />
       @if (submitted() && form.controls.name.errors?.["required"]) {
-      <div class="error">Name ist erforderlich.</div>
+      <div class="error">{{ 'championshipForm.validation.nameRequired' | translate }}</div>
       } @if (form.controls.name.errors?.["maxlength"]) {
-      <div class="error">Maximal 64 Zeichen.</div>
+      <div class="error">{{ 'championshipForm.validation.nameMax' | translate }}</div>
       }
     </div>
     <div class="form-group">
-      <label for="description">Beschreibung</label>
+      <label for="description">{{ 'championshipForm.fields.description' | translate }}</label>
       <textarea
         id="description"
         formControlName="description"
         maxlength="256"
       ></textarea>
       @if (form.controls.description.errors?.["maxlength"]) {
-      <div class="error">Maximal 256 Zeichen.</div>
+      <div class="error">{{ 'championshipForm.validation.descriptionMax' | translate }}</div>
       }
     </div>
     <app-image-upload
       [uploadCategory]="'championships'"
       [currentImageUrl]="form.controls.image.value"
-      [label]="'Championship-Bild'"
+      [label]="'championshipForm.fields.image' | translate"
       (imageUploaded)="onImageUploaded($event)"
       (uploadError)="onUploadError($event)"
     />
     @if (submitted() && form.controls.image.errors?.["required"]) {
-    <div class="error">Bild ist erforderlich.</div>
+    <div class="error">{{ 'championshipForm.validation.imageRequired' | translate }}</div>
     }
 
     <div class="team-selector-section">
@@ -55,12 +55,16 @@
 
     <div class="form-row">
       <label
-        ><input type="checkbox" formControlName="isPublic" /> Öffentlich</label
+        ><input type="checkbox" formControlName="isPublic" />
+        {{ 'championshipForm.fields.public' | translate }}</label
       >
-      <label><input type="checkbox" formControlName="isActive" /> Aktiv</label>
+      <label
+        ><input type="checkbox" formControlName="isActive" />
+        {{ 'championshipForm.fields.active' | translate }}</label
+      >
     </div>
     <button type="submit" class="submit-btn" [disabled]="isLoading()">
-      Championship anlegen
+      {{ 'championshipForm.create.submit' | translate }}
     </button>
   </form>
 </div>

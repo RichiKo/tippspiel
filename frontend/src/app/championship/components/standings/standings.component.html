@@ -1,7 +1,7 @@
 <section class="standings-view">
   @if (isLoading()) {
     <ui-card variant="default" padding="lg">
-      <p class="standings-feedback">Laden...</p>
+      <p class="standings-feedback">{{ 'championship.standings.loading' | translate }}</p>
     </ui-card>
   } @else if (error()) {
     <ui-card variant="default" padding="lg">
@@ -10,21 +10,27 @@
   } @else {
     <ui-card variant="elevated" padding="lg" class="standings-shell">
       <ui-page-header
-        kicker="Tabelle"
-        title="Ergebnis-Tabelle"
+        [kicker]="'championship.standings.page.kicker' | translate"
+        [title]="'championship.standings.page.title' | translate"
         [subtitle]="championship()?.name ?? null"
         [showBack]="true"
-        backLabel="Zurueck zur Championship"
+        [backLabel]="'championship.standings.page.backLabel' | translate"
         (back)="backToChampionship()"
       >
         <div uiPageHeaderActions class="standings-actions">
           <ui-badge tone="info" appearance="soft">
             <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
-            {{ sortedStandings().length }} Teilnehmer
+            {{
+              'championship.standings.badges.participants'
+                | translate: { count: sortedStandings().length }
+            }}
           </ui-badge>
           <ui-badge tone="success" appearance="soft">
             <lucide-icon [img]="icons.table" [size]="14" aria-hidden="true"></lucide-icon>
-            {{ bonusColumns().length }} Bonus-Spalten
+            {{
+              'championship.standings.badges.bonusColumns'
+                | translate: { count: bonusColumns().length }
+            }}
           </ui-badge>
         </div>
       </ui-page-header>
@@ -34,14 +40,14 @@
           <table class="standings-table">
             <thead>
               <tr>
-                <th class="rank-col">Platz</th>
-                <th>Teilnehmer</th>
-                <th class="points-col">Punkte (Spiele)</th>
+                <th class="rank-col">{{ 'championship.standings.headers.rank' | translate }}</th>
+                <th>{{ 'championship.standings.headers.participant' | translate }}</th>
+                <th class="points-col">{{ 'championship.standings.headers.gamePoints' | translate }}</th>
                 @for (column of bonusColumns(); track column.key) {
                   <th class="bonus-col">{{ column.label }}</th>
                 }
                 @if (showTotalColumn()) {
-                  <th class="total-col">Gesamt</th>
+                  <th class="total-col">{{ 'championship.standings.headers.total' | translate }}</th>
                 }
               </tr>
             </thead>

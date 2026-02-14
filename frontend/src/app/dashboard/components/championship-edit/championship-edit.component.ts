@@ -12,6 +12,7 @@ import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TeamService } from '../../../teams/services/team.service';
 import { Team } from '../../../teams/types/team.interface';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-championship-edit',
@@ -24,6 +25,7 @@ import { Team } from '../../../teams/types/team.interface';
     TeamSelectorComponent,
     MemberSelectorComponent,
     BonusAdminComponent,
+    TranslateModule,
   ],
   templateUrl: './championship-edit.component.html',
   styleUrl: './championship-edit.component.scss',
@@ -34,6 +36,7 @@ export class ChampionshipEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly championshipService = inject(ChampionshipService);
   private readonly teamService = inject(TeamService);
+  private readonly translate = inject(TranslateService);
 
   readonly championshipId = signal<string | null>(null);
   readonly isLoading = signal(false);
@@ -81,7 +84,9 @@ export class ChampionshipEditComponent implements OnInit {
         this.allTeams.set(teams);
       },
       error: () => {
-        this.errorMessage.set('Teams konnten nicht geladen werden.');
+        this.errorMessage.set(
+          this.translate.instant('teamSelector.errors.loadFailed'),
+        );
       },
     });
   }
@@ -128,7 +133,9 @@ export class ChampionshipEditComponent implements OnInit {
         });
       },
       error: () => {
-        this.errorMessage.set('Championship konnte nicht geladen werden.');
+        this.errorMessage.set(
+          this.translate.instant('championshipForm.errors.loadFailed'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -165,7 +172,7 @@ export class ChampionshipEditComponent implements OnInit {
         },
         error: () => {
           this.errorMessage.set(
-            'Ausgestiegen-Markierung konnte nicht aktualisiert werden.'
+            this.translate.instant('championshipForm.errors.eliminatedUpdateFailed'),
           );
           this.isUpdatingEliminated.set(false);
         },
@@ -241,7 +248,7 @@ export class ChampionshipEditComponent implements OnInit {
         },
         error: () => {
           this.errorMessage.set(
-            'Championship konnte nicht aktualisiert werden.'
+            this.translate.instant('championshipForm.errors.updateFailed'),
           );
           this.isLoading.set(false);
         },

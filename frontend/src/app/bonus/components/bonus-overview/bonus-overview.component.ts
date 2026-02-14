@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BonusService } from '../../services/bonus.service';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { BonusPick, BonusRule } from '../../types/bonus.interface';
@@ -33,6 +34,7 @@ interface UserPicksRow {
   imports: [
     CommonModule,
     LucideAngularModule,
+    TranslateModule,
     UiBadgeComponent,
     UiCardComponent,
     UiPageHeaderComponent,
@@ -46,6 +48,7 @@ export class BonusOverviewComponent {
   private readonly router = inject(Router);
   private readonly bonusService = inject(BonusService);
   private readonly championshipService = inject(ChampionshipService);
+  private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
   bonusRules = signal<BonusRule[]>([]);
@@ -98,7 +101,9 @@ export class BonusOverviewComponent {
         this.eliminatedTeamIds.set(new Set(championship.eliminatedTeamIds || []));
       },
       error: () => {
-        this.errorMessage.set('Fehler beim Laden der Championship.');
+        this.errorMessage.set(
+          this.translate.instant('bonus.overview.errors.loadChampionship'),
+        );
       },
     });
 
@@ -144,7 +149,9 @@ export class BonusOverviewComponent {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Fehler beim Laden der Bonus-Regeln.');
+        this.errorMessage.set(
+          this.translate.instant('bonus.overview.errors.loadRules'),
+        );
         this.isLoading.set(false);
       },
     });
@@ -181,7 +188,7 @@ export class BonusOverviewComponent {
   }
 
   getUserInitial(username: string): string {
-    return username?.charAt(0).toUpperCase() || 'U';
+    return username?.charAt(0).toUpperCase() || '?';
   }
 
   onUserAvatarError(userId: number): void {

@@ -2,7 +2,7 @@
   @if (isLoading() && activeBonusRules().length === 0) {
     <div class="bonus-state-card bonus-state-card--loading">
       <div class="spinner" aria-hidden="true"></div>
-      <p>Lade Bonus-Regeln...</p>
+      <p>{{ 'bonus.pickForm.loading' | translate }}</p>
     </div>
   }
 
@@ -16,7 +16,7 @@
   @if (activeBonusRules().length === 0 && !isLoading()) {
     <div class="bonus-state-card bonus-state-card--empty">
       <lucide-icon [img]="icons.award" [size]="18" aria-hidden="true"></lucide-icon>
-      <p>Aktuell gibt es keine aktiven Bonus-Regeln für diese Championship.</p>
+      <p>{{ 'bonus.pickForm.empty' | translate }}</p>
     </div>
   }
 
@@ -27,9 +27,9 @@
           <h3>{{ rule.name }}</h3>
           <p class="bonus-rule-subtitle">
             @if (rule.type === BonusRuleType.CHAMPION) {
-              Champion-Bonus
+              {{ 'bonus.pickForm.ruleTypeChampion' | translate }}
             } @else {
-              Champion + Finalist
+              {{ 'bonus.pickForm.ruleTypeChampionFinalist' | translate }}
             }
           </p>
         </div>
@@ -46,29 +46,29 @@
 
       <div class="bonus-rule-meta">
         <div class="detail-item">
-          <span class="label">Typ</span>
+          <span class="label">{{ 'bonus.pickForm.meta.type' | translate }}</span>
           <span class="value value--strong">
             @if (rule.type === BonusRuleType.CHAMPION) {
-              Champion
+              {{ 'bonus.pickForm.ruleTypeChampion' | translate }}
             } @else {
-              Champion + Finalist
+              {{ 'bonus.pickForm.ruleTypeChampionFinalist' | translate }}
             }
           </span>
         </div>
 
         <div class="detail-item">
-          <span class="label">Punkte</span>
+          <span class="label">{{ 'bonus.pickForm.meta.points' | translate }}</span>
           <span class="value">{{ getConfigPoints(rule) }}</span>
         </div>
 
         <div class="detail-item">
-          <span class="label">Deadline</span>
+          <span class="label">{{ 'bonus.pickForm.meta.deadline' | translate }}</span>
           <span class="value">{{ rule.deadline | date: 'dd.MM.yyyy HH:mm' }}</span>
         </div>
       </div>
 
       <div class="team-selection">
-        <label class="selection-label">Wähle dein Team</label>
+        <label class="selection-label">{{ 'bonus.pickForm.selectLabel' | translate }}</label>
         @if (shouldShowSelect(rule.id)) {
           <select
             class="team-select"
@@ -76,10 +76,15 @@
             (change)="onTeamSelect(rule, $any($event.target).value)"
             [disabled]="!isBeforeDeadline(rule) || isLoading()"
           >
-            <option value="" disabled>Team auswählen</option>
+            <option value="" disabled>{{ 'bonus.pickForm.selectOption' | translate }}</option>
             @for (team of availableTeams(); track team.id) {
               <option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
-                {{ team.name }}{{ isEliminatedTeam(team.id) ? ' (ausgeschieden)' : '' }}
+                {{
+                  team.name +
+                    (isEliminatedTeam(team.id)
+                      ? (' ' + ('bonus.pickForm.eliminatedSuffix' | translate))
+                      : '')
+                }}
               </option>
             }
           </select>
@@ -89,7 +94,7 @@
               <div class="selected-team-main">
                 <img [src]="selectedTeam.logoUrl" [alt]="selectedTeam.name" class="team-logo" />
                 <div class="selected-team-text">
-                  <span class="selected-team-label">Aktuelle Auswahl</span>
+                  <span class="selected-team-label">{{ 'bonus.pickForm.currentSelection' | translate }}</span>
                   <span class="team-name">{{ selectedTeam.name }}</span>
                 </div>
               </div>
@@ -102,7 +107,7 @@
                   [disabled]="isLoading()"
                   (click)="startUpdate(rule.id)"
                 >
-                  Aktualisieren
+                  {{ 'bonus.pickForm.update' | translate }}
                 </ui-button>
               }
             </div>
@@ -113,7 +118,7 @@
       @if (!isBeforeDeadline(rule)) {
         <div class="expired-notice">
           <lucide-icon [img]="icons.circleX" [size]="16" aria-hidden="true"></lucide-icon>
-          <p>Die Deadline für diesen Bonus ist abgelaufen. Keine Änderungen mehr möglich.</p>
+          <p>{{ 'bonus.pickForm.expiredNotice' | translate }}</p>
         </div>
       }
     </section>

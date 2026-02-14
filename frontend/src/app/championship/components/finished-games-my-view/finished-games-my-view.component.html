@@ -3,7 +3,9 @@
     @for (group of groupedEntries(); track group.kickoffTime.toISOString()) {
       <section class="my-kickoff-group">
         <div class="my-item-head">
-          <p class="my-kickoff">Anstoß: {{ formatKickoff(group.kickoffTime) }}</p>
+          <p class="my-kickoff">
+            {{ 'championship.finishedMy.kickoffLabel' | translate }}: {{ formatKickoff(group.kickoffTime) }}
+          </p>
         </div>
 
         <div class="my-list">
@@ -28,19 +30,19 @@
                 </div>
 
                 <div class="my-center">
-                  <span class="my-final" title="Endstand">{{
+                  <span class="my-final" [attr.title]="'championship.finishedMy.finalScore' | translate">{{
                     entry.finalScore
                   }}</span>
-                  <span class="my-tip" title="Dein Tipp"
-                    >Tipp: {{ entry.userTip }}</span
+                  <span class="my-tip" [attr.title]="'championship.finishedMy.yourTip' | translate"
+                    >{{ 'championship.finishedMy.tipPrefix' | translate }}: {{ entry.userTip }}</span
                   >
                   <span
                     class="my-points"
                     [class.my-points--zero]="entry.points === 0"
                     [class.my-points--mid]="entry.points > 0 && entry.points < 3"
                     [class.my-points--high]="entry.points >= 3"
-                    title="Punkte"
-                    >{{ entry.points }} P</span
+                    [attr.title]="'championship.finishedMy.points' | translate"
+                    >{{ entry.points }} {{ 'championship.finishedMy.pointsShort' | translate }}</span
                   >
                 </div>
 
@@ -67,6 +69,6 @@
       </section>
     }
   } @else {
-    <p class="my-empty">Noch keine gewerteten Spiele.</p>
+    <p class="my-empty">{{ 'championship.finishedMy.empty' | translate }}</p>
   }
 </div>

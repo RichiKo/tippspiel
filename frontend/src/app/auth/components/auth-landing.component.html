@@ -2,45 +2,52 @@
   <section class="auth-hero">
     <div class="auth-hero__badge">
       <mat-icon>sports_soccer</mat-icon>
-      <span>Tippspiel</span>
+      <span>{{ 'auth.landing.brand' | translate }}</span>
     </div>
-    <h1>Tipp, Punkte, Tabelle. Alles an einem Ort.</h1>
-    <p>
-      Das digitale Fussball-Tippspiel fuer Liga, Freunde und Community.
-      Uebersichtlich auf Desktop und schnell auf Mobile.
-    </p>
+    <h1>{{ 'auth.landing.headline' | translate }}</h1>
+    <p>{{ 'auth.landing.subline' | translate }}</p>
     <div class="auth-hero__stats">
       <div class="stat-card">
-        <strong>Live</strong>
-        <span>Spieltag-Rankings</span>
+        <strong>{{ 'auth.landing.stats.liveValue' | translate }}</strong>
+        <span>{{ 'auth.landing.stats.liveLabel' | translate }}</span>
       </div>
       <div class="stat-card">
         <strong>100%</strong>
-        <span>Tipps vor Anpfiff gesichert</span>
+        <span>{{ 'auth.landing.stats.lockedLabel' | translate }}</span>
       </div>
     </div>
   </section>
 
   <section class="auth-panel">
     <header class="auth-panel__header">
-      <h2>{{ showLogin ? 'Willkommen zurueck' : 'Neues Konto erstellen' }}</h2>
+      <h2>
+        {{
+          showLogin
+            ? ('auth.landing.panel.loginTitle' | translate)
+            : ('auth.landing.panel.registerTitle' | translate)
+        }}
+      </h2>
       <p>
         {{
           showLogin
-            ? 'Melde dich an und gib deine Tipps fuer den naechsten Spieltag ab.'
-            : 'Registriere dich in weniger als einer Minute.'
+            ? ('auth.landing.panel.loginSubtitle' | translate)
+            : ('auth.landing.panel.registerSubtitle' | translate)
         }}
       </p>
     </header>
 
-    <div class="auth-switch" role="tablist" aria-label="Anmeldung oder Registrierung">
+    <div
+      class="auth-switch"
+      role="tablist"
+      [attr.aria-label]="'auth.landing.switch.aria' | translate"
+    >
       <button
         type="button"
         class="auth-switch__button"
         [class.is-active]="showLogin"
         (click)="switchToLogin()"
       >
-        Login
+        {{ 'auth.landing.switch.login' | translate }}
       </button>
       <button
         type="button"
@@ -48,7 +55,7 @@
         [class.is-active]="!showLogin"
         (click)="switchToRegister()"
       >
-        Registrierung
+        {{ 'auth.landing.switch.register' | translate }}
       </button>
     </div>
 
@@ -60,4 +67,4 @@
       }
     </div>
   </section>
-  </div>
+</div>

@@ -9,11 +9,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TeamService } from '../../../teams/services/team.service';
 import {
   Team,
   TeamOrigin,
-  TEAM_ORIGIN_LABELS,
   TEAM_ORIGIN_OPTIONS,
 } from '../../../teams/types/team.interface';
 
@@ -22,12 +22,13 @@ type TeamOriginFilter = TeamOrigin | 'ALL';
 @Component({
   selector: 'app-team-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './team-selector.component.html',
   styleUrl: './team-selector.component.scss',
 })
 export class TeamSelectorComponent {
   private readonly teamService = inject(TeamService);
+  private readonly translate = inject(TranslateService);
 
   // Inputs
   selectedTeamIds = input<string[]>([]);
@@ -48,7 +49,6 @@ export class TeamSelectorComponent {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly originOptions = TEAM_ORIGIN_OPTIONS;
-  readonly originLabels = TEAM_ORIGIN_LABELS;
 
   // Computed
   readonly selectedTeams = computed(() => {
@@ -88,7 +88,9 @@ export class TeamSelectorComponent {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Teams konnten nicht geladen werden.');
+        this.errorMessage.set(
+          this.translate.instant('teamSelector.errors.loadFailed'),
+        );
         this.allTeams.set([]);
         this.filteredTeams.set([]);
         this.isLoading.set(false);
@@ -133,5 +135,9 @@ export class TeamSelectorComponent {
     if (!this.disabled()) {
       this.teamActiveChanged.emit({ teamId, isActive: checked });
     }
+  }
+
+  getOriginLabel(origin: TeamOrigin): string {
+    return this.translate.instant(`teams.origin.${origin}`);
   }
 }

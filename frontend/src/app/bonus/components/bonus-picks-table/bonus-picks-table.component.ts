@@ -1,16 +1,18 @@
 import { Component, input, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BonusService } from '../../services/bonus.service';
 import { BonusPick } from '../../types/bonus.interface';
 
 @Component({
   selector: 'app-bonus-picks-table',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './bonus-picks-table.component.html',
   styleUrls: ['./bonus-picks-table.component.scss'],
 })
 export class BonusPicksTableComponent {
   private readonly bonusService = inject(BonusService);
+  private readonly translate = inject(TranslateService);
 
   bonusRuleId = input.required<string>();
   bonusRuleName = input.required<string>();
@@ -38,14 +40,13 @@ export class BonusPicksTableComponent {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading picks:', error);
         if (error.status === 403) {
           this.errorMessage.set(
-            'Die Picks sind erst nach Ablauf der Deadline sichtbar.',
+            this.translate.instant('bonus.picksTable.errors.visibleAfterDeadline'),
           );
         } else {
           this.errorMessage.set(
-            'Fehler beim Laden der Picks. Bitte versuche es später erneut.',
+            this.translate.instant('bonus.picksTable.errors.loadFailed'),
           );
         }
         this.isLoading.set(false);

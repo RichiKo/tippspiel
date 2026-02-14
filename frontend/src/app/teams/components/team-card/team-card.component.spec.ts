@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { TeamCardComponent } from './team-card.component';
 import { PersistingService } from '../../../auth/services/persisisting.service';
@@ -33,7 +34,7 @@ describe('TeamCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TeamCardComponent],
+      imports: [TeamCardComponent, TranslateModule.forRoot()],
       providers: [
         { provide: PersistingService, useValue: mockPersistingService },
         { provide: TeamService, useValue: mockTeamService },

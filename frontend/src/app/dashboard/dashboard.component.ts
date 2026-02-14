@@ -5,16 +5,18 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ChampionshipService } from './services/championship.service';
 import { PersistingService } from '../auth/services/persisisting.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ChampionshipCardComponent, CommonModule, RouterModule],
+  imports: [ChampionshipCardComponent, CommonModule, RouterModule, TranslateModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {
   private readonly championshipService = inject(ChampionshipService);
   private readonly persistingService = inject(PersistingService);
+  private readonly translate = inject(TranslateService);
 
   championships = signal<Championship[]>([]);
   readonly isLoading = signal(true);
@@ -54,9 +56,7 @@ export class DashboardComponent {
       },
       error: () => {
         this.championships.set([]);
-        this.loadError.set(
-          'Championships konnten nicht geladen werden. Bitte erneut versuchen.'
-        );
+        this.loadError.set(this.translate.instant('dashboard.errors.loadFailed'));
         this.isLoading.set(false);
       },
     });

@@ -19,10 +19,10 @@
       @if (isAdmin()) {
         <div class="team-actions">
           <ui-button type="button" variant="secondary" size="sm" (click)="onEditClick()">
-            Bearbeiten
+            {{ 'common.edit' | translate }}
           </ui-button>
           <ui-button type="button" variant="danger" size="sm" (click)="onDeleteClick()">
-            Loeschen
+            {{ 'common.delete' | translate }}
           </ui-button>
         </div>
       }
@@ -32,29 +32,29 @@
   <ui-card variant="subtle" padding="lg" class="team-card team-card-editing">
     <form [formGroup]="editForm" (ngSubmit)="onSaveEdit()">
       <div class="form-group">
-        <label for="name">Name*</label>
+        <label for="name">{{ 'teams.form.nameLabel' | translate }}</label>
         <input id="name" type="text" formControlName="name" maxlength="100" />
       </div>
 
       <div class="form-group">
-        <label for="shortName">Kurzname*</label>
+        <label for="shortName">{{ 'teams.form.shortNameLabel' | translate }}</label>
         <input id="shortName" type="text" formControlName="shortName" maxlength="10" />
       </div>
 
       <div class="form-group">
-        <label for="origin">Herkunft*</label>
+        <label for="origin">{{ 'teams.form.originLabel' | translate }}</label>
         <select id="origin" formControlName="origin">
           @for (origin of originOptions; track origin) {
-            <option [value]="origin">{{ originLabels[origin] }}</option>
+            <option [value]="origin">{{ getOriginLabel(origin) }}</option>
           }
         </select>
       </div>
 
       <div class="form-group">
-        <label>Team-Logo*</label>
+        <label>{{ 'teams.form.logoLabel' | translate }}</label>
         <app-image-upload
           [uploadCategory]="'teams'"
-          [label]="'Logo aendern'"
+          [label]="'teams.form.changeLogo'"
           [currentImageUrl]="uploadedLogoUrl()"
           (imageUploaded)="onImageUploaded($event)"
         />
@@ -63,7 +63,7 @@
       <div class="team-actions">
         <ui-button type="submit" size="sm" [disabled]="editForm.invalid || isSaving()">
           <lucide-icon [img]="icons.save" [size]="14" aria-hidden="true"></lucide-icon>
-          Speichern
+          {{ 'common.save' | translate }}
         </ui-button>
         <ui-button
           type="button"
@@ -72,7 +72,7 @@
           (click)="onCancelEdit()"
           [disabled]="isSaving()"
         >
-          Abbrechen
+          {{ 'common.cancel' | translate }}
         </ui-button>
       </div>
     </form>
@@ -81,12 +81,10 @@
 
 <app-confirmation-dialog
   [visible]="showDeleteDialog()"
-  [title]="'Team loeschen'"
-  [message]="
-    'Moechtest du das Team »' + (team()?.name ?? '') + '« wirklich loeschen?'
-  "
-  [confirmLabel]="'Loeschen'"
-  [cancelLabel]="'Abbrechen'"
+  [title]="'teams.deleteDialog.title'"
+  [message]="'teams.deleteDialog.message' | translate : { name: team()?.name ?? '' }"
+  [confirmLabel]="'common.delete'"
+  [cancelLabel]="'common.cancel'"
   (confirmed)="handleDeleteConfirm()"
   (cancelled)="handleDeleteCancel()"
 />
