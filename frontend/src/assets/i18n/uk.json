@@ -625,7 +625,7 @@
         "result": "Результат"
       },
       "unknownUser": "Невідомо",
-      "open": "Відкрито",
+      "open": "",
       "outcomes": {
         "exact": "Точно",
         "goalDiff": "Різниця",
