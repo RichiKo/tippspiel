@@ -79,7 +79,12 @@
               <tbody>
                 @for (userRow of userPicksRows(); track userRow.userId) {
                   <tr>
-                    <td class="user-cell">
+                    <td
+                      class="user-cell"
+                      [attr.data-label]="
+                        'bonus.overview.headers.participant' | translate
+                      "
+                    >
                       <div class="user-info">
                         @if (shouldRenderUserAvatar(userRow)) {
                           <img
@@ -102,6 +107,7 @@
                     @for (rule of bonusRules(); track rule.id) {
                       <td
                         class="pick-cell"
+                        [attr.data-label]="rule.name"
                         [class.eliminated-pick]="
                           isUserPickEliminated(userRow.userId, rule.id)
                         "

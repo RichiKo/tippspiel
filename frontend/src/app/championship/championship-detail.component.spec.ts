@@ -229,4 +229,12 @@ describe('ChampionshipDetailComponent', () => {
       fixture.nativeElement.querySelector('[data-testid="view-table"]'),
     ).toBeTruthy();
   });
+
+  it('should set mobile view on resize when viewport is below 768px', () => {
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(390);
+
+    component.onWindowResize();
+
+    expect(component.isMobileView()).toBeTrue();
+  });
 });

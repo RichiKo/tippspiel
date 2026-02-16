@@ -122,6 +122,7 @@ describe('StandingsComponent', () => {
           standings: {
             headers: {
               total: 'Gesamt',
+              gamePoints: 'Punkte (Spiele)',
             },
           },
         },
@@ -165,4 +166,5 @@ describe('StandingsComponent', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith(['/championship', 'champ-1']);
   });
+
 });

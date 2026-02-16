@@ -1,5 +1,6 @@
 .championship-detail {
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 86px 0 28px;
   background:
     radial-gradient(
@@ -514,11 +515,15 @@ app-game-card:last-child {
   .championship-header,
   .bonus-section-full,
   .championship-content {
-    width: calc(100% - 32px);
+    width: auto;
+    margin-left: max(16px, env(safe-area-inset-left, 0px));
+    margin-right: max(16px, env(safe-area-inset-right, 0px));
   }
 
   .detail-back-row {
-    width: calc(100% - 32px);
+    width: auto;
+    margin-left: max(16px, env(safe-area-inset-left, 0px));
+    margin-right: max(16px, env(safe-area-inset-right, 0px));
   }
 
   .championship-content {
@@ -539,12 +544,16 @@ app-game-card:last-child {
   .championship-header,
   .bonus-section-full,
   .championship-content {
-    width: calc(100% - 20px);
+    width: auto;
+    margin-left: max(10px, env(safe-area-inset-left, 0px));
+    margin-right: max(10px, env(safe-area-inset-right, 0px));
     margin-bottom: 12px;
   }
 
   .detail-back-row {
-    width: calc(100% - 20px);
+    width: auto;
+    margin-left: max(10px, env(safe-area-inset-left, 0px));
+    margin-right: max(10px, env(safe-area-inset-right, 0px));
     margin-bottom: 8px;
   }
 
@@ -574,7 +583,7 @@ app-game-card:last-child {
   .action-links-scroll a {
     flex: 1 1 calc(50% - 4px);
     justify-content: center;
-    min-width: 146px;
+    min-width: 0;
     align-items: center;
     text-align: center;
     padding: 9px 10px;
@@ -630,8 +639,8 @@ app-game-card:last-child {
   .round-drawer-fab {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 80px);
-    left: 14px;
-    min-height: 42px;
+    left: max(14px, env(safe-area-inset-left, 0px));
+    min-height: 44px;
     border: 0;
     border-radius: 16px;
     background: linear-gradient(135deg, #0f5f4c 0%, #10b981 100%);
@@ -843,7 +852,7 @@ app-game-card:last-child {
   }
 
   .games-section {
-    padding: 12px;
+    padding: 14px;
   }
 
   .games-header {
@@ -869,9 +878,9 @@ app-game-card:last-child {
   }
 
   .spieltag-view-toggle button {
-    min-height: 38px;
-    font-size: 0.68rem;
-    padding: 6px 4px;
+    min-height: 44px;
+    font-size: 0.76rem;
+    padding: 8px 6px;
   }
 
   .finished-view-shell {
@@ -893,7 +902,7 @@ app-game-card:last-child {
   }
 
   .section-inline-info {
-    font-size: 0.84rem;
+    font-size: 0.9rem;
     padding: 10px 12px;
   }
 }

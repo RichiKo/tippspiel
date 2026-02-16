@@ -128,7 +128,7 @@
               @for (team of teams(); track team.id) {
                 @if (editingTeamId() === team.id) {
                   <tr class="editing-row">
-                    <td>
+                    <td [attr.data-label]="'teams.list.table.logo' | translate">
                       <app-image-upload
                         [uploadCategory]="'teams'"
                         [label]="''"
@@ -136,7 +136,7 @@
                         (imageUploaded)="onEditImageUploaded($event)"
                       />
                     </td>
-                    <td>
+                    <td [attr.data-label]="'teams.list.table.name' | translate">
                       <input
                         type="text"
                         [formControl]="editForm.controls.name"
@@ -144,7 +144,7 @@
                         class="edit-input"
                       />
                     </td>
-                    <td>
+                    <td [attr.data-label]="'teams.list.table.shortName' | translate">
                       <input
                         type="text"
                         [formControl]="editForm.controls.shortName"
@@ -152,7 +152,7 @@
                         class="edit-input"
                       />
                     </td>
-                    <td>
+                    <td [attr.data-label]="'teams.list.table.origin' | translate">
                       <mat-form-field appearance="outline" class="edit-select-field">
                         <mat-select [formControl]="editForm.controls.origin" class="edit-input">
                           @for (origin of originOptions; track origin) {
@@ -161,9 +161,11 @@
                         </mat-select>
                       </mat-form-field>
                     </td>
-                    <td>{{ team.createdAt | date : 'dd.MM.yyyy' }}</td>
+                    <td [attr.data-label]="'teams.list.table.createdAt' | translate">
+                      {{ team.createdAt | date : 'dd.MM.yyyy' }}
+                    </td>
                     @if (isAdmin()) {
-                      <td class="actions-cell">
+                      <td class="actions-cell" [attr.data-label]="'teams.list.table.actions' | translate">
                         <ui-button
                           size="sm"
                           (click)="onSaveEdit(team.id)"
@@ -185,7 +187,7 @@
                   </tr>
                 } @else {
                   <tr>
-                    <td>
+                    <td [attr.data-label]="'teams.list.table.logo' | translate">
                       <img
                         [src]="team.logoUrl"
                         [alt]="team.name"
@@ -193,12 +195,12 @@
                         onerror="this.src='https://via.placeholder.com/50?text=Team'"
                       />
                     </td>
-                    <td class="team-name">{{ team.name }}</td>
-                    <td class="team-short">{{ team.shortName }}</td>
-                    <td>{{ getOriginLabel(team.origin) }}</td>
-                    <td>{{ team.createdAt | date : 'dd.MM.yyyy HH:mm' }}</td>
+                    <td class="team-name" [attr.data-label]="'teams.list.table.name' | translate">{{ team.name }}</td>
+                    <td class="team-short" [attr.data-label]="'teams.list.table.shortName' | translate">{{ team.shortName }}</td>
+                    <td [attr.data-label]="'teams.list.table.origin' | translate">{{ getOriginLabel(team.origin) }}</td>
+                    <td [attr.data-label]="'teams.list.table.createdAt' | translate">{{ team.createdAt | date : 'dd.MM.yyyy HH:mm' }}</td>
                     @if (isAdmin()) {
-                      <td class="actions-cell">
+                      <td class="actions-cell" [attr.data-label]="'teams.list.table.actions' | translate">
                         <ui-button variant="secondary" size="sm" (click)="onEditClick(team)">
                           {{ 'teams.list.actions.edit' | translate }}
                         </ui-button>

@@ -41,14 +41,13 @@
 }
 
 .table-wrapper {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .bonus-overview-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  min-width: 820px;
 }
 
 .bonus-overview-table thead th {
@@ -65,7 +64,6 @@
 }
 
 .bonus-overview-table thead th.user-column {
-  min-width: 220px;
   position: sticky;
   left: 0;
   z-index: 4;
@@ -73,7 +71,6 @@
 
 .bonus-overview-table thead th.bonus-column {
   text-align: center;
-  min-width: 190px;
 }
 
 .bonus-overview-table tbody tr {
@@ -184,10 +181,6 @@
     padding: var(--ts-space-4);
   }
 
-  .bonus-overview-table {
-    min-width: 560px;
-  }
-
   .bonus-overview-table thead th,
   .bonus-overview-table tbody td {
     padding: 10px 8px;
@@ -222,7 +215,6 @@
   }
 
   .bonus-overview-table {
-    min-width: 0;
     table-layout: fixed;
   }
 
@@ -232,24 +224,33 @@
   }
 
   .bonus-overview-table thead th {
-    font-size: 0.54rem;
-    letter-spacing: 0.04em;
-    line-height: 1.15;
+    font-size: 0.56rem;
+    letter-spacing: 0;
+    line-height: 1.18;
     white-space: normal;
     overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
-  .bonus-overview-table thead th.user-column,
-  .bonus-overview-table tbody td.user-cell {
-    width: 42%;
-    min-width: 0;
+  .bonus-overview-table thead th.user-column {
     position: static;
+    width: 38%;
   }
 
-  .bonus-overview-table thead th.bonus-column,
+  .bonus-overview-table tbody td.user-cell {
+    width: 38%;
+    position: static;
+    background: transparent;
+  }
+
   .bonus-overview-table tbody td.pick-cell {
-    width: 58%;
-    min-width: 0;
+    text-align: center;
+  }
+
+  .bonus-overview-table tbody td.empty-row {
+    display: table-cell;
+    border-bottom: 0;
+    text-align: center;
   }
 
   .user-info {
@@ -268,15 +269,23 @@
     font-size: 0.76rem;
   }
 
+  .user-avatar,
+  .user-avatar-placeholder {
+    width: 24px;
+    height: 24px;
+    font-size: 0.68rem;
+  }
+
   .team-display {
     width: 100%;
     min-width: 0;
+    justify-content: center;
     gap: 4px;
   }
 
   .team-logo {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .team-name {
@@ -286,11 +295,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.74rem;
-  }
-
-  .bonus-overview-table tbody td ui-badge {
-    transform: scale(0.82);
-    transform-origin: center;
+    font-size: 0.72rem;
   }
 }

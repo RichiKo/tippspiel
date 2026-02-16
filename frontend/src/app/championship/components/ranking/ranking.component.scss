@@ -46,12 +46,11 @@
 }
 
 .ranking-table-wrapper {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .ranking-table {
   width: 100%;
-  min-width: 620px;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -92,6 +91,7 @@
   padding: 13px 16px;
   border-bottom: 1px solid #e9eff3;
   text-align: center;
+  vertical-align: middle;
 }
 
 .ranking-table tbody tr:last-child td {
@@ -123,13 +123,9 @@
     font-size: 0.78rem;
   }
 
-  .ranking-table {
-    min-width: 500px;
-  }
-
   .ranking-table thead th,
   .ranking-table tbody td {
-    padding: 10px 8px;
+    padding: 10px 7px;
   }
 
   .ranking-table thead th {
@@ -146,12 +142,7 @@
     padding: 10px;
   }
 
-  .ranking-table-wrapper {
-    overflow-x: hidden;
-  }
-
   .ranking-table {
-    min-width: 0;
     table-layout: fixed;
   }
 
@@ -161,26 +152,19 @@
   }
 
   .ranking-table thead th {
-    font-size: 0.54rem;
-    letter-spacing: 0.04em;
+    font-size: 0.62rem;
+    letter-spacing: 0;
     white-space: normal;
-    line-height: 1.15;
-  }
-
-  .ranking-table thead th:first-child,
-  .ranking-table tbody td:first-child {
-    width: 36%;
-  }
-
-  .ranking-table thead th:not(:first-child),
-  .ranking-table tbody td:not(:first-child) {
-    width: 16%;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    text-transform: uppercase;
   }
 
   .username-cell {
     width: 100%;
     min-width: 0;
-    gap: 4px;
+    gap: 3px;
   }
 
   .username-text {
@@ -190,16 +174,35 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
+  }
+
+  .ranking-table thead th:first-child,
+  .ranking-table tbody td:first-child {
+    width: 36%;
+  }
+
+  .ranking-table thead th:nth-child(2),
+  .ranking-table tbody td:nth-child(2) {
+    width: 16%;
+  }
+
+  .ranking-table thead th:nth-child(3),
+  .ranking-table tbody td:nth-child(3),
+  .ranking-table thead th:nth-child(4),
+  .ranking-table tbody td:nth-child(4),
+  .ranking-table thead th:nth-child(5),
+  .ranking-table tbody td:nth-child(5) {
+    width: 16%;
   }
 
   .ranking-table tbody td ui-badge {
-    transform: scale(0.84);
+    transform: scale(0.86);
     transform-origin: center;
   }
 
   .ranking-table tbody td.username ui-badge {
-    transform: scale(0.78);
+    transform: scale(0.8);
     transform-origin: left center;
   }
 }

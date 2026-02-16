@@ -50,7 +50,7 @@
         <tbody>
           @for (pick of allPicks(); track pick.id) {
             <tr>
-              <td class="user-cell">
+              <td class="user-cell" [attr.data-label]="'bonus.picksTable.headers.user' | translate">
                 @if (pick.user) {
                   <div class="user-info">
                     <img
@@ -65,7 +65,7 @@
                   </div>
                 }
               </td>
-              <td class="team-cell">
+              <td class="team-cell" [attr.data-label]="'bonus.picksTable.headers.team' | translate">
                 @if (pick.team) {
                   <div class="team-info">
                     <img
@@ -77,7 +77,7 @@
                   </div>
                 }
               </td>
-              <td class="date-cell">
+              <td class="date-cell" [attr.data-label]="'bonus.picksTable.headers.time' | translate">
                 {{ pick.createdAt | date: 'dd.MM.yyyy HH:mm' }}
               </td>
             </tr>

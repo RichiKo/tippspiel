@@ -58,13 +58,34 @@ export class GameCardComponent {
   });
 
   onHomeGoalsChange(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.homeGoals.set(value === '' ? null : parseInt(value, 10));
+    const target = event.target as HTMLInputElement;
+    const sanitizedValue = target.value.replace(/\D+/g, '');
+    if (target.value !== sanitizedValue) {
+      target.value = sanitizedValue;
+    }
+    this.homeGoals.set(this.parseGoalsValue(sanitizedValue));
   }
 
   onAwayGoalsChange(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.awayGoals.set(value === '' ? null : parseInt(value, 10));
+    const target = event.target as HTMLInputElement;
+    const sanitizedValue = target.value.replace(/\D+/g, '');
+    if (target.value !== sanitizedValue) {
+      target.value = sanitizedValue;
+    }
+    this.awayGoals.set(this.parseGoalsValue(sanitizedValue));
+  }
+
+  private parseGoalsValue(value: string): number | null {
+    if (value === '') {
+      return null;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+
+    return Math.max(0, parsed);
   }
 
   saveTip() {

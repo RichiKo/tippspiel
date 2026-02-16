@@ -37,14 +37,25 @@
 
       <ui-card variant="default" padding="none" class="standings-table-shell">
         <div class="standings-table-wrapper">
-          <table class="standings-table">
+          <table
+            class="standings-table"
+            [class.standings-table--base]="!showTotalColumn()"
+            [class.standings-table--with-bonus]="showTotalColumn()"
+          >
+            @if (!showTotalColumn()) {
+              <colgroup>
+                <col class="col-rank" />
+                <col class="col-participant" />
+                <col class="col-points" />
+              </colgroup>
+            }
             <thead>
               <tr>
                 <th class="rank-col">{{ 'championship.standings.headers.rank' | translate }}</th>
-                <th>{{ 'championship.standings.headers.participant' | translate }}</th>
+                <th class="participant-col">{{ 'championship.standings.headers.participant' | translate }}</th>
                 <th class="points-col">{{ 'championship.standings.headers.gamePoints' | translate }}</th>
                 @for (column of bonusColumns(); track column.key) {
-                  <th class="bonus-col">{{ column.label }}</th>
+                  <th class="bonus-col" [attr.title]="column.label">{{ column.label }}</th>
                 }
                 @if (showTotalColumn()) {
                   <th class="total-col">{{ 'championship.standings.headers.total' | translate }}</th>

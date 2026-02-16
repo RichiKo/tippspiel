@@ -81,7 +81,13 @@ import { CreateRoundDto } from '../../types/round.interface';
       background: white;
       padding: 2rem;
       border-radius: 8px;
-      min-width: 400px;
+      width: min(
+        560px,
+        calc(
+          100vw - max(20px, env(safe-area-inset-left, 0px)) -
+            max(20px, env(safe-area-inset-right, 0px))
+        )
+      );
       max-width: 90vw;
 
       h2 {
@@ -141,6 +147,36 @@ import { CreateRoundDto } from '../../types/round.interface';
             }
           }
         }
+      }
+    }
+
+    @media (max-width: 767px) {
+      .dialog-overlay {
+        align-items: flex-end;
+        padding-left: max(8px, env(safe-area-inset-left, 0px));
+        padding-right: max(8px, env(safe-area-inset-right, 0px));
+        padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+      }
+
+      .dialog-content {
+        width: 100%;
+        max-width: none;
+        border-radius: 14px 14px 0 0;
+        padding: 1rem;
+      }
+
+      .dialog-content .form-field input {
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      .dialog-content .dialog-actions {
+        flex-direction: column-reverse;
+      }
+
+      .dialog-content .dialog-actions button {
+        width: 100%;
+        min-height: 44px;
       }
     }
   `],

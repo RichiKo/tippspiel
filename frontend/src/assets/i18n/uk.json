@@ -5,6 +5,7 @@
     "save": "Зберегти",
     "delete": "Видалити",
     "edit": "Редагувати",
+    "details": "Деталі",
     "confirm": "Підтвердити",
     "confirmation": {
       "title": "Підтвердження"
@@ -584,10 +585,11 @@
       "gamesInfo": "{{closed}} з {{total}} матчів уже оцінено",
       "headers": {
         "participant": "Учасник",
-        "exact": "Точно (3Б)",
-        "goalDiff": "Різниця (2Б)",
-        "tendency": "Тенденція (1Б)",
-        "missed": "Мімо (0Б)"
+        "exact": "Точн. (3Б)",
+        "goalDiff": "Різн. (2Б)",
+        "tendency": "Тенд. (1Б)",
+        "missed": "Мімо (0Б)",
+        "totalPoints": "Загальні бали"
       },
       "you": "Ти",
       "errors": {

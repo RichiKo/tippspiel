@@ -93,7 +93,6 @@ export class RankingComponent {
 
     return 'neutral';
   });
-
   championshipId = '';
 
   constructor() {

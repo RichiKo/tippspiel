@@ -123,6 +123,7 @@ describe('RankingComponent', () => {
           ranking: {
             gamesInfo: '{{closed}} von {{total}} Spielen ausgewertet',
             you: 'Du',
+            headers: {},
           },
         },
       },
@@ -173,4 +174,5 @@ describe('RankingComponent', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith(['/championship', 'champ-1']);
   });
+
 });

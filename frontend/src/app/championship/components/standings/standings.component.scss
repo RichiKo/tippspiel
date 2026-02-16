@@ -35,14 +35,21 @@
 }
 
 .standings-table-wrapper {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .standings-table {
   width: 100%;
-  min-width: 740px;
   border-collapse: separate;
   border-spacing: 0;
+}
+
+.standings-table.standings-table--base col.col-rank {
+  width: 96px;
+}
+
+.standings-table.standings-table--base col.col-points {
+  width: 140px;
 }
 
 .standings-table thead th {
@@ -57,19 +64,17 @@
   background: #f5f8fa;
 }
 
-.standings-table thead th.rank-col,
-.standings-table thead th.points-col,
-.standings-table thead th.bonus-col,
-.standings-table thead th.total-col {
+.standings-table thead th.rank-col {
   text-align: center;
 }
 
-.standings-table thead th.rank-col {
-  width: 96px;
+.standings-table thead th.points-col {
+  text-align: right;
 }
 
-.standings-table thead th.points-col {
-  width: 140px;
+.standings-table thead th.bonus-col,
+.standings-table thead th.total-col {
+  text-align: right;
 }
 
 .standings-table thead th.total-col {
@@ -116,9 +121,18 @@
 .standings-table tbody td.points,
 .standings-table tbody td.bonus-points,
 .standings-table tbody td.total-points {
-  text-align: center;
   font-weight: 700;
   color: #334155;
+}
+
+.standings-table tbody td.rank {
+  text-align: center;
+}
+
+.standings-table tbody td.points,
+.standings-table tbody td.bonus-points,
+.standings-table tbody td.total-points {
+  text-align: center;
 }
 
 .standings-table tbody td.total-points {
@@ -182,10 +196,6 @@
     padding: var(--ts-space-4);
   }
 
-  .standings-table {
-    min-width: 620px;
-  }
-
   .standings-table thead th,
   .standings-table tbody td {
     padding: 10px 8px;
@@ -193,6 +203,14 @@
 
   .standings-table thead th {
     font-size: 0.63rem;
+  }
+
+  .standings-table.standings-table--base col.col-rank {
+    width: 74px;
+  }
+
+  .standings-table.standings-table--base col.col-points {
+    width: 96px;
   }
 
   .username-text {
@@ -214,12 +232,7 @@
     transform-origin: left center;
   }
 
-  .standings-table-wrapper {
-    overflow-x: hidden;
-  }
-
-  .standings-table {
-    min-width: 0;
+  .standings-table.standings-table--with-bonus {
     table-layout: fixed;
   }
 
@@ -229,37 +242,64 @@
   }
 
   .standings-table thead th {
-    font-size: 0.54rem;
-    letter-spacing: 0.04em;
-    line-height: 1.15;
+    font-size: 0.56rem;
+    letter-spacing: 0;
+    line-height: 1.18;
     white-space: normal;
     overflow-wrap: anywhere;
+    hyphens: auto;
+    text-transform: uppercase;
   }
 
-  .standings-table thead th.rank-col,
-  .standings-table tbody td.rank {
-    width: 18%;
+  .standings-table.standings-table--base {
+    table-layout: auto;
   }
 
-  .standings-table thead th.points-col,
-  .standings-table tbody td.points {
-    width: 20%;
+  .standings-table.standings-table--base col.col-rank {
+    width: 52px;
   }
 
-  .standings-table thead th.bonus-col,
-  .standings-table tbody td.bonus-points {
-    width: 15%;
+  .standings-table.standings-table--base col.col-points {
+    width: 68px;
   }
 
-  .standings-table thead th.total-col,
-  .standings-table tbody td.total-points {
-    width: 15%;
+  .standings-table.standings-table--base thead th {
+    font-size: 0.62rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+
+  .standings-table.standings-table--base thead th.rank-col {
+    text-align: center;
+  }
+
+  .standings-table.standings-table--base thead th.points-col {
+    text-align: right;
+  }
+
+  .standings-table.standings-table--base thead th.points-col,
+  .standings-table.standings-table--base tbody td.points {
+    padding-right: 10px;
+  }
+
+  .standings-table.standings-table--with-bonus thead th {
+    font-size: 0.5rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+    hyphens: none;
+    padding-left: 3px;
+    padding-right: 3px;
   }
 
   .username-cell {
     width: 100%;
     min-width: 0;
-    gap: 0;
+    gap: 2px;
   }
 
   .username-text {
@@ -269,13 +309,55 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
+  }
+
+  .standings-table.standings-table--base .username-text {
+    font-size: 0.88rem;
+  }
+
+  .standings-table.standings-table--with-bonus thead th.rank-col,
+  .standings-table.standings-table--with-bonus tbody td.rank {
+    width: 13%;
+  }
+
+  .standings-table.standings-table--with-bonus thead th.participant-col,
+  .standings-table.standings-table--with-bonus tbody td.username {
+    width: 31%;
+  }
+
+  .standings-table.standings-table--with-bonus thead th.points-col,
+  .standings-table.standings-table--with-bonus tbody td.points {
+    width: 20%;
+  }
+
+  .standings-table.standings-table--with-bonus thead th.bonus-col,
+  .standings-table.standings-table--with-bonus tbody td.bonus-points,
+  .standings-table.standings-table--with-bonus thead th.total-col,
+  .standings-table.standings-table--with-bonus tbody td.total-points {
+    width: 16%;
+  }
+
+  .standings-table.standings-table--with-bonus thead th.points-col,
+  .standings-table.standings-table--with-bonus thead th.bonus-col,
+  .standings-table.standings-table--with-bonus thead th.total-col,
+  .standings-table.standings-table--with-bonus tbody td.points,
+  .standings-table.standings-table--with-bonus tbody td.bonus-points,
+  .standings-table.standings-table--with-bonus tbody td.total-points {
+    padding-right: 6px;
+  }
+
+  .standings-table tbody td.rank,
+  .standings-table tbody td.points,
+  .standings-table tbody td.bonus-points,
+  .standings-table tbody td.total-points {
+    font-size: 0.74rem;
   }
 
   .rank-pill {
-    min-width: 24px;
-    min-height: 24px;
-    font-size: 0.68rem;
-    padding: 1px 6px;
+    min-width: 22px;
+    min-height: 22px;
+    font-size: 0.64rem;
+    padding: 1px 5px;
   }
 }

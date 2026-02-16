@@ -2,7 +2,10 @@ import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tip } from '../../types/tip.interface';
-import { UiBadgeComponent, type UiBadgeTone } from '../../../ui-lib/public-api';
+import {
+  UiBadgeComponent,
+  type UiBadgeTone,
+} from '../../../ui-lib/public-api';
 
 @Component({
   selector: 'app-tips-table',

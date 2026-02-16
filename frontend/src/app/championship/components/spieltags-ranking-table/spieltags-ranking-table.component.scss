@@ -12,7 +12,7 @@
 }
 
 .table-wrapper {
-  overflow-x: auto;
+  overflow-x: hidden;
   background: var(--ts-surface);
   border: 1px solid var(--ts-border);
   border-radius: 14px;
@@ -22,7 +22,6 @@
 .spieltags-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 560px;
 }
 
 .spieltags-table thead th {
@@ -123,7 +122,7 @@
 
 .num-col {
   width: 132px;
-  text-align: center;
+  text-align: right;
   font-weight: 700;
   font-size: 1rem;
   color: #0f5f4c;
@@ -143,10 +142,6 @@
 @media (max-width: 767px) {
   .table-meta {
     font-size: 0.8rem;
-  }
-
-  .spieltags-table {
-    min-width: 480px;
   }
 
   .spieltags-table thead th,
@@ -181,17 +176,11 @@
   .num-col {
     width: 84px;
     font-size: 0.86rem;
-    text-align: right;
   }
 }
 
 @media (max-width: 430px) {
-  .table-wrapper {
-    overflow-x: hidden;
-  }
-
   .spieltags-table {
-    min-width: 0;
     table-layout: fixed;
   }
 
@@ -237,6 +226,6 @@
 
   .num-col {
     font-size: 0.76rem;
-    text-align: center;
+    text-align: right;
   }
 }

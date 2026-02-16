@@ -5,6 +5,7 @@
     "save": "Speichern",
     "delete": "Loeschen",
     "edit": "Bearbeiten",
+    "details": "Details",
     "confirm": "Bestaetigen",
     "confirmation": {
       "title": "Bestaetigung"
@@ -587,7 +588,8 @@
         "exact": "Exakt (3P)",
         "goalDiff": "Differenz (2P)",
         "tendency": "Tendenz (1P)",
-        "missed": "Missed (0P)"
+        "missed": "Missed (0P)",
+        "totalPoints": "Gesamtpunkte"
       },
       "you": "Du",
       "errors": {

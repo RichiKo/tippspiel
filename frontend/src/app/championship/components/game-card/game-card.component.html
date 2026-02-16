@@ -70,21 +70,29 @@
           <div class="tip-editor">
             <div class="tip-input">
               <input
-                type="number"
+                type="tel"
                 [value]="homeGoals() ?? ''"
                 (input)="onHomeGoalsChange($event)"
                 min="0"
                 placeholder="-"
                 class="goal-input"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                enterkeyhint="done"
+                autocomplete="off"
               />
               <span class="colon">:</span>
               <input
-                type="number"
+                type="tel"
                 [value]="awayGoals() ?? ''"
                 (input)="onAwayGoalsChange($event)"
                 min="0"
                 placeholder="-"
                 class="goal-input"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                enterkeyhint="done"
+                autocomplete="off"
               />
             </div>
             <button

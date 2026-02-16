@@ -7,6 +7,7 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { firstValueFrom, of } from 'rxjs';
 import { TeamsComponent } from './teams.component';
 import { TeamService } from './services/team.service';
@@ -66,6 +67,7 @@ describe('TeamsComponent', () => {
         }),
       ],
       providers: [
+        provideNoopAnimations(),
         { provide: TeamService, useValue: mockTeamService },
         { provide: PersistingService, useValue: mockPersistingService },
         { provide: Router, useValue: { navigate: navigateSpy } },
