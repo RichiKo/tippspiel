@@ -60,6 +60,14 @@
   line-height: 1;
 }
 
+.logo-text__base {
+  color: var(--ts-text-primary);
+}
+
+.logo-text__highlight {
+  color: var(--ts-primary-600);
+}
+
 .header-right {
   position: relative;
   display: flex;

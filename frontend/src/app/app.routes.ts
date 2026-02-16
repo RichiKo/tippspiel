@@ -3,7 +3,7 @@ import { AuthGuard } from './shared/guards/auth.guard';
 import { AuthLandingComponent } from './auth/components/auth-landing.component';
 
 export const routes: Routes = [
-  { path: '', component: AuthLandingComponent },
+  { path: '', canActivate: [AuthGuard], component: AuthLandingComponent },
   {
     path: 'dashboard',
     canActivate: [AuthGuard],

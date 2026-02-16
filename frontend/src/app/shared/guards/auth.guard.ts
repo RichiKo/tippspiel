@@ -4,6 +4,7 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   Router,
+  UrlTree,
 } from '@angular/router';
 import { PersistingService } from '../../auth/services/persisisting.service';
 
@@ -13,15 +14,24 @@ export class AuthGuard implements CanActivate {
   private readonly persistingService = inject(PersistingService);
 
   canActivate(
-    route: ActivatedRouteSnapshot,
+    _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
+  ): boolean | UrlTree {
     const user = this.persistingService.currentUser();
-    if (user) {
+    const isAuthenticated = Boolean(user?.token);
+
+    if (state.url === '/') {
+      if (isAuthenticated) {
+        return this.router.parseUrl('/dashboard');
+      }
+
       return true;
     }
 
-    this.router.navigate(['/login']);
-    return false;
+    if (isAuthenticated) {
+      return true;
+    }
+
+    return this.router.parseUrl('/');
   }
 }

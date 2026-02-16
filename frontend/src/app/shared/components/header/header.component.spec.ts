@@ -81,10 +81,15 @@ describe('HeaderComponent', () => {
       '.settings-btn',
     ) as HTMLButtonElement;
     const logoImage = fixture.nativeElement.querySelector('.logo-mark') as HTMLImageElement;
+    const logoHighlight = fixture.nativeElement.querySelector(
+      '.logo-text__highlight',
+    ) as HTMLElement | null;
 
     expect(content).toContain('Вийти');
     expect(content).toContain('TippsLiga');
     expect(logoImage).not.toBeNull();
+    expect(logoHighlight).not.toBeNull();
+    expect(logoHighlight?.textContent?.trim()).toBe('Liga');
     expect(logoImage.getAttribute('src')).toContain('assets/branding/tippsliga-logo-mark.png');
     expect(settingsButton.getAttribute('aria-label')).toBe('Налаштування');
   });
