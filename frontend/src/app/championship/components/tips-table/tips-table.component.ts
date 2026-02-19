@@ -51,7 +51,7 @@ export class TipsTableComponent {
       goalDiff: 'info',
       tendency: 'warning',
       missed: 'danger',
-      notTipped: 'neutral',
+      notTipped: 'danger',
     };
 
     return tones[outcomeType || ''] ?? 'neutral';

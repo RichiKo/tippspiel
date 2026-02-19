@@ -5,9 +5,10 @@ import { TipService } from './tip.service';
 import { TipController } from './tip.controller';
 import { GameEntity } from '../game/game.entity';
 import { AuthGuard } from '../guards/auth.guard';
+import { MembershipEntity } from '../membership/membership.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TipEntity, GameEntity])],
+  imports: [TypeOrmModule.forFeature([TipEntity, GameEntity, MembershipEntity])],
   controllers: [TipController],
   providers: [TipService, AuthGuard],
   exports: [TipService],

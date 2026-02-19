@@ -111,19 +111,34 @@ describe('ChampionshipDetailComponent', () => {
       ),
     getTipsForGame: jasmine
       .createSpy('getTipsForGame')
-      .and.returnValue(
-        of([
-          {
-            gameId: 'g1',
-            championshipId: 'champ-1',
-            userId: 1,
-            homeTeamGoals: 2,
-            awayTeamGoals: 1,
-            points: 3,
-            outcomeType: 'exact',
-            user: { id: 1, username: 'Richi', email: 'r@test.com' },
-          },
-        ]),
+      .and.callFake((gameId: string) =>
+        of(
+          gameId === 'g2'
+            ? [
+                {
+                  gameId: 'g2',
+                  championshipId: 'champ-1',
+                  userId: 2,
+                  homeTeamGoals: null,
+                  awayTeamGoals: null,
+                  points: 0,
+                  outcomeType: 'notTipped',
+                  user: { id: 2, username: 'Ivan', email: 'i@test.com' },
+                },
+              ]
+            : [
+                {
+                  gameId: 'g1',
+                  championshipId: 'champ-1',
+                  userId: 1,
+                  homeTeamGoals: 2,
+                  awayTeamGoals: 1,
+                  points: 3,
+                  outcomeType: 'exact',
+                  user: { id: 1, username: 'Richi', email: 'r@test.com' },
+                },
+              ],
+        ),
       ),
     createOrUpdateTip: jasmine.createSpy('createOrUpdateTip').and.returnValue(
       of({
@@ -236,5 +251,12 @@ describe('ChampionshipDetailComponent', () => {
     component.onWindowResize();
 
     expect(component.isMobileView()).toBeTrue();
+  });
+
+  it('should keep notTipped tips in started games map', () => {
+    const startedGameTips = component.gameTips().get('g2') ?? [];
+
+    expect(mockTipService.getTipsForGame).toHaveBeenCalledWith('g2');
+    expect(startedGameTips.some((tip) => tip.outcomeType === 'notTipped')).toBeTrue();
   });
 });

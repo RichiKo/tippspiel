@@ -26,7 +26,7 @@
               }
             </td>
             <td class="points" [attr.data-label]="'championship.tipsTable.headers.points' | translate">
-              @if (isClosed()) {
+              @if (isClosed() || tip.outcomeType === 'notTipped') {
                 <ui-badge [tone]="getPointsTone(tip.points ?? 0)" appearance="soft">
                   {{ tip.points ?? 0 }}
                 </ui-badge>
@@ -35,7 +35,7 @@
               }
             </td>
             <td class="outcome" [attr.data-label]="'championship.tipsTable.headers.result' | translate">
-              @if (isClosed()) {
+              @if (isClosed() || tip.outcomeType === 'notTipped') {
                 <ui-badge [tone]="getOutcomeTone(tip.outcomeType)" appearance="soft">
                   {{ getOutcomeLabel(tip.outcomeType) }}
                 </ui-badge>

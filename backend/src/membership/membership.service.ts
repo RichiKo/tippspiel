@@ -73,12 +73,9 @@ export class MembershipService {
 
     const savedMembership = await this.membershipRepository.save(membership);
 
-    // If membership is ACTIVE (public championship), create ranking entry
+    // If membership is ACTIVE (public championship), recalculate rankings.
     if (savedMembership.status === MembershipStatus.ACTIVE) {
-      await this.rankingService.ensureRankingExistsForUser(
-        userId,
-        championshipId,
-      );
+      await this.rankingService.recalculateForChampionship(championshipId);
     }
 
     return savedMembership;
@@ -156,13 +153,13 @@ export class MembershipService {
     membership.status = status;
     const updatedMembership = await this.membershipRepository.save(membership);
 
-    // If status changed to ACTIVE (admin approval), create ranking entry
+    // Keep rankings in sync for transitions entering/leaving ACTIVE state.
     if (
-      oldStatus !== MembershipStatus.ACTIVE &&
-      status === MembershipStatus.ACTIVE
+      oldStatus !== status &&
+      (oldStatus === MembershipStatus.ACTIVE ||
+        status === MembershipStatus.ACTIVE)
     ) {
-      await this.rankingService.ensureRankingExistsForUser(
-        updatedMembership.userId,
+      await this.rankingService.recalculateForChampionship(
         updatedMembership.championshipId,
       );
     }
@@ -171,10 +168,19 @@ export class MembershipService {
   }
 
   async removeMembership(membershipId: string): Promise<void> {
-    const result = await this.membershipRepository.delete(membershipId);
-
-    if (result.affected === 0) {
+    const membership = await this.membershipRepository.findOne({
+      where: { id: membershipId },
+    });
+    if (!membership) {
       throw new NotFoundException('Membership not found');
+    }
+
+    await this.membershipRepository.delete(membershipId);
+
+    if (membership.status === MembershipStatus.ACTIVE) {
+      await this.rankingService.recalculateForChampionship(
+        membership.championshipId,
+      );
     }
   }
 }

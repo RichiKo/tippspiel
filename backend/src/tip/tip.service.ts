@@ -12,6 +12,8 @@ import { CreateTipDto } from './dto/create-tip.dto';
 import { UpdateTipDto } from './dto/update-tip.dto';
 import { computeTipOutcome } from './tip-calculation';
 import { TipOutcome } from './tip-outcome.enum';
+import { MembershipEntity } from '../membership/membership.entity';
+import { MembershipStatus } from '../membership/membership-status.enum';
 
 @Injectable()
 export class TipService {
@@ -20,6 +22,8 @@ export class TipService {
     private readonly tipRepository: Repository<TipEntity>,
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(MembershipEntity)
+    private readonly membershipRepository: Repository<MembershipEntity>,
   ) {}
 
   async create(userId: number, createDto: CreateTipDto): Promise<TipEntity> {
@@ -118,11 +122,44 @@ export class TipService {
   }
 
   async findByGame(gameId: string): Promise<TipEntity[]> {
-    return this.tipRepository.find({
+    const game = await this.gameRepository.findOne({
+      where: { id: gameId },
+      relations: ['round'],
+    });
+
+    if (!game) {
+      return [];
+    }
+
+    const championshipId = game.round?.championshipId;
+    if (!championshipId) {
+      return [];
+    }
+
+    const activeUserIds = await this.getActiveUserIds(championshipId);
+    const activeUserIdSet = new Set(activeUserIds);
+
+    const shouldCreateMissingTips =
+      game.isClosed || new Date(game.kickoffTime) <= new Date();
+
+    if (shouldCreateMissingTips) {
+      await this.insertNotTippedForMissingUsers(
+        gameId,
+        championshipId,
+        activeUserIds,
+      );
+    }
+
+    const tips = await this.tipRepository.find({
       where: { gameId },
       relations: ['user'],
-      order: { createdAt: 'ASC' },
     });
+
+    return tips
+      .filter((tip) => activeUserIdSet.has(tip.userId))
+      .sort((a, b) =>
+        (a.user?.username ?? '').localeCompare(b.user?.username ?? ''),
+      );
   }
 
   async evaluateTipsForGame(gameId: string): Promise<void> {
@@ -161,38 +198,12 @@ export class TipService {
     gameId: string,
     championshipId: string,
   ): Promise<void> {
-    const existingTips = await this.tipRepository.find({
-      where: { gameId },
-      select: ['userId'],
-    });
-
-    const existingUserIds = existingTips.map((tip) => tip.userId);
-
-    const allTipsInChampionship = await this.tipRepository
-      .createQueryBuilder('tip')
-      .select('DISTINCT tip.userId', 'userId')
-      .where('tip.championshipId = :championshipId', { championshipId })
-      .getRawMany();
-
-    const allUserIds = allTipsInChampionship.map((t) => t.userId);
-
-    const missingUserIds = allUserIds.filter(
-      (id) => !existingUserIds.includes(id),
+    const activeUserIds = await this.getActiveUserIds(championshipId);
+    await this.insertNotTippedForMissingUsers(
+      gameId,
+      championshipId,
+      activeUserIds,
     );
-
-    for (const userId of missingUserIds) {
-      const tip = this.tipRepository.create({
-        userId,
-        gameId,
-        championshipId,
-        homeTeamGoals: null,
-        awayTeamGoals: null,
-        points: 0,
-        outcomeType: TipOutcome.NOT_TIPPED,
-      });
-
-      await this.tipRepository.save(tip);
-    }
   }
 
   async resetTipsForGame(gameId: string): Promise<void> {
@@ -212,5 +223,55 @@ export class TipService {
         await this.tipRepository.save(tip);
       }
     }
+  }
+
+  private async getActiveUserIds(championshipId: string): Promise<number[]> {
+    const activeMembers = await this.membershipRepository.find({
+      where: { championshipId, status: MembershipStatus.ACTIVE },
+      select: ['userId'],
+    });
+
+    return activeMembers.map((member) => member.userId);
+  }
+
+  private async insertNotTippedForMissingUsers(
+    gameId: string,
+    championshipId: string,
+    activeUserIds: number[],
+  ): Promise<void> {
+    if (activeUserIds.length === 0) {
+      return;
+    }
+
+    const existingTips = await this.tipRepository.find({
+      where: { gameId },
+      select: ['userId'],
+    });
+    const existingUserIdSet = new Set(existingTips.map((tip) => tip.userId));
+    const missingUserIds = activeUserIds.filter(
+      (userId) => !existingUserIdSet.has(userId),
+    );
+
+    if (missingUserIds.length === 0) {
+      return;
+    }
+
+    const values = missingUserIds.map((userId) => ({
+      userId,
+      gameId,
+      championshipId,
+      homeTeamGoals: null,
+      awayTeamGoals: null,
+      points: 0,
+      outcomeType: TipOutcome.NOT_TIPPED,
+    }));
+
+    await this.tipRepository
+      .createQueryBuilder()
+      .insert()
+      .into(TipEntity)
+      .values(values)
+      .orIgnore()
+      .execute();
   }
 }

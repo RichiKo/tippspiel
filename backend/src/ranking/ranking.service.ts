@@ -11,6 +11,7 @@ import { BonusEvaluationEntity } from '../bonus/bonus-evaluation.entity';
 import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
 import { BonusRuleStatus } from '../bonus/bonus-rule-status.enum';
 import { BonusRuleType } from '../bonus/bonus-rule-type.enum';
+import { GameEntity } from '../game/game.entity';
 
 export interface EvaluatedBonusRuleDto {
   id: string;
@@ -76,6 +77,8 @@ export class RankingService {
     private readonly bonusEvaluationRepository: Repository<BonusEvaluationEntity>,
     @InjectRepository(BonusRuleEntity)
     private readonly bonusRuleRepository: Repository<BonusRuleEntity>,
+    @InjectRepository(GameEntity)
+    private readonly gameRepository: Repository<GameEntity>,
   ) {}
 
   async recalculateForChampionship(championshipId: string): Promise<void> {
@@ -87,27 +90,64 @@ export class RankingService {
       throw new NotFoundException('Championship not found');
     }
 
+    const activeMembers = await this.membershipRepository.find({
+      where: { championshipId, status: MembershipStatus.ACTIVE },
+      select: ['userId'],
+    });
+    const activeUserIds = activeMembers.map((member) => member.userId);
+    const activeUserIdSet = new Set(activeUserIds);
+
+    if (activeUserIds.length === 0) {
+      await this.rankingRepository.delete({ championshipId });
+      return;
+    }
+
+    const closedGames = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoin('game.round', 'round')
+      .where('round.championshipId = :championshipId', { championshipId })
+      .andWhere('game.isClosed = :isClosed', { isClosed: true })
+      .getMany();
+    const closedGameIds = closedGames.map((game) => game.id);
+    const closedGameIdSet = new Set(closedGameIds);
+
+    await this.backfillMissingNotTipped(
+      championshipId,
+      closedGameIds,
+      activeUserIds,
+    );
+
     const tips = await this.tipRepository.find({
       where: { championshipId },
-      relations: ['user'],
+      select: ['userId', 'gameId', 'outcomeType'],
     });
 
     const userDataMap = new Map<number, UserRankingData>();
 
+    for (const userId of activeUserIds) {
+      userDataMap.set(userId, {
+        userId,
+        exactHits: 0,
+        goalDiffHits: 0,
+        tendencyHits: 0,
+        missedTips: 0,
+        totalPoints: 0,
+        bonusPoints: 0,
+      });
+    }
+
     for (const tip of tips) {
-      if (!userDataMap.has(tip.userId)) {
-        userDataMap.set(tip.userId, {
-          userId: tip.userId,
-          exactHits: 0,
-          goalDiffHits: 0,
-          tendencyHits: 0,
-          missedTips: 0,
-          totalPoints: 0,
-          bonusPoints: 0,
-        });
+      if (!activeUserIdSet.has(tip.userId)) {
+        continue;
+      }
+      if (!closedGameIdSet.has(tip.gameId)) {
+        continue;
       }
 
-      const userData = userDataMap.get(tip.userId)!;
+      const userData = userDataMap.get(tip.userId);
+      if (!userData) {
+        continue;
+      }
 
       if (tip.outcomeType === TipOutcome.EXACT) {
         userData.exactHits++;
@@ -125,26 +165,6 @@ export class RankingService {
       }
     }
 
-    // Ensure all ACTIVE members have a ranking entry (even with 0 points)
-    const allActiveMembers = await this.membershipRepository.find({
-      where: { championshipId, status: MembershipStatus.ACTIVE },
-    });
-
-    for (const member of allActiveMembers) {
-      if (!userDataMap.has(member.userId)) {
-        // Add members without tips with 0 points
-        userDataMap.set(member.userId, {
-          userId: member.userId,
-          exactHits: 0,
-          goalDiffHits: 0,
-          tendencyHits: 0,
-          missedTips: 0,
-          totalPoints: 0,
-          bonusPoints: 0,
-        });
-      }
-    }
-
     // Load bonus evaluations for this championship
     const bonusEvaluations = await this.bonusEvaluationRepository
       .createQueryBuilder('evaluation')
@@ -155,6 +175,9 @@ export class RankingService {
     // Aggregate bonus points per user
     const userBonusMap = new Map<number, number>();
     for (const evaluation of bonusEvaluations) {
+      if (!activeUserIdSet.has(evaluation.userId)) {
+        continue;
+      }
       const current = userBonusMap.get(evaluation.userId) || 0;
       userBonusMap.set(evaluation.userId, current + evaluation.points);
     }
@@ -211,9 +234,12 @@ export class RankingService {
         await this.rankingRepository.save(newRanking);
       }
     }
+
+    await this.deleteInactiveRankings(championshipId, activeUserIdSet);
   }
 
   async findByChampionship(championshipId: string): Promise<RankingEntity[]> {
+    await this.recalculateForChampionship(championshipId);
     return this.rankingRepository.find({
       where: { championshipId },
       relations: ['user'],
@@ -224,6 +250,8 @@ export class RankingService {
   async findStandingsByChampionship(
     championshipId: string,
   ): Promise<StandingsResponseDto> {
+    await this.recalculateForChampionship(championshipId);
+
     const rankings = await this.rankingRepository.find({
       where: { championshipId },
       relations: ['user'],
@@ -378,6 +406,66 @@ export class RankingService {
     });
 
     return { evaluatedBonusRules, bonusColumns, standings };
+  }
+
+  private async backfillMissingNotTipped(
+    championshipId: string,
+    closedGameIds: string[],
+    activeUserIds: number[],
+  ): Promise<void> {
+    if (closedGameIds.length === 0 || activeUserIds.length === 0) {
+      return;
+    }
+
+    for (const gameId of closedGameIds) {
+      const existingTips = await this.tipRepository.find({
+        where: { gameId },
+        select: ['userId'],
+      });
+      const existingUserIdSet = new Set(existingTips.map((tip) => tip.userId));
+      const missingUserIds = activeUserIds.filter(
+        (userId) => !existingUserIdSet.has(userId),
+      );
+
+      if (missingUserIds.length === 0) {
+        continue;
+      }
+
+      const values = missingUserIds.map((userId) => ({
+        userId,
+        gameId,
+        championshipId,
+        homeTeamGoals: null,
+        awayTeamGoals: null,
+        points: 0,
+        outcomeType: TipOutcome.NOT_TIPPED,
+      }));
+
+      await this.tipRepository
+        .createQueryBuilder()
+        .insert()
+        .into(TipEntity)
+        .values(values)
+        .orIgnore()
+        .execute();
+    }
+  }
+
+  private async deleteInactiveRankings(
+    championshipId: string,
+    activeUserIdSet: Set<number>,
+  ): Promise<void> {
+    const allRankings = await this.rankingRepository.find({
+      where: { championshipId },
+      select: ['id', 'userId'],
+    });
+    const staleRankingIds = allRankings
+      .filter((ranking) => !activeUserIdSet.has(ranking.userId))
+      .map((ranking) => ranking.id);
+
+    if (staleRankingIds.length > 0) {
+      await this.rankingRepository.delete(staleRankingIds);
+    }
   }
 
   async ensureRankingExistsForUser(

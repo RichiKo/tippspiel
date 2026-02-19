@@ -8,6 +8,7 @@ import { ChampionshipEntity } from '../championship/championship.entity';
 import { MembershipEntity } from '../membership/membership.entity';
 import { BonusEvaluationEntity } from '../bonus/bonus-evaluation.entity';
 import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
+import { GameEntity } from '../game/game.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
       MembershipEntity,
       BonusEvaluationEntity,
       BonusRuleEntity,
+      GameEntity,
     ]),
   ],
   controllers: [RankingController],
