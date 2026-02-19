@@ -40,7 +40,9 @@
 .edit-game-btn,
 .delete-game-btn {
   min-height: 40px;
-  padding: 0.35rem 0.72rem;
+  min-width: 40px;
+  width: 40px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -48,10 +50,11 @@
   border: 1px solid;
   border-radius: 9px;
   cursor: pointer;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
   transition: all 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.action-icon {
+  display: inline-flex;
 }
 
 .edit-game-btn {
@@ -290,7 +293,7 @@
   }
 
   .game-meta-header {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.65rem;
   }
 
@@ -300,18 +303,19 @@
 
   .admin-actions {
     gap: 0.5rem;
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
   }
 
   .edit-game-btn,
   .delete-game-btn {
     min-height: 44px;
-    min-width: 120px;
-    padding: 0.35rem 0.8rem;
+    min-width: 44px;
+    width: 44px;
+    padding: 0;
     border-radius: 9px;
-    font-size: 0.82rem;
   }
 
   .game-info {

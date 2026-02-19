@@ -43,4 +43,19 @@ describe('ConfirmationDialogComponent', () => {
     expect(cancelSpy).toHaveBeenCalledTimes(1);
     expect(confirmSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('should lock body scroll while visible and restore it after close', () => {
+    fixture.componentRef.setInput('visible', false);
+    fixture.detectChanges();
+
+    document.body.style.overflow = 'auto';
+
+    fixture.componentRef.setInput('visible', true);
+    fixture.detectChanges();
+    expect(document.body.style.overflow).toBe('hidden');
+
+    fixture.componentRef.setInput('visible', false);
+    fixture.detectChanges();
+    expect(document.body.style.overflow).toBe('auto');
+  });
 });

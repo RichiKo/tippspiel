@@ -1,19 +1,28 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Game } from '../../types/game.interface';
 import { Tip, CreateTipDto } from '../../types/tip.interface';
 import { TipsTableComponent } from '../tips-table/tips-table.component';
+import { UI_ICONS } from '../../../ui-lib/public-api';
 
 @Component({
   selector: 'app-game-card',
-  imports: [CommonModule, FormsModule, TranslateModule, TipsTableComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    TipsTableComponent,
+    LucideAngularModule,
+  ],
   templateUrl: './game-card.component.html',
   styleUrl: './game-card.component.scss',
 })
 export class GameCardComponent {
   private readonly translate = inject(TranslateService);
+  readonly icons = UI_ICONS;
 
   game = input.required<Game>();
   tip = input<Tip | undefined>();

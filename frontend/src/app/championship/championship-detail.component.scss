@@ -797,6 +797,8 @@ app-game-card:last-child {
   .round-drawer-list {
     flex: 1;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     padding: 6px 0 14px;
   }
 

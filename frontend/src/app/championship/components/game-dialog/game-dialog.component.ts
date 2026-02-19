@@ -1,7 +1,15 @@
-import { Component, output, input, effect } from '@angular/core';
+import {
+  Component,
+  output,
+  input,
+  effect,
+  inject,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import {
   CreateGameDto,
   UpdateGameDto,
@@ -10,10 +18,15 @@ import {
 } from '../../types/game.interface';
 import { Team } from '../../../teams/types/team.interface';
 import { MaterialModule } from '../../../material.module';
+import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-first-native-date-adapter';
 
 @Component({
   selector: 'app-game-dialog',
   imports: [CommonModule, FormsModule, TranslateModule, MaterialModule],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
+    { provide: DateAdapter, useClass: MondayFirstNativeDateAdapter },
+  ],
   template: `
     <div class="dialog-overlay" *ngIf="visible()" (click)="onCancel()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
@@ -141,10 +154,15 @@ import { MaterialModule } from '../../../material.module';
                     'championship.dialogs.game.homeGoalsLabel' | translate
                   }}</label>
                   <input
-                    type="number"
-                    [(ngModel)]="homeScore"
+                    type="tel"
+                    [value]="homeScore ?? ''"
+                    (input)="onHomeScoreChange($event)"
                     name="homeScore"
                     min="0"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    enterkeyhint="done"
+                    autocomplete="off"
                   />
                 </div>
 
@@ -153,10 +171,15 @@ import { MaterialModule } from '../../../material.module';
                     'championship.dialogs.game.awayGoalsLabel' | translate
                   }}</label>
                   <input
-                    type="number"
-                    [(ngModel)]="awayScore"
+                    type="tel"
+                    [value]="awayScore ?? ''"
+                    (input)="onAwayScoreChange($event)"
                     name="awayScore"
                     min="0"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    enterkeyhint="done"
+                    autocomplete="off"
                   />
                 </div>
               </div>
@@ -332,9 +355,10 @@ import { MaterialModule } from '../../../material.module';
 
       @media (max-width: 767px) {
         .dialog-overlay {
-          align-items: flex-end;
+          align-items: center;
           padding-left: max(8px, env(safe-area-inset-left, 0px));
           padding-right: max(8px, env(safe-area-inset-right, 0px));
+          padding-top: max(8px, env(safe-area-inset-top, 0px));
           padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
         }
 
@@ -342,7 +366,7 @@ import { MaterialModule } from '../../../material.module';
           width: 100%;
           max-width: none;
           max-height: min(86dvh, 720px);
-          border-radius: 14px 14px 0 0;
+          border-radius: 14px;
           padding: 1rem;
         }
 
@@ -367,7 +391,7 @@ import { MaterialModule } from '../../../material.module';
     `,
   ],
 })
-export class GameDialogComponent {
+export class GameDialogComponent implements OnDestroy {
   visible = input<boolean>(false);
   gameId = input<string | null>(null);
   gameData = input<Game | null>(null);
@@ -384,8 +408,17 @@ export class GameDialogComponent {
   homeScore: number | null = null;
   awayScore: number | null = null;
   isClosed = false;
+  private readonly dateAdapter = inject<DateAdapter<Date>>(DateAdapter);
+  private isBodyScrollLockedByInstance = false;
 
   constructor() {
+    // Enforce German date/time presentation in the dialog picker controls.
+    this.dateAdapter.setLocale('de-DE');
+
+    effect(() => {
+      this.setBodyScrollLocked(this.visible());
+    });
+
     effect(() => {
       const game = this.gameData();
       if (game) {
@@ -399,6 +432,10 @@ export class GameDialogComponent {
         this.isClosed = game.isClosed;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.setBodyScrollLocked(false);
   }
 
   isValid() {
@@ -420,6 +457,26 @@ export class GameDialogComponent {
     return side === 'home'
       ? this.homeTeamId !== teamId
       : this.awayTeamId !== teamId;
+  }
+
+  onHomeScoreChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const sanitizedValue = target.value.replace(/\D+/g, '');
+    if (target.value !== sanitizedValue) {
+      target.value = sanitizedValue;
+    }
+
+    this.homeScore = this.parseScoreValue(sanitizedValue);
+  }
+
+  onAwayScoreChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const sanitizedValue = target.value.replace(/\D+/g, '');
+    if (target.value !== sanitizedValue) {
+      target.value = sanitizedValue;
+    }
+
+    this.awayScore = this.parseScoreValue(sanitizedValue);
   }
 
   onSubmit() {
@@ -484,6 +541,94 @@ export class GameDialogComponent {
       0,
     );
     return kickoff;
+  }
+
+  private parseScoreValue(value: string): number | null {
+    if (value === '') {
+      return null;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+
+    return Math.max(0, parsed);
+  }
+
+  private setBodyScrollLocked(locked: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const countKey = 'dialogScrollLockCount';
+    const scrollYKey = 'dialogScrollLockScrollY';
+    const bodyOverflowKey = 'dialogScrollLockBodyOverflow';
+    const bodyPositionKey = 'dialogScrollLockBodyPosition';
+    const bodyTopKey = 'dialogScrollLockBodyTop';
+    const bodyWidthKey = 'dialogScrollLockBodyWidth';
+    const htmlOverflowKey = 'dialogScrollLockHtmlOverflow';
+    const currentCount = Number.parseInt(
+      document.body.dataset[countKey] ?? '0',
+      10,
+    );
+
+    if (locked) {
+      if (this.isBodyScrollLockedByInstance) {
+        return;
+      }
+
+      if (currentCount === 0) {
+        const scrollY =
+          typeof window !== 'undefined'
+            ? window.scrollY || window.pageYOffset || 0
+            : 0;
+        document.body.dataset[scrollYKey] = String(scrollY);
+        document.body.dataset[bodyOverflowKey] = document.body.style.overflow;
+        document.body.dataset[bodyPositionKey] = document.body.style.position;
+        document.body.dataset[bodyTopKey] = document.body.style.top;
+        document.body.dataset[bodyWidthKey] = document.body.style.width;
+        document.body.dataset[htmlOverflowKey] =
+          document.documentElement.style.overflow;
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+      }
+
+      document.body.dataset[countKey] = String(currentCount + 1);
+      this.isBodyScrollLockedByInstance = true;
+      return;
+    }
+
+    if (!this.isBodyScrollLockedByInstance) {
+      return;
+    }
+
+    const nextCount = Math.max(0, currentCount - 1);
+    document.body.dataset[countKey] = String(nextCount);
+    this.isBodyScrollLockedByInstance = false;
+
+    if (nextCount === 0) {
+      const scrollY = Number.parseInt(document.body.dataset[scrollYKey] ?? '0', 10);
+      document.body.style.overflow = document.body.dataset[bodyOverflowKey] ?? '';
+      document.body.style.position = document.body.dataset[bodyPositionKey] ?? '';
+      document.body.style.top = document.body.dataset[bodyTopKey] ?? '';
+      document.body.style.width = document.body.dataset[bodyWidthKey] ?? '';
+      document.documentElement.style.overflow =
+        document.body.dataset[htmlOverflowKey] ?? '';
+      if (typeof window !== 'undefined') {
+        window.scrollTo(0, Number.isNaN(scrollY) ? 0 : scrollY);
+      }
+      delete document.body.dataset[scrollYKey];
+      delete document.body.dataset[bodyOverflowKey];
+      delete document.body.dataset[bodyPositionKey];
+      delete document.body.dataset[bodyTopKey];
+      delete document.body.dataset[bodyWidthKey];
+      delete document.body.dataset[htmlOverflowKey];
+      delete document.body.dataset[countKey];
+    }
   }
 
 }

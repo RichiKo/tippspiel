@@ -12,7 +12,12 @@
           [attr.aria-label]="'championship.gameCard.editGame' | translate"
           [attr.title]="'common.edit' | translate"
         >
-          {{ 'common.edit' | translate }}
+          <lucide-icon
+            class="action-icon"
+            [img]="icons.squarePen"
+            [size]="16"
+            aria-hidden="true"
+          ></lucide-icon>
         </button>
         <button
           type="button"
@@ -21,7 +26,12 @@
           [attr.aria-label]="'championship.gameCard.deleteGame' | translate"
           [attr.title]="'common.delete' | translate"
         >
-          {{ 'common.delete' | translate }}
+          <lucide-icon
+            class="action-icon"
+            [img]="icons.trash2"
+            [size]="16"
+            aria-hidden="true"
+          ></lucide-icon>
         </button>
       </div>
     }

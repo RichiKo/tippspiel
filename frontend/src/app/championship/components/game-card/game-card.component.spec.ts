@@ -62,6 +62,23 @@ describe('GameCardComponent', () => {
     expect(inputs[0].getAttribute('autocomplete')).toBe('off');
   });
 
+  it('should render icon-only admin action buttons', () => {
+    fixture.componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+
+    const editButton = fixture.nativeElement.querySelector(
+      '.edit-game-btn',
+    ) as HTMLButtonElement | null;
+    const deleteButton = fixture.nativeElement.querySelector(
+      '.delete-game-btn',
+    ) as HTMLButtonElement | null;
+
+    expect(editButton).toBeTruthy();
+    expect(deleteButton).toBeTruthy();
+    expect(editButton?.querySelector('lucide-icon')).toBeTruthy();
+    expect(deleteButton?.querySelector('lucide-icon')).toBeTruthy();
+  });
+
   it('should sanitize non-digit characters in goal input', () => {
     const input = fixture.nativeElement.querySelector(
       '.goal-input',
