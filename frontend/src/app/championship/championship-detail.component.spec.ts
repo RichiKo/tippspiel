@@ -12,6 +12,7 @@ import { BonusService } from '../bonus/services/bonus.service';
 import { RankingService } from './services/ranking.service';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { Game } from './types/game.interface';
+import { TeamOrigin } from '../teams/types/team.interface';
 
 describe('ChampionshipDetailComponent', () => {
   let component: ChampionshipDetailComponent;
@@ -316,7 +317,57 @@ describe('ChampionshipDetailComponent', () => {
     expect(progressBadge?.textContent?.replace(/\s+/g, ' ').trim()).toContain('1/2');
   });
 
+  it('should hydrate created game with team data when backend returns only team ids', () => {
+    const kickoffTime = new Date('2026-02-03T12:00:00.000Z');
+    const createdGame: Game = {
+      id: 'g3',
+      homeTeamId: 'h3',
+      awayTeamId: 'a3',
+      kickoffTime,
+      roundId: 'r1',
+      homeScore: null,
+      awayScore: null,
+      isClosed: false,
+      createdAt: new Date('2026-02-01T00:00:00.000Z'),
+    };
+
+    mockGameService.createGame.and.returnValue(of(createdGame));
+    component.teams.set([
+      {
+        id: 'h3',
+        name: 'Arsenal',
+        shortName: 'ARS',
+        logoUrl: 'arsenal.png',
+        origin: TeamOrigin.ENGLAND,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      },
+      {
+        id: 'a3',
+        name: 'Barcelona',
+        shortName: 'BAR',
+        logoUrl: 'barcelona.png',
+        origin: TeamOrigin.SPAIN,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      },
+    ]);
+
+    component.onGameDialogConfirmed({
+      homeTeamId: 'h3',
+      awayTeamId: 'a3',
+      kickoffTime,
+    });
+
+    const addedGame = component.games().find((game) => game.id === 'g3');
+    expect(addedGame?.homeTeam?.name).toBe('Arsenal');
+    expect(addedGame?.awayTeam?.name).toBe('Barcelona');
+  });
+
   it('should not open round edit dialog for non-admin', () => {
+    mockPersistingService.currentUser.set({
+      ...mockPersistingService.currentUser(),
+      role: 'user',
+    });
+
     component.onEditRound();
 
     expect(component.showRoundDialog()).toBeFalse();

@@ -337,6 +337,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
       .subscribe({
         next: (data) => {
           this.teams.set(data);
+          const hydratedGames = this.hydrateGamesWithTeams(this.games(), data);
+          this.games.set(hydratedGames);
         },
         error: () => {
           this.error.set(
@@ -410,7 +412,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
       .getGamesByChampionship(this.championshipId, { roundId })
       .subscribe({
         next: (data) => {
-          const sortedGames = data.sort(
+          const hydratedGames = this.hydrateGamesWithTeams(data);
+          const sortedGames = hydratedGames.sort(
             (a, b) =>
               new Date(a.kickoffTime).getTime() -
               new Date(b.kickoffTime).getTime(),
@@ -658,7 +661,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
               const currentGames = this.games();
               const index = currentGames.findIndex((g) => g.id === gameId);
               if (index !== -1) {
-                currentGames[index] = finalGame;
+                currentGames[index] = this.hydrateGameWithTeams(finalGame);
                 const sortedGames = [...currentGames].sort(
                   (a, b) =>
                     new Date(a.kickoffTime).getTime() -
@@ -703,7 +706,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
       this.gameService.createGame(round.id, dto as CreateGameDto).subscribe({
         next: (game) => {
           const currentGames = this.games();
-          const sortedGames = [...currentGames, game].sort(
+          const hydratedGame = this.hydrateGameWithTeams(game);
+          const sortedGames = [...currentGames, hydratedGame].sort(
             (a, b) =>
               new Date(a.kickoffTime).getTime() -
               new Date(b.kickoffTime).getTime(),
@@ -790,6 +794,33 @@ export class ChampionshipDetailComponent implements OnDestroy {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
+  }
+
+  private hydrateGamesWithTeams(games: Game[], teams = this.teams()): Game[] {
+    if (games.length === 0 || teams.length === 0) {
+      return games;
+    }
+
+    const teamById = new Map(teams.map((team) => [team.id, team]));
+    return games.map((game) => this.hydrateGameWithTeams(game, teamById));
+  }
+
+  private hydrateGameWithTeams(
+    game: Game,
+    teamById = new Map(this.teams().map((team) => [team.id, team])),
+  ): Game {
+    const homeTeam = game.homeTeam ?? teamById.get(game.homeTeamId);
+    const awayTeam = game.awayTeam ?? teamById.get(game.awayTeamId);
+
+    if (!homeTeam && !awayTeam) {
+      return game;
+    }
+
+    return {
+      ...game,
+      homeTeam: homeTeam ?? game.homeTeam,
+      awayTeam: awayTeam ?? game.awayTeam,
+    };
   }
 
   private setBodyScrollLocked(locked: boolean): void {
