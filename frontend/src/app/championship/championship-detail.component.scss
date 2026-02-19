@@ -66,7 +66,7 @@
   border-radius: 20px;
   border: 1px solid rgba(15, 118, 110, 0.45);
   background: linear-gradient(128deg, #0b2d24 0%, #0f5f4c 56%, #10b981 100%);
-  box-shadow: 0 14px 34px rgba(6, 78, 59, 0.2);
+  box-shadow: 0 10px 24px rgba(6, 78, 59, 0.2);
   padding: 20px 24px 20px 10px;
   display: block;
 }
@@ -80,41 +80,6 @@
   z-index: 1;
 }
 
-.championship-header::before {
-  content: "";
-  position: absolute;
-  left: -124px;
-  top: -112px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(167, 243, 208, 0.14) 0%,
-    rgba(167, 243, 208, 0.03) 42%,
-    transparent 74%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.championship-header::after {
-  content: "";
-  position: absolute;
-  right: -84px;
-  bottom: -120px;
-  width: 360px;
-  height: 360px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.2) 0%,
-    transparent 74%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
 .championship-image {
   width: 148px;
   height: 148px;
@@ -122,9 +87,7 @@
   border-radius: 16px;
   flex-shrink: 0;
   border: 1px solid rgba(236, 253, 245, 0.34);
-  box-shadow:
-    0 12px 28px rgba(2, 44, 34, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 20px rgba(2, 44, 34, 0.28);
   z-index: 1;
 }
 
@@ -144,7 +107,6 @@
   color: #ecfdf5;
   overflow-wrap: anywhere;
   text-wrap: balance;
-  text-shadow: 0 3px 14px rgba(2, 44, 34, 0.38);
   max-width: 14ch;
 }
 
@@ -184,12 +146,11 @@
     rgba(15, 23, 42, 0.34),
     rgba(6, 78, 59, 0.38)
   );
-  box-shadow: 0 6px 18px rgba(2, 44, 34, 0.2);
+  box-shadow: 0 4px 12px rgba(2, 44, 34, 0.18);
   transition:
     transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .action-link__icon {
@@ -214,39 +175,10 @@
   --action-accent: #c084fc;
 }
 
-.admin-link {
-  --action-accent: #fbbf24;
-  border-color: rgba(251, 191, 36, 0.5);
-  background: linear-gradient(
-    135deg,
-    rgba(127, 29, 29, 0.46),
-    rgba(146, 64, 14, 0.44)
-  );
-}
-
-.admin-link .action-link__label {
-  color: #fef3c7;
-}
-
-.admin-link:hover {
-  border-color: rgba(251, 191, 36, 0.75);
-  background: linear-gradient(
-    135deg,
-    rgba(127, 29, 29, 0.58),
-    rgba(146, 64, 14, 0.56)
-  );
-  box-shadow: 0 10px 20px rgba(127, 29, 29, 0.34);
-}
-
 .action-links a:hover {
   transform: translateY(-1px);
   border-color: rgba(220, 252, 231, 0.52);
-  background: linear-gradient(
-    135deg,
-    rgba(2, 44, 34, 0.58),
-    rgba(6, 78, 59, 0.52)
-  );
-  box-shadow: 0 10px 20px rgba(2, 44, 34, 0.26);
+  background: rgba(2, 44, 34, 0.5);
 }
 
 .action-links a:focus-visible,
