@@ -44,7 +44,7 @@ import {
   groupGamesByKickoff,
   isFinishedGame,
 } from './utils/spieltag-views.util';
-import { UI_ICONS, UiButtonComponent } from '../ui-lib/public-api';
+import { UI_ICONS, UiBadgeComponent, UiButtonComponent } from '../ui-lib/public-api';
 
 @Component({
   selector: 'app-championship-detail',
@@ -62,6 +62,7 @@ import { UI_ICONS, UiButtonComponent } from '../ui-lib/public-api';
     FinishedGamesAllViewComponent,
     SpieltagsRankingTableComponent,
     UiButtonComponent,
+    UiBadgeComponent,
   ],
   templateUrl: './championship-detail.component.html',
   styleUrl: './championship-detail.component.scss',
@@ -89,6 +90,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
   error = signal<string | null>(null);
 
   showRoundDialog = signal(false);
+  roundInDialog = signal<Round | null>(null);
   showGameDialog = signal(false);
   selectedGame = signal<Game | null>(null);
   showDeleteConfirm = signal(false);
@@ -152,6 +154,30 @@ export class ChampionshipDetailComponent implements OnDestroy {
       this.rankingParticipants(),
     ),
   );
+
+  readonly tippedOpenGamesCount = computed(() =>
+    this.openGames().reduce((count, game) => {
+      const tip = this.userTips().get(game.id);
+      const hasSubmittedTip =
+        tip !== undefined &&
+        tip.homeTeamGoals !== null &&
+        tip.awayTeamGoals !== null;
+      return hasSubmittedTip ? count + 1 : count;
+    }, 0),
+  );
+
+  readonly roundDialogInitialData = computed<CreateRoundDto | null>(() => {
+    const round = this.roundInDialog();
+    if (!round) {
+      return null;
+    }
+
+    return {
+      name: round.name,
+      startDate: new Date(round.startDate),
+      endDate: round.endDate ? new Date(round.endDate) : undefined,
+    };
+  });
 
   championshipId = '';
 
@@ -473,27 +499,128 @@ export class ChampionshipDetailComponent implements OnDestroy {
   }
 
   onCreateRound() {
+    this.roundInDialog.set(null);
+    this.showRoundDialog.set(true);
+  }
+
+  onEditRound(): void {
+    if (!this.isAdmin()) {
+      return;
+    }
+
+    const round = this.selectedRound();
+    if (!round) {
+      return;
+    }
+
+    this.roundInDialog.set(round);
     this.showRoundDialog.set(true);
   }
 
   onRoundDialogConfirmed(dto: CreateRoundDto) {
+    const roundToEdit = this.roundInDialog();
+
+    if (roundToEdit) {
+      if (!this.isAdmin()) {
+        this.showRoundDialog.set(false);
+        this.roundInDialog.set(null);
+        return;
+      }
+
+      this.roundService.updateRound(roundToEdit.id, dto).subscribe({
+        next: (updatedRound) => {
+          const updatedRounds = this.rounds().map((round) =>
+            round.id === updatedRound.id ? updatedRound : round,
+          );
+          this.rounds.set(updatedRounds);
+
+          if (this.selectedRound()?.id === updatedRound.id) {
+            this.selectRound(updatedRound);
+          }
+
+          this.showRoundDialog.set(false);
+          this.roundInDialog.set(null);
+        },
+        error: () => {
+          this.error.set(
+            this.translate.instant('championship.detail.errors.updateRound'),
+          );
+          this.showRoundDialog.set(false);
+          this.roundInDialog.set(null);
+        },
+      });
+      return;
+    }
+
     this.roundService.createRound(this.championshipId, dto).subscribe({
       next: (round) => {
         const currentRounds = this.rounds();
         this.rounds.set([...currentRounds, round]);
         this.showRoundDialog.set(false);
+        this.roundInDialog.set(null);
       },
       error: () => {
         this.error.set(
           this.translate.instant('championship.detail.errors.createRound'),
         );
         this.showRoundDialog.set(false);
+        this.roundInDialog.set(null);
+      },
+    });
+  }
+
+  onRoundDialogDeleted(): void {
+    const roundToDelete = this.roundInDialog();
+    if (!roundToDelete) {
+      this.showRoundDialog.set(false);
+      return;
+    }
+
+    if (!this.isAdmin()) {
+      this.showRoundDialog.set(false);
+      this.roundInDialog.set(null);
+      return;
+    }
+
+    this.roundService.deleteRound(roundToDelete.id).subscribe({
+      next: () => {
+        const remainingRounds = this.rounds().filter(
+          (round) => round.id !== roundToDelete.id,
+        );
+        this.rounds.set(remainingRounds);
+
+        if (this.selectedRound()?.id === roundToDelete.id) {
+          const nextRound =
+            remainingRounds.length > 0
+              ? remainingRounds[remainingRounds.length - 1]
+              : null;
+          this.selectedRound.set(nextRound);
+
+          if (nextRound) {
+            this.loadGames(nextRound.id);
+          } else {
+            this.games.set([]);
+            this.userTips.set(new Map());
+            this.gameTips.set(new Map());
+          }
+        }
+
+        this.showRoundDialog.set(false);
+        this.roundInDialog.set(null);
+      },
+      error: () => {
+        this.error.set(
+          this.translate.instant('championship.detail.errors.deleteRound'),
+        );
+        this.showRoundDialog.set(false);
+        this.roundInDialog.set(null);
       },
     });
   }
 
   onRoundDialogCancelled() {
     this.showRoundDialog.set(false);
+    this.roundInDialog.set(null);
   }
 
   onAddGame() {

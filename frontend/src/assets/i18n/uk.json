@@ -487,12 +487,15 @@
       },
       "actions": {
         "newRound": "+ Новий тур",
+        "editRound": "Редагувати тур",
         "addGame": "+ Додати матч"
       },
       "sections": {
         "finishedGames": "Оцінені матчі",
+        "finishedGamesProgress": "Оцінених матчів: {{evaluated}} з {{total}}",
         "noFinishedResults": "Наразі ще немає результатів.",
         "openGames": "Відкриті матчі",
+        "openGamesTipsProgress": "Подано прогнозів на відкриті матчі: {{filled}} з {{total}}",
         "noOpenGames": "Наразі немає відкритих матчів."
       },
       "views": {
@@ -513,6 +516,8 @@
         "loadGames": "Не вдалося завантажити матчі.",
         "saveTip": "Не вдалося зберегти прогноз.",
         "createRound": "Не вдалося створити тур.",
+        "updateRound": "Не вдалося оновити тур.",
+        "deleteRound": "Не вдалося видалити тур.",
         "updateResult": "Не вдалося оновити результат.",
         "updateGame": "Не вдалося оновити матч.",
         "createGame": "Не вдалося створити матч.",
@@ -527,6 +532,8 @@
         "namePlaceholder": "напр. Груповий етап 1",
         "startDateLabel": "Дата початку",
         "endDateLabel": "Дата завершення (необов'язково)",
+        "delete": "Видалити тур",
+        "deleteConfirmMessage": "Ви дійсно хочете видалити цей тур? Усі пов'язані матчі та прогнози також будуть видалені.",
         "create": "Створити",
         "update": "Оновити"
       },

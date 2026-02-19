@@ -225,6 +225,7 @@
 .action-links a:focus-visible,
 .detail-back-btn:focus-visible,
 .create-round-btn:focus-visible,
+.edit-round-mobile-btn:focus-visible,
 .round-drawer-fab:focus-visible,
 .round-drawer-close:focus-visible,
 .round-drawer-item:focus-visible,
@@ -322,6 +323,30 @@
   box-shadow: 0 10px 20px rgba(15, 118, 110, 0.28);
 }
 
+.edit-round-mobile-btn {
+  min-height: 44px;
+  margin: 0 12px 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(15, 118, 110, 0.32);
+  border-radius: 10px;
+  background: #edf8f5;
+  color: #0f5f4c;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.edit-round-mobile-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 118, 110, 0.46);
+  background: #e4f4ef;
+}
+
 .rounds-list {
   overflow-y: auto;
   padding-bottom: 0px;
@@ -393,6 +418,14 @@
   font-size: clamp(1.6rem, 3vw, 2.1rem);
 }
 
+.games-header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .spieltag-view-toggle {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -453,6 +486,23 @@
 .open-games-section {
   border-top: 1px solid #e8edf1;
   padding-top: 16px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.section-title-row .finished-games-title {
+  margin: 0;
+}
+
+.finished-games-progress,
+.open-games-progress {
+  flex-shrink: 0;
 }
 
 .open-games-title {
@@ -688,6 +738,11 @@ app-game-card:last-child {
     width: 100%;
   }
 
+  .mobile-round-switcher .edit-round-mobile-btn {
+    margin: 0;
+    width: 100%;
+  }
+
   .round-drawer-overlay {
     display: block;
     position: fixed;
@@ -863,7 +918,14 @@ app-game-card:last-child {
     margin-bottom: 14px;
   }
 
-  .games-header .add-game-btn {
+  .games-header-actions {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .games-header-actions ui-button {
+    display: flex;
     width: 100%;
   }
 
@@ -891,6 +953,10 @@ app-game-card:last-child {
 
   .open-games-section {
     padding-top: 12px;
+  }
+
+  .section-title-row {
+    margin-bottom: 8px;
   }
 
   .open-games-title {
@@ -924,6 +990,7 @@ app-game-card:last-child {
 @media (prefers-reduced-motion: reduce) {
   .action-links a,
   .create-round-btn,
+  .edit-round-mobile-btn,
   .round-drawer,
   .round-drawer-overlay,
   .round-item,

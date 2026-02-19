@@ -169,6 +169,15 @@
             >
               {{ "championship.detail.actions.newRound" | translate }}
             </button>
+            @if (selectedRound()) {
+              <button
+                type="button"
+                class="edit-round-mobile-btn"
+                (click)="onEditRound()"
+              >
+                {{ "championship.detail.actions.editRound" | translate }}
+              </button>
+            }
           }
         </div>
       }
@@ -210,21 +219,61 @@
           <div class="games-header">
             <h2>{{ round.name }}</h2>
             @if (isAdmin()) {
-              <ui-button
-                type="button"
-                class="add-game-btn"
-                size="lg"
-                (click)="onAddGame()"
-              >
-                {{ "championship.detail.actions.addGame" | translate }}
-              </ui-button>
+              <div class="games-header-actions">
+                @if (!isMobileView()) {
+                  <ui-button
+                    type="button"
+                    variant="secondary"
+                    class="edit-round-btn"
+                    size="lg"
+                    (click)="onEditRound()"
+                  >
+                    {{ "championship.detail.actions.editRound" | translate }}
+                  </ui-button>
+                }
+                <ui-button
+                  type="button"
+                  class="add-game-btn"
+                  size="lg"
+                  [fullWidth]="isMobileView()"
+                  (click)="onAddGame()"
+                >
+                  {{ "championship.detail.actions.addGame" | translate }}
+                </ui-button>
+              </div>
             }
           </div>
 
           <section class="finished-games-section">
-            <h3 class="finished-games-title">
-              {{ "championship.detail.sections.finishedGames" | translate }}
-            </h3>
+            <div class="section-title-row">
+              <h3 class="finished-games-title">
+                {{ "championship.detail.sections.finishedGames" | translate }}
+              </h3>
+              @if (games().length > 0) {
+                <ui-badge
+                  class="finished-games-progress"
+                  tone="info"
+                  appearance="soft"
+                  [attr.aria-label]="
+                    'championship.detail.sections.finishedGamesProgress'
+                      | translate
+                        : { evaluated: finishedGames().length, total: games().length }
+                  "
+                  [attr.title]="
+                    'championship.detail.sections.finishedGamesProgress'
+                      | translate
+                        : { evaluated: finishedGames().length, total: games().length }
+                  "
+                >
+                  <lucide-icon
+                    [img]="icons.circleCheckBig"
+                    [size]="13"
+                    aria-hidden="true"
+                  ></lucide-icon>
+                  {{ finishedGames().length }}/{{ games().length }}
+                </ui-badge>
+              }
+            </div>
             @if (finishedGames().length > 0) {
               <div
                 class="spieltag-view-toggle"
@@ -307,9 +356,31 @@
           </section>
 
           <section class="open-games-section">
-            <h3 class="finished-games-title">
-              {{ "championship.detail.sections.openGames" | translate }}
-            </h3>
+            <div class="section-title-row">
+              <h3 class="finished-games-title">
+                {{ "championship.detail.sections.openGames" | translate }}
+              </h3>
+              @if (openGames().length > 0) {
+                <ui-badge
+                  class="open-games-progress"
+                  tone="info"
+                  appearance="soft"
+                  [attr.aria-label]="
+                    'championship.detail.sections.openGamesTipsProgress'
+                      | translate
+                        : { filled: tippedOpenGamesCount(), total: openGames().length }
+                  "
+                  [attr.title]="
+                    'championship.detail.sections.openGamesTipsProgress'
+                      | translate
+                        : { filled: tippedOpenGamesCount(), total: openGames().length }
+                  "
+                >
+                  <lucide-icon [img]="icons.table" [size]="13" aria-hidden="true"></lucide-icon>
+                  {{ tippedOpenGamesCount() }}/{{ openGames().length }}
+                </ui-badge>
+              }
+            </div>
             @if (openGamesGroupedByDate().length > 0) {
               <div class="games-list">
                 @for (group of openGamesGroupedByDate(); track group.date) {
@@ -412,7 +483,10 @@
 
   <app-round-dialog
     [visible]="showRoundDialog()"
+    [roundId]="roundInDialog()?.id ?? null"
+    [initialData]="roundDialogInitialData()"
     (confirmed)="onRoundDialogConfirmed($event)"
+    (deleted)="onRoundDialogDeleted()"
     (cancelled)="onRoundDialogCancelled()"
   />
 

@@ -48,6 +48,11 @@ import { CreateRoundDto } from '../../types/round.interface';
           </div>
 
           <div class="dialog-actions">
+            @if (roundId()) {
+              <button type="button" class="delete-btn" (click)="onDeleteClick()">
+                {{ 'championship.dialogs.round.delete' | translate }}
+              </button>
+            }
             <button type="button" class="cancel-btn" (click)="onCancel()">
               {{ 'common.cancel' | translate }}
             </button>
@@ -59,6 +64,22 @@ import { CreateRoundDto } from '../../types/round.interface';
               }}
             </button>
           </div>
+
+          @if (showDeleteConfirmation) {
+            <div class="delete-confirm">
+              <p class="delete-confirm-message">
+                {{ 'championship.dialogs.round.deleteConfirmMessage' | translate }}
+              </p>
+              <div class="delete-confirm-actions">
+                <button type="button" class="cancel-btn" (click)="onDeleteAbort()">
+                  {{ 'common.cancel' | translate }}
+                </button>
+                <button type="button" class="delete-btn" (click)="onDeleteConfirm()">
+                  {{ 'common.delete' | translate }}
+                </button>
+              </div>
+            </div>
+          }
         </form>
       </div>
     </div>
@@ -121,6 +142,7 @@ import { CreateRoundDto } from '../../types/round.interface';
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
+        flex-wrap: wrap;
 
         button {
           padding: 0.75rem 1.5rem;
@@ -146,6 +168,43 @@ import { CreateRoundDto } from '../../types/round.interface';
               background: #1565c0;
             }
           }
+
+          &.delete-btn {
+            background: #dc2626;
+            color: #ffffff;
+
+            &:hover {
+              background: #b91c1c;
+            }
+          }
+        }
+      }
+
+      .delete-confirm {
+        margin-top: 1rem;
+        padding: 0.9rem;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        background: #fef2f2;
+      }
+
+      .delete-confirm-message {
+        margin: 0 0 0.75rem;
+        color: #7f1d1d;
+        font-weight: 600;
+      }
+
+      .delete-confirm-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+
+        button {
+          padding: 0.65rem 1.1rem;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.95rem;
         }
       }
     }
@@ -179,6 +238,15 @@ import { CreateRoundDto } from '../../types/round.interface';
         width: 100%;
         min-height: 44px;
       }
+
+      .dialog-content .delete-confirm-actions {
+        flex-direction: column-reverse;
+      }
+
+      .dialog-content .delete-confirm-actions button {
+        width: 100%;
+        min-height: 44px;
+      }
     }
   `],
 })
@@ -189,15 +257,24 @@ export class RoundDialogComponent implements OnDestroy {
 
   confirmed = output<CreateRoundDto>();
   cancelled = output<void>();
+  deleted = output<void>();
 
   name = '';
   startDate = '';
   endDate = '';
+  showDeleteConfirmation = false;
   private isBodyScrollLockedByInstance = false;
 
   constructor() {
     effect(() => {
       this.setBodyScrollLocked(this.visible());
+    });
+
+    effect(() => {
+      if (!this.visible()) {
+        return;
+      }
+      this.applyInitialData();
     });
   }
 
@@ -206,8 +283,13 @@ export class RoundDialogComponent implements OnDestroy {
   }
 
   onSubmit() {
+    const normalizedName = this.name.trim();
+    if (!normalizedName || !this.startDate) {
+      return;
+    }
+
     const dto: CreateRoundDto = {
-      name: this.name,
+      name: normalizedName,
       startDate: new Date(this.startDate),
     };
     
@@ -224,10 +306,51 @@ export class RoundDialogComponent implements OnDestroy {
     this.reset();
   }
 
+  onDeleteClick(): void {
+    this.showDeleteConfirmation = true;
+  }
+
+  onDeleteAbort(): void {
+    this.showDeleteConfirmation = false;
+  }
+
+  onDeleteConfirm(): void {
+    this.deleted.emit();
+    this.reset();
+  }
+
+  private applyInitialData(): void {
+    const initial = this.initialData();
+    if (!initial) {
+      this.reset();
+      return;
+    }
+
+    this.name = initial.name ?? '';
+    this.startDate = this.toDateInputValue(initial.startDate);
+    this.endDate = initial.endDate
+      ? this.toDateInputValue(initial.endDate)
+      : '';
+    this.showDeleteConfirmation = false;
+  }
+
+  private toDateInputValue(value: Date | string): string {
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private reset() {
     this.name = '';
     this.startDate = '';
     this.endDate = '';
+    this.showDeleteConfirmation = false;
   }
 
   private setBodyScrollLocked(locked: boolean): void {

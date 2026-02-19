@@ -487,12 +487,15 @@
       },
       "actions": {
         "newRound": "+ Neuer Spieltag",
+        "editRound": "Spieltag bearbeiten",
         "addGame": "+ Spiel hinzufuegen"
       },
       "sections": {
         "finishedGames": "Ausgewertete Spiele",
+        "finishedGamesProgress": "Ausgewertete Spiele: {{evaluated}} von {{total}}",
         "noFinishedResults": "Momentan gibt es noch keine Ergebnisse.",
         "openGames": "Offene Spiele",
+        "openGamesTipsProgress": "Abgegebene Tipps bei offenen Spielen: {{filled}} von {{total}}",
         "noOpenGames": "Momentan gibt es keine offenen Spiele."
       },
       "views": {
@@ -513,6 +516,8 @@
         "loadGames": "Spiele konnten nicht geladen werden.",
         "saveTip": "Tipp konnte nicht gespeichert werden.",
         "createRound": "Spieltag konnte nicht erstellt werden.",
+        "updateRound": "Spieltag konnte nicht aktualisiert werden.",
+        "deleteRound": "Spieltag konnte nicht geloescht werden.",
         "updateResult": "Ergebnis konnte nicht aktualisiert werden.",
         "updateGame": "Spiel konnte nicht aktualisiert werden.",
         "createGame": "Spiel konnte nicht erstellt werden.",
@@ -527,6 +532,8 @@
         "namePlaceholder": "z.B. Vorrunde 1",
         "startDateLabel": "Startdatum",
         "endDateLabel": "Enddatum (optional)",
+        "delete": "Spieltag loeschen",
+        "deleteConfirmMessage": "Moechtest du diesen Spieltag wirklich loeschen? Alle zugehoerigen Spiele und Tipps werden ebenfalls entfernt.",
         "create": "Erstellen",
         "update": "Aktualisieren"
       },

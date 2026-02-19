@@ -79,6 +79,19 @@ describe('ChampionshipDetailComponent', () => {
         ]),
       ),
     createRound: jasmine.createSpy('createRound').and.returnValue(of()),
+    updateRound: jasmine
+      .createSpy('updateRound')
+      .and.callFake((id: string, dto: { name: string; startDate: Date; endDate?: Date }) =>
+        of({
+          id,
+          name: dto.name,
+          startDate: dto.startDate,
+          endDate: dto.endDate ?? null,
+          championshipId: 'champ-1',
+          createdAt: new Date('2026-01-01T00:00:00.000Z'),
+        }),
+      ),
+    deleteRound: jasmine.createSpy('deleteRound').and.returnValue(of(void 0)),
   };
 
   const mockGameService = {
@@ -258,5 +271,91 @@ describe('ChampionshipDetailComponent', () => {
 
     expect(mockTipService.getTipsForGame).toHaveBeenCalledWith('g2');
     expect(startedGameTips.some((tip) => tip.outcomeType === 'notTipped')).toBeTrue();
+  });
+
+  it('should show open games tip progress in section header', () => {
+    const progressBadge = fixture.nativeElement.querySelector(
+      '.open-games-progress',
+    ) as HTMLElement | null;
+
+    expect(progressBadge).toBeTruthy();
+    expect(progressBadge?.textContent?.replace(/\s+/g, ' ').trim()).toContain('0/1');
+
+    component.userTips.set(
+      new Map([
+        [
+          'g2',
+          {
+            gameId: 'g2',
+            championshipId: 'champ-1',
+            userId: 1,
+            homeTeamGoals: 1,
+            awayTeamGoals: 0,
+            points: null,
+            outcomeType: null,
+          },
+        ],
+      ]),
+    );
+    fixture.detectChanges();
+
+    const updatedProgressBadge = fixture.nativeElement.querySelector(
+      '.open-games-progress',
+    ) as HTMLElement | null;
+    expect(updatedProgressBadge?.textContent?.replace(/\s+/g, ' ').trim()).toContain(
+      '1/1',
+    );
+  });
+
+  it('should show finished games progress in section header', () => {
+    const progressBadge = fixture.nativeElement.querySelector(
+      '.finished-games-progress',
+    ) as HTMLElement | null;
+
+    expect(progressBadge).toBeTruthy();
+    expect(progressBadge?.textContent?.replace(/\s+/g, ' ').trim()).toContain('1/2');
+  });
+
+  it('should not open round edit dialog for non-admin', () => {
+    component.onEditRound();
+
+    expect(component.showRoundDialog()).toBeFalse();
+    expect(component.roundInDialog()).toBeNull();
+  });
+
+  it('should update selected round from round dialog confirmation in edit mode', () => {
+    mockPersistingService.currentUser.set({
+      ...mockPersistingService.currentUser(),
+      role: 'admin',
+    });
+
+    const selected = component.selectedRound();
+    expect(selected).toBeTruthy();
+
+    component.onEditRound();
+    component.onRoundDialogConfirmed({
+      name: 'Runde 1 korrigiert',
+      startDate: new Date('2026-02-01T00:00:00.000Z'),
+      endDate: new Date('2026-02-04T00:00:00.000Z'),
+    });
+
+    expect(mockRoundService.updateRound).toHaveBeenCalled();
+    expect(component.selectedRound()?.name).toBe('Runde 1 korrigiert');
+    expect(component.showRoundDialog()).toBeFalse();
+  });
+
+  it('should delete selected round from round dialog and clear games', () => {
+    mockPersistingService.currentUser.set({
+      ...mockPersistingService.currentUser(),
+      role: 'admin',
+    });
+
+    component.onEditRound();
+    component.onRoundDialogDeleted();
+
+    expect(mockRoundService.deleteRound).toHaveBeenCalled();
+    expect(component.rounds().length).toBe(0);
+    expect(component.selectedRound()).toBeNull();
+    expect(component.games().length).toBe(0);
   });
 });
