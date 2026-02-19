@@ -297,7 +297,7 @@
                   <mat-form-field appearance="outline" class="form-select-field">
                     <mat-select formControlName="finalistTeam1Id">
                       <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
-                      @for (team of availableTeams(); track team.id) {
+                      @for (team of sortedAvailableTeams(); track team.id) {
                         <mat-option [value]="team.id">{{ team.name }}</mat-option>
                       }
                     </mat-select>
@@ -309,7 +309,7 @@
                   <mat-form-field appearance="outline" class="form-select-field">
                     <mat-select formControlName="finalistTeam2Id">
                       <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
-                      @for (team of availableTeams(); track team.id) {
+                      @for (team of sortedAvailableTeams(); track team.id) {
                         <mat-option [value]="team.id">{{ team.name }}</mat-option>
                       }
                     </mat-select>
@@ -323,7 +323,7 @@
                       formControlName="finalistTeam1Id"
                       [disabled]="true"
                     >
-                      @for (team of availableTeams(); track team.id) {
+                      @for (team of sortedAvailableTeams(); track team.id) {
                         <mat-option [value]="team.id">{{ team.name }}</mat-option>
                       }
                     </mat-select>
@@ -337,7 +337,7 @@
                       formControlName="finalistTeam2Id"
                       [disabled]="true"
                     >
-                      @for (team of availableTeams(); track team.id) {
+                      @for (team of sortedAvailableTeams(); track team.id) {
                         <mat-option [value]="team.id">{{ team.name }}</mat-option>
                       }
                     </mat-select>
@@ -364,7 +364,7 @@
                 <mat-form-field appearance="outline" class="form-select-field">
                   <mat-select formControlName="championTeamId">
                     <mat-option value="">{{ 'bonus.admin.evaluate.selectTeam' | translate }}</mat-option>
-                    @for (team of availableTeams(); track team.id) {
+                    @for (team of sortedAvailableTeams(); track team.id) {
                       <mat-option [value]="team.id">{{ team.name }}</mat-option>
                     }
                   </mat-select>

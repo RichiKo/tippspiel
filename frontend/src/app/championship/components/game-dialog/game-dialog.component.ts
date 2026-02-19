@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   output,
   input,
   effect,
@@ -53,7 +54,7 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
                 <mat-option [value]="''">
                   {{ 'championship.dialogs.game.selectTeamOption' | translate }}
                 </mat-option>
-                @for (team of teams(); track team.id) {
+                @for (team of sortedTeams(); track team.id) {
                   <mat-option
                     [value]="team.id"
                     [disabled]="isTeamDisabled(team.id, 'home')"
@@ -86,7 +87,7 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
                 <mat-option [value]="''">
                   {{ 'championship.dialogs.game.selectTeamOption' | translate }}
                 </mat-option>
-                @for (team of teams(); track team.id) {
+                @for (team of sortedTeams(); track team.id) {
                   <mat-option
                     [value]="team.id"
                     [disabled]="isTeamDisabled(team.id, 'away')"
@@ -397,6 +398,12 @@ export class GameDialogComponent implements OnDestroy {
   gameData = input<Game | null>(null);
   teams = input<Team[]>([]);
   eliminatedTeamIds = input<string[]>([]);
+
+  readonly sortedTeams = computed(() =>
+    [...this.teams()].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+    ),
+  );
 
   confirmed = output<CreateGameDto | UpdateGameDto | UpdateGameResultDto>();
   cancelled = output<void>();

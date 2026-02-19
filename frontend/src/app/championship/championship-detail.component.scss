@@ -67,15 +67,35 @@
   border: 1px solid rgba(15, 118, 110, 0.45);
   background: linear-gradient(128deg, #0b2d24 0%, #0f5f4c 56%, #10b981 100%);
   box-shadow: 0 14px 34px rgba(6, 78, 59, 0.2);
-  padding: 26px;
+  padding: 20px 24px 20px 10px;
   display: block;
 }
 
 .championship-heading-row {
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  margin-bottom: 10px;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.championship-header::before {
+  content: "";
+  position: absolute;
+  left: -124px;
+  top: -112px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(167, 243, 208, 0.14) 0%,
+    rgba(167, 243, 208, 0.03) 42%,
+    transparent 74%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .championship-header::after {
@@ -96,13 +116,15 @@
 }
 
 .championship-image {
-  width: 124px;
-  height: 124px;
+  width: 148px;
+  height: 148px;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 16px;
   flex-shrink: 0;
-  border: 1px solid rgba(236, 253, 245, 0.28);
-  box-shadow: 0 10px 26px rgba(2, 44, 34, 0.35);
+  border: 1px solid rgba(236, 253, 245, 0.34);
+  box-shadow:
+    0 12px 28px rgba(2, 44, 34, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   z-index: 1;
 }
 
@@ -114,11 +136,16 @@
 }
 
 .championship-title {
-  margin: 0 0 8px;
-  font-size: clamp(2.1rem, 3.8vw, 3.2rem);
-  line-height: 1.02;
+  margin: 0 0 6px;
+  font-size: clamp(1.95rem, 3.7vw, 3.05rem);
+  line-height: 1.04;
+  letter-spacing: 0;
+  font-weight: 600;
   color: #ecfdf5;
   overflow-wrap: anywhere;
+  text-wrap: balance;
+  text-shadow: 0 3px 14px rgba(2, 44, 34, 0.38);
+  max-width: 14ch;
 }
 
 .championship-info p {
@@ -595,31 +622,31 @@ app-game-card:last-child {
   .bonus-section-full,
   .championship-content {
     width: auto;
-    margin-left: max(10px, env(safe-area-inset-left, 0px));
-    margin-right: max(10px, env(safe-area-inset-right, 0px));
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
     margin-bottom: 12px;
   }
 
   .detail-back-row {
     width: auto;
-    margin-left: max(10px, env(safe-area-inset-left, 0px));
-    margin-right: max(10px, env(safe-area-inset-right, 0px));
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+    margin-right: max(8px, env(safe-area-inset-right, 0px));
     margin-bottom: 8px;
   }
 
   .championship-header {
-    padding: 16px;
+    padding: 12px 12px 12px 6px;
     border-radius: 16px;
   }
 
   .championship-heading-row {
-    gap: 14px;
+    gap: 20px;
     margin-bottom: 8px;
   }
 
   .championship-image {
-    width: 90px;
-    height: 90px;
+    width: 112px;
+    height: 112px;
     border-radius: 12px;
   }
 
@@ -641,9 +668,10 @@ app-game-card:last-child {
   }
 
   .championship-title {
-    font-size: clamp(1.95rem, 9vw, 2.7rem);
-    line-height: 1.06;
+    font-size: clamp(1.68rem, 7.2vw, 2.15rem);
+    line-height: 1.08;
     margin-bottom: 6px;
+    max-width: 12ch;
   }
 
   .championship-info p {

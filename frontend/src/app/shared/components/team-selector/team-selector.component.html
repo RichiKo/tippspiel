@@ -25,7 +25,7 @@
             [disabled]="disabled()"
           >
             <mat-option value="ALL">{{ 'teamSelector.allOrigins' | translate }}</mat-option>
-            @for (origin of originOptions; track origin) {
+            @for (origin of sortedOriginOptions(); track origin) {
               <mat-option [value]="origin">{{ getOriginLabel(origin) }}</mat-option>
             }
           </mat-select>

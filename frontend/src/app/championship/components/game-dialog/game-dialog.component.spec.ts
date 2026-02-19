@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatTimepicker } from '@angular/material/timepicker';
 import { GameDialogComponent } from './game-dialog.component';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { TeamOrigin } from '../../../teams/types/team.interface';
 
 describe('GameDialogComponent', () => {
   let component: GameDialogComponent;
@@ -92,6 +93,33 @@ describe('GameDialogComponent', () => {
     expect(awayInput.value).toBe('03');
     expect(component.homeScore).toBe(12);
     expect(component.awayScore).toBe(3);
+  });
+
+  it('sorts team select options alphabetically by name', () => {
+    fixture.componentRef.setInput('teams', [
+      {
+        id: 'team-2',
+        name: 'Juventus',
+        shortName: 'JUV',
+        logoUrl: 'https://example.com/juve.png',
+        origin: TeamOrigin.ITALY,
+        createdAt: new Date('2026-01-02T00:00:00.000Z'),
+      },
+      {
+        id: 'team-1',
+        name: 'Barcelona',
+        shortName: 'BAR',
+        logoUrl: 'https://example.com/barca.png',
+        origin: TeamOrigin.SPAIN,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      },
+    ]);
+    fixture.detectChanges();
+
+    expect(component.sortedTeams().map((team) => team.name)).toEqual([
+      'Barcelona',
+      'Juventus',
+    ]);
   });
 
   it('locks body scroll while dialog is visible and restores it after close', () => {

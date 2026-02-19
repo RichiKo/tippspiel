@@ -60,6 +60,13 @@ export class TeamCardComponent {
 
   readonly icons = UI_ICONS;
   readonly originOptions = TEAM_ORIGIN_OPTIONS;
+  readonly sortedOriginOptions = computed(() =>
+    [...this.originOptions].sort((a, b) =>
+      this.getOriginLabel(a).localeCompare(this.getOriginLabel(b), undefined, {
+        sensitivity: 'base',
+      }),
+    ),
+  );
   readonly isAdmin = computed(
     () => this.persistingService.currentUser()?.role === 'admin',
   );

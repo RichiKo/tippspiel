@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -54,6 +55,12 @@ export class BonusPickFormComponent {
   ruleUpdateMode = signal<Set<string>>(new Set());
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+
+  readonly sortedAvailableTeams = computed(() =>
+    [...this.availableTeams()].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+    ),
+  );
 
   BonusRuleType = BonusRuleType;
   readonly icons = UI_ICONS;

@@ -80,7 +80,7 @@
               <mat-option [value]="null" disabled>
                 {{ 'bonus.pickForm.selectOption' | translate }}
               </mat-option>
-              @for (team of availableTeams(); track team.id) {
+              @for (team of sortedAvailableTeams(); track team.id) {
                 <mat-option [value]="team.id" [disabled]="isEliminatedTeam(team.id)">
                   {{
                     team.name +

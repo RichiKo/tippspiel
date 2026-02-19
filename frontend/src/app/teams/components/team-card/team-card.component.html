@@ -45,7 +45,7 @@
         <label for="origin">{{ 'teams.form.originLabel' | translate }}</label>
         <mat-form-field appearance="outline" class="select-field">
           <mat-select id="origin" formControlName="origin">
-            @for (origin of originOptions; track origin) {
+            @for (origin of sortedOriginOptions(); track origin) {
               <mat-option [value]="origin">{{ getOriginLabel(origin) }}</mat-option>
             }
           </mat-select>

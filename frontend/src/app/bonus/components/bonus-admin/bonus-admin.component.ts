@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   input,
   signal,
   inject,
@@ -52,6 +53,12 @@ export class BonusAdminComponent {
 
   championshipId = input.required<string>();
   availableTeams = input.required<TeamOption[]>();
+
+  readonly sortedAvailableTeams = computed(() =>
+    [...this.availableTeams()].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+    ),
+  );
 
   bonusRules = signal<BonusRule[]>([]);
   isLoading = signal<boolean>(false);
@@ -503,12 +510,12 @@ export class BonusAdminComponent {
       return [];
     }
     if (rule.type === BonusRuleType.CHAMPION) {
-      return this.availableTeams();
+      return this.sortedAvailableTeams();
     }
 
     const finalist1 = this.evaluateForm.value.finalistTeam1Id || '';
     const finalist2 = this.evaluateForm.value.finalistTeam2Id || '';
     const finalistIds = new Set([finalist1, finalist2].filter(Boolean));
-    return this.availableTeams().filter((team) => finalistIds.has(team.id));
+    return this.sortedAvailableTeams().filter((team) => finalistIds.has(team.id));
   }
 }

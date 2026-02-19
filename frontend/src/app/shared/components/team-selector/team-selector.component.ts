@@ -50,6 +50,13 @@ export class TeamSelectorComponent {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly originOptions = TEAM_ORIGIN_OPTIONS;
+  readonly sortedOriginOptions = computed(() =>
+    [...this.originOptions].sort((a, b) =>
+      this.getOriginLabel(a).localeCompare(this.getOriginLabel(b), undefined, {
+        sensitivity: 'base',
+      }),
+    ),
+  );
 
   // Computed
   readonly selectedTeams = computed(() => {
@@ -84,8 +91,8 @@ export class TeamSelectorComponent {
       filteredTeams: this.teamService.getAllTeams(originFilter),
     }).subscribe({
       next: ({ allTeams, filteredTeams }) => {
-        this.allTeams.set(allTeams);
-        this.filteredTeams.set(filteredTeams);
+        this.allTeams.set(this.sortTeamsByName(allTeams));
+        this.filteredTeams.set(this.sortTeamsByName(filteredTeams));
         this.isLoading.set(false);
       },
       error: () => {
@@ -140,5 +147,11 @@ export class TeamSelectorComponent {
 
   getOriginLabel(origin: TeamOrigin): string {
     return this.translate.instant(`teams.origin.${origin}`);
+  }
+
+  private sortTeamsByName(teams: Team[]): Team[] {
+    return [...teams].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+    );
   }
 }
