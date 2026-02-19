@@ -508,10 +508,6 @@ app-game-card:last-child {
   font-weight: 600;
 }
 
-.section-inline-info--subtle {
-  margin-top: 8px;
-}
-
 .no-selection {
   text-align: center;
   padding: 28px 16px;
@@ -596,7 +592,6 @@ app-game-card:last-child {
     align-items: center;
     text-align: center;
     padding: 9px 10px;
-    white-space: normal;
   }
 
   .championship-title {
@@ -669,10 +664,6 @@ app-game-card:last-child {
     font-weight: 700;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-  }
-
-  .round-drawer-fab:active {
-    transform: scale(0.97);
   }
 
   .mobile-selected-round {
