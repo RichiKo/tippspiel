@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /championship
+Disallow: /teams
+Disallow: /settings
+
+Sitemap: https://tippsliga.com/sitemap.xml

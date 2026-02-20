@@ -4,6 +4,7 @@ import { MaterialModule } from './material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { PersistingService } from './auth/services/persisisting.service';
+import { SeoService } from './shared/services/seo.service';
 
 @Component({
   selector: 'app-root',
@@ -20,9 +21,12 @@ import { PersistingService } from './auth/services/persisisting.service';
 export class AppComponent {
   title = 'TippsLiga';
   private readonly persistingService = inject(PersistingService);
+  private readonly seoService = inject(SeoService);
   readonly currentUser = this.persistingService.currentUser;
 
   constructor() {
+    this.seoService.init();
+
     // Add/remove body class based on authentication status
     effect(() => {
       const user = this.currentUser();
