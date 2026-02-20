@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
 import { Router } from '@angular/router';
 import { MaterialModule } from '../../../material.module';
@@ -23,6 +24,7 @@ export class LoginComponent {
   router = inject(Router);
   fb = inject(FormBuilder);
   translate = inject(TranslateService);
+  private readonly document = inject(DOCUMENT);
 
   switchMode = output<void>();
 
@@ -47,11 +49,15 @@ export class LoginComponent {
 
     const { email, password } = this.form.getRawValue();
     this.isSubmitting = true;
+    this.blurActiveElement();
 
     this.authService.login(email, password).subscribe({
       next: (user) => {
         this.persistingService.save(user.user);
-        this.router.navigate(['/dashboard']);
+        this.blurActiveElement();
+        this.router.navigate(['/dashboard']).then(() => {
+          this.resetViewportPosition();
+        });
       },
       error: (error: HttpErrorResponse) => {
         this.authError = this.resolveAuthErrorMessage(error);
@@ -70,6 +76,23 @@ export class LoginComponent {
   shouldShowError(controlName: 'email' | 'password'): boolean {
     const control = this.form.controls[controlName];
     return control.invalid && (control.touched || this.hasSubmitted);
+  }
+
+  private blurActiveElement(): void {
+    const activeElement = this.document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
+  }
+
+  private resetViewportPosition(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 0);
   }
 
   private resolveAuthErrorMessage(error: HttpErrorResponse): string {
