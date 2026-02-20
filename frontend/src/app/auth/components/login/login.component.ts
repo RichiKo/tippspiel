@@ -54,7 +54,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
-        if (error.status === 401 || error.status === 422) {
+        if (this.isInvalidCredentialsError(error)) {
           this.authError = this.translate.instant(
             'auth.login.errors.invalidCredentials',
           );
@@ -76,5 +76,27 @@ export class LoginComponent {
   shouldShowError(controlName: 'email' | 'password'): boolean {
     const control = this.form.controls[controlName];
     return control.invalid && (control.touched || this.hasSubmitted);
+  }
+
+  private isInvalidCredentialsError(error: HttpErrorResponse): boolean {
+    if (error.status === 400 || error.status === 401 || error.status === 422) {
+      return true;
+    }
+
+    const rawMessage = error.error?.message;
+    const messages = Array.isArray(rawMessage)
+      ? rawMessage
+      : typeof rawMessage === 'string'
+        ? [rawMessage]
+        : [];
+    const normalizedMessages = messages.map((message) =>
+      message.toLowerCase(),
+    );
+
+    return normalizedMessages.some(
+      (message) =>
+        message.includes('credentials are not valid') ||
+        message.includes('email must be an email'),
+    );
   }
 }
