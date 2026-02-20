@@ -50,6 +50,7 @@ describe('LoginComponent', () => {
         auth: {
           login: {
             submit: 'Увійти',
+            emailInvalid: 'Некоректний формат електронної пошти.',
             errors: {
               invalidCredentials: 'Неправильна електронна пошта або пароль.',
               general: 'Зараз неможливо увійти. Спробуйте пізніше.',
@@ -110,12 +111,17 @@ describe('LoginComponent', () => {
     );
   });
 
-  it('maps 400 response to translated auth error message', () => {
+  it('maps 400 email validation response to translated email format error', () => {
     loginSpy.and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
             status: 400,
+            error: {
+              message: ['email must be an email'],
+              error: 'Bad Request',
+              statusCode: 400,
+            },
           }),
       ),
     );
@@ -123,8 +129,6 @@ describe('LoginComponent', () => {
     component.form.setValue({ email: 'missing@user.de', password: 'secret1' });
     component.onLogin();
 
-    expect(component.authError).toBe(
-      'Неправильна електронна пошта або пароль.',
-    );
+    expect(component.authError).toBe('Некоректний формат електронної пошти.');
   });
 });

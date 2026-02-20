@@ -54,13 +54,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
-        if (this.isInvalidCredentialsError(error)) {
-          this.authError = this.translate.instant(
-            'auth.login.errors.invalidCredentials',
-          );
-        } else {
-          this.authError = this.translate.instant('auth.login.errors.general');
-        }
+        this.authError = this.resolveAuthErrorMessage(error);
         this.isSubmitting = false;
       },
       complete: () => {
@@ -78,11 +72,7 @@ export class LoginComponent {
     return control.invalid && (control.touched || this.hasSubmitted);
   }
 
-  private isInvalidCredentialsError(error: HttpErrorResponse): boolean {
-    if (error.status === 400 || error.status === 401 || error.status === 422) {
-      return true;
-    }
-
+  private resolveAuthErrorMessage(error: HttpErrorResponse): string {
     const rawMessage = error.error?.message;
     const messages = Array.isArray(rawMessage)
       ? rawMessage
@@ -93,10 +83,24 @@ export class LoginComponent {
       message.toLowerCase(),
     );
 
-    return normalizedMessages.some(
-      (message) =>
-        message.includes('credentials are not valid') ||
-        message.includes('email must be an email'),
-    );
+    if (
+      normalizedMessages.some((message) => message.includes('email must be an email'))
+    ) {
+      return this.translate.instant('auth.login.emailInvalid');
+    }
+
+    if (error.status === 400 || error.status === 401 || error.status === 422) {
+      return this.translate.instant('auth.login.errors.invalidCredentials');
+    }
+
+    if (
+      normalizedMessages.some((message) =>
+        message.includes('credentials are not valid'),
+      )
+    ) {
+      return this.translate.instant('auth.login.errors.invalidCredentials');
+    }
+
+    return this.translate.instant('auth.login.errors.general');
   }
 }
