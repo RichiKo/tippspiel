@@ -13,10 +13,13 @@
 html,
 body {
   min-height: 100%;
+  width: 100%;
   max-width: 100%;
   overscroll-behavior-x: none;
   overflow-x: hidden;
   overflow-x: clip;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -30,6 +33,13 @@ body {
     radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 34%),
     radial-gradient(circle at 92% 26%, rgba(15, 118, 110, 0.08) 0%, transparent 36%),
     linear-gradient(180deg, #eef3f5 0%, #f4f6f8 52%, #f7f9fa 100%);
+}
+
+app-root {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 h1,
