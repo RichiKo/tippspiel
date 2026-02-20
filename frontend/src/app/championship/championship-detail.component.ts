@@ -379,9 +379,14 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.roundService.getRoundsByChampionship(this.championshipId).subscribe({
       next: (data) => {
         this.rounds.set(data);
-        if (data.length > 0) {
-          const lastRoundIndex = data.length - 1;
-          this.selectRound(data[lastRoundIndex]);
+        const initialRound = this.pickInitialRound(data);
+        if (initialRound) {
+          this.selectRound(initialRound);
+        } else {
+          this.selectedRound.set(null);
+          this.games.set([]);
+          this.userTips.set(new Map());
+          this.gameTips.set(new Map());
         }
         this.isLoading.set(false);
       },
@@ -794,6 +799,106 @@ export class ChampionshipDetailComponent implements OnDestroy {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
+  }
+
+  private pickInitialRound(rounds: Round[], today = new Date()): Round | null {
+    if (rounds.length === 0) {
+      return null;
+    }
+
+    const todayDayTime = this.startOfLocalDay(today).getTime();
+    const normalized = rounds.map((round) => {
+      const range = this.normalizeRoundRange(round);
+      return {
+        round,
+        startTime: range.start.getTime(),
+        endTime: range.end.getTime(),
+        createdAtTime: this.toTime(round.createdAt),
+      };
+    });
+
+    const active = normalized
+      .filter((entry) => entry.startTime <= todayDayTime && todayDayTime <= entry.endTime)
+      .sort(
+        (a, b) =>
+          b.startTime - a.startTime ||
+          b.endTime - a.endTime ||
+          b.createdAtTime - a.createdAtTime,
+      );
+    if (active.length > 0) {
+      return active[0]?.round ?? null;
+    }
+
+    const upcoming = normalized
+      .filter((entry) => entry.startTime > todayDayTime)
+      .sort(
+        (a, b) =>
+          a.startTime - b.startTime ||
+          a.endTime - b.endTime ||
+          a.createdAtTime - b.createdAtTime,
+      );
+    if (upcoming.length > 0) {
+      return upcoming[0]?.round ?? null;
+    }
+
+    const past = normalized
+      .filter((entry) => entry.endTime < todayDayTime)
+      .sort(
+        (a, b) =>
+          b.endTime - a.endTime ||
+          b.startTime - a.startTime ||
+          b.createdAtTime - a.createdAtTime,
+      );
+    return past[0]?.round ?? null;
+  }
+
+  private normalizeRoundRange(round: Round): { start: Date; end: Date } {
+    const startDate = this.startOfLocalDay(round.startDate);
+    const resolvedEndDate = round.endDate ?? round.startDate;
+    const endDate = this.endOfLocalDay(resolvedEndDate);
+
+    if (endDate.getTime() < startDate.getTime()) {
+      return {
+        start: startDate,
+        end: this.endOfLocalDay(startDate),
+      };
+    }
+
+    return {
+      start: startDate,
+      end: endDate,
+    };
+  }
+
+  private startOfLocalDay(date: Date): Date {
+    const parsedDate = new Date(date);
+    return new Date(
+      parsedDate.getFullYear(),
+      parsedDate.getMonth(),
+      parsedDate.getDate(),
+      0,
+      0,
+      0,
+      0,
+    );
+  }
+
+  private endOfLocalDay(date: Date): Date {
+    const parsedDate = new Date(date);
+    return new Date(
+      parsedDate.getFullYear(),
+      parsedDate.getMonth(),
+      parsedDate.getDate(),
+      23,
+      59,
+      59,
+      999,
+    );
+  }
+
+  private toTime(value: Date): number {
+    const time = new Date(value).getTime();
+    return Number.isNaN(time) ? 0 : time;
   }
 
   private hydrateGamesWithTeams(games: Game[], teams = this.teams()): Game[] {

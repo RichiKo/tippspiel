@@ -91,4 +91,22 @@ describe('LoginComponent', () => {
       'Неправильна електронна пошта або пароль.',
     );
   });
+
+  it('maps 422 response to translated auth error message', () => {
+    loginSpy.and.returnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 422,
+          }),
+      ),
+    );
+
+    component.form.setValue({ email: 'missing@user.de', password: 'secret1' });
+    component.onLogin();
+
+    expect(component.authError).toBe(
+      'Неправильна електронна пошта або пароль.',
+    );
+  });
 });

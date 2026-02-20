@@ -12,11 +12,26 @@ import { BonusService } from '../bonus/services/bonus.service';
 import { RankingService } from './services/ranking.service';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { Game } from './types/game.interface';
+import { Round } from './types/round.interface';
 import { TeamOrigin } from '../teams/types/team.interface';
 
 describe('ChampionshipDetailComponent', () => {
   let component: ChampionshipDetailComponent;
   let fixture: ComponentFixture<ChampionshipDetailComponent>;
+
+  const createRound = (
+    id: string,
+    startDate: string,
+    endDate: string | null,
+    createdAt = '2026-01-01T00:00:00.000Z',
+  ): Round => ({
+    id,
+    name: `Runde ${id}`,
+    startDate: new Date(startDate),
+    endDate: endDate ? new Date(endDate) : null,
+    championshipId: 'champ-1',
+    createdAt: new Date(createdAt),
+  });
 
   const closedGame: Game = {
     id: 'g1',
@@ -41,6 +56,17 @@ describe('ChampionshipDetailComponent', () => {
     isClosed: false,
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
   };
+
+  const defaultRounds: Round[] = [
+    {
+      id: 'r1',
+      name: 'Runde 1',
+      startDate: new Date('2026-02-01T00:00:00.000Z'),
+      endDate: new Date('2026-02-03T00:00:00.000Z'),
+      championshipId: 'champ-1',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+    },
+  ];
 
   const mockChampionshipService = {
     getChampionshipById: jasmine
@@ -67,18 +93,7 @@ describe('ChampionshipDetailComponent', () => {
   const mockRoundService = {
     getRoundsByChampionship: jasmine
       .createSpy('getRoundsByChampionship')
-      .and.returnValue(
-        of([
-          {
-            id: 'r1',
-            name: 'Runde 1',
-            startDate: new Date('2026-02-01T00:00:00.000Z'),
-            endDate: new Date('2026-02-03T00:00:00.000Z'),
-            championshipId: 'champ-1',
-            createdAt: new Date('2026-01-01T00:00:00.000Z'),
-          },
-        ]),
-      ),
+      .and.returnValue(of(defaultRounds)),
     createRound: jasmine.createSpy('createRound').and.returnValue(of()),
     updateRound: jasmine
       .createSpy('updateRound')
@@ -208,6 +223,8 @@ describe('ChampionshipDetailComponent', () => {
   };
 
   beforeEach(async () => {
+    mockRoundService.getRoundsByChampionship.and.returnValue(of(defaultRounds));
+
     await TestBed.configureTestingModule({
       imports: [ChampionshipDetailComponent, TranslateModule.forRoot()],
       providers: [
@@ -315,6 +332,138 @@ describe('ChampionshipDetailComponent', () => {
 
     expect(progressBadge).toBeTruthy();
     expect(progressBadge?.textContent?.replace(/\s+/g, ' ').trim()).toContain('1/2');
+  });
+
+  it('should pick active round initially when today is inside round range', () => {
+    const rounds = [
+      createRound('r4', '2026-02-21T00:00:00.000Z', '2026-02-22T00:00:00.000Z'),
+      createRound('r1', '2026-02-04T00:00:00.000Z', '2026-02-04T00:00:00.000Z'),
+      createRound('r3', '2026-02-16T00:00:00.000Z', '2026-02-20T00:00:00.000Z'),
+      createRound('r2', '2026-02-06T00:00:00.000Z', '2026-02-06T00:00:00.000Z'),
+    ];
+
+    const picked = (component as any).pickInitialRound(
+      rounds,
+      new Date('2026-02-18T10:30:00.000Z'),
+    ) as Round | null;
+
+    expect(picked?.id).toBe('r3');
+  });
+
+  it('should pick next upcoming round when no active round exists', () => {
+    const rounds = [
+      createRound('r1', '2026-02-04T00:00:00.000Z', '2026-02-04T00:00:00.000Z'),
+      createRound('r3', '2026-02-16T00:00:00.000Z', '2026-02-20T00:00:00.000Z'),
+      createRound('r4', '2026-02-21T00:00:00.000Z', '2026-02-22T00:00:00.000Z'),
+    ];
+
+    const picked = (component as any).pickInitialRound(
+      rounds,
+      new Date('2026-02-10T08:00:00.000Z'),
+    ) as Round | null;
+
+    expect(picked?.id).toBe('r3');
+  });
+
+  it('should pick latest past round when no active and no upcoming round exists', () => {
+    const rounds = [
+      createRound('r1', '2026-02-04T00:00:00.000Z', '2026-02-04T00:00:00.000Z'),
+      createRound('r2', '2026-02-06T00:00:00.000Z', '2026-02-06T00:00:00.000Z'),
+      createRound('r3', '2026-02-16T00:00:00.000Z', '2026-02-20T00:00:00.000Z'),
+      createRound('r4', '2026-02-21T00:00:00.000Z', '2026-02-22T00:00:00.000Z'),
+    ];
+
+    const picked = (component as any).pickInitialRound(
+      rounds,
+      new Date('2026-03-01T12:00:00.000Z'),
+    ) as Round | null;
+
+    expect(picked?.id).toBe('r4');
+  });
+
+  it('should treat round without endDate as one-day active round', () => {
+    const rounds = [
+      createRound('r1', '2026-02-12T00:00:00.000Z', null),
+      createRound('r2', '2026-02-14T00:00:00.000Z', '2026-02-15T00:00:00.000Z'),
+    ];
+
+    const picked = (component as any).pickInitialRound(
+      rounds,
+      new Date('2026-02-12T19:15:00.000Z'),
+    ) as Round | null;
+
+    expect(picked?.id).toBe('r1');
+  });
+
+  it('should pick deterministic round for overlapping active rounds', () => {
+    const rounds = [
+      createRound('rA', '2026-02-16T00:00:00.000Z', '2026-02-20T00:00:00.000Z'),
+      createRound('rB', '2026-02-17T00:00:00.000Z', '2026-02-18T00:00:00.000Z'),
+    ];
+
+    const picked = (component as any).pickInitialRound(
+      rounds,
+      new Date('2026-02-18T09:00:00.000Z'),
+    ) as Round | null;
+
+    expect(picked?.id).toBe('rB');
+  });
+
+  it('should keep deterministic tiebreaker by createdAt for identical active ranges', () => {
+    const rounds = [
+      createRound(
+        'rOld',
+        '2026-02-16T00:00:00.000Z',
+        '2026-02-20T00:00:00.000Z',
+        '2026-01-01T00:00:00.000Z',
+      ),
+      createRound(
+        'rNew',
+        '2026-02-16T00:00:00.000Z',
+        '2026-02-20T00:00:00.000Z',
+        '2026-01-05T00:00:00.000Z',
+      ),
+    ];
+
+    const picked = (component as any).pickInitialRound(
+      rounds,
+      new Date('2026-02-17T11:00:00.000Z'),
+    ) as Round | null;
+
+    expect(picked?.id).toBe('rNew');
+  });
+
+  it('should clear selection and dependent state when rounds list is empty', () => {
+    mockRoundService.getRoundsByChampionship.and.returnValue(of([]));
+    component.selectedRound.set(
+      createRound('existing', '2026-02-10T00:00:00.000Z', '2026-02-11T00:00:00.000Z'),
+    );
+    component.games.set([closedGame]);
+    component.userTips.set(
+      new Map([
+        [
+          'g1',
+          {
+            gameId: 'g1',
+            championshipId: 'champ-1',
+            userId: 1,
+            homeTeamGoals: 2,
+            awayTeamGoals: 1,
+            points: 3,
+            outcomeType: 'exact',
+          },
+        ],
+      ]),
+    );
+    component.gameTips.set(new Map([['g1', []]]));
+
+    (component as any).loadRounds();
+
+    expect(component.selectedRound()).toBeNull();
+    expect(component.games().length).toBe(0);
+    expect(component.userTips().size).toBe(0);
+    expect(component.gameTips().size).toBe(0);
+    expect(component.isLoading()).toBeFalse();
   });
 
   it('should hydrate created game with team data when backend returns only team ids', () => {

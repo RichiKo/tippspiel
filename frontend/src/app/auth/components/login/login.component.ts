@@ -54,7 +54,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        if (error.status === 401 || error.status === 422) {
           this.authError = this.translate.instant(
             'auth.login.errors.invalidCredentials',
           );
