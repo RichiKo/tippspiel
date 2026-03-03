@@ -91,6 +91,39 @@ describe('GameCardComponent', () => {
     expect(component.homeGoals()).toBe(1);
   });
 
+  it('should move focus to away input after entering one home goal digit', () => {
+    const inputs = fixture.nativeElement.querySelectorAll(
+      '.goal-input',
+    ) as NodeListOf<HTMLInputElement>;
+    const homeInput = inputs[0] as HTMLInputElement;
+    const awayInput = inputs[1] as HTMLInputElement;
+    const awayFocusSpy = spyOn(awayInput, 'focus');
+    const awaySelectSpy = spyOn(awayInput, 'select');
+
+    homeInput.value = '4';
+    homeInput.dispatchEvent(new Event('input'));
+
+    expect(component.homeGoals()).toBe(4);
+    expect(awayFocusSpy).toHaveBeenCalled();
+    expect(awaySelectSpy).toHaveBeenCalled();
+  });
+
+  it('should move focus back to home input on backspace in empty away input', () => {
+    const inputs = fixture.nativeElement.querySelectorAll(
+      '.goal-input',
+    ) as NodeListOf<HTMLInputElement>;
+    const homeInput = inputs[0] as HTMLInputElement;
+    const awayInput = inputs[1] as HTMLInputElement;
+    const homeFocusSpy = spyOn(homeInput, 'focus');
+    const homeSelectSpy = spyOn(homeInput, 'select');
+
+    awayInput.value = '';
+    awayInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
+
+    expect(homeFocusSpy).toHaveBeenCalled();
+    expect(homeSelectSpy).toHaveBeenCalled();
+  });
+
   it('should render tips table with notTipped entry for started game', () => {
     fixture.componentRef.setInput('game', {
       ...component.game(),

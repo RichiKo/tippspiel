@@ -80,9 +80,11 @@
           <div class="tip-editor">
             <div class="tip-input">
               <input
+                #homeGoalInput
                 type="tel"
                 [value]="homeGoals() ?? ''"
-                (input)="onHomeGoalsChange($event)"
+                (input)="onHomeGoalsChange($event, awayGoalInput)"
+                (focus)="selectInputValue($event)"
                 min="0"
                 max="9"
                 maxlength="1"
@@ -95,9 +97,12 @@
               />
               <span class="colon">:</span>
               <input
+                #awayGoalInput
                 type="tel"
                 [value]="awayGoals() ?? ''"
                 (input)="onAwayGoalsChange($event)"
+                (keydown)="onAwayGoalsKeydown($event, homeGoalInput)"
+                (focus)="selectInputValue($event)"
                 min="0"
                 max="9"
                 maxlength="1"

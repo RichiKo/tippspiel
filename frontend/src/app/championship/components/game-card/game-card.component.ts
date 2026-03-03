@@ -66,13 +66,18 @@ export class GameCardComponent {
     return this.game().isClosed || this.isTipLocked();
   });
 
-  onHomeGoalsChange(event: Event) {
+  onHomeGoalsChange(event: Event, nextInput: HTMLInputElement) {
     const target = event.target as HTMLInputElement;
     const sanitizedValue = target.value.replace(/\D+/g, '').slice(0, 1);
     if (target.value !== sanitizedValue) {
       target.value = sanitizedValue;
     }
     this.homeGoals.set(this.parseGoalsValue(sanitizedValue));
+
+    if (sanitizedValue.length === 1) {
+      nextInput.focus();
+      nextInput.select();
+    }
   }
 
   onAwayGoalsChange(event: Event) {
@@ -82,6 +87,25 @@ export class GameCardComponent {
       target.value = sanitizedValue;
     }
     this.awayGoals.set(this.parseGoalsValue(sanitizedValue));
+  }
+
+  onAwayGoalsKeydown(
+    event: KeyboardEvent,
+    previousInput: HTMLInputElement,
+  ): void {
+    const target = event.target as HTMLInputElement;
+    if (event.key !== 'Backspace' || target.value !== '') {
+      return;
+    }
+
+    event.preventDefault();
+    previousInput.focus();
+    previousInput.select();
+  }
+
+  selectInputValue(event: FocusEvent): void {
+    const target = event.target as HTMLInputElement;
+    target.select();
   }
 
   private parseGoalsValue(value: string): number | null {
