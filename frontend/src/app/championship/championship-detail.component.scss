@@ -45,19 +45,27 @@
 }
 
 .detail-back-btn {
-  min-height: 38px;
-  border: 1px solid var(--ts-border);
+  min-height: 40px;
+  border: 1px solid #bcd5cc;
   border-radius: 10px;
   background: #ffffff;
-  color: var(--ts-text-primary);
+  color: #0b5a45;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0.5rem 0.9rem;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: none;
+}
+
+.detail-back-btn:not(:disabled):hover {
+  background: #e9f6f0;
+  border-color: #95c2b1;
+  transform: none;
+  box-shadow: none;
 }
 
 .championship-header {
@@ -778,21 +786,6 @@ app-game-card:last-child {
     color: #f8fafc;
     font-size: 1.1rem;
     font-weight: 700;
-  }
-
-  .round-drawer-title-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    background: radial-gradient(
-      circle,
-      rgba(16, 185, 129, 0.85),
-      rgba(16, 185, 129, 0.2)
-    );
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .round-drawer-close {

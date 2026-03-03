@@ -570,4 +570,25 @@ describe('ChampionshipDetailComponent', () => {
     expect(component.selectedRound()).toBeNull();
     expect(component.games().length).toBe(0);
   });
+
+  it('should blur focused drawer element before closing round drawer', () => {
+    component.isMobileView.set(true);
+    component.rounds.set([
+      createRound('r-mobile', '2026-02-10T00:00:00.000Z', '2026-02-12T00:00:00.000Z'),
+    ]);
+    fixture.detectChanges();
+
+    component.openRoundDrawer();
+    fixture.detectChanges();
+
+    const drawerItem = fixture.nativeElement.querySelector(
+      '.round-drawer-item',
+    ) as HTMLButtonElement;
+    const blurSpy = spyOn(drawerItem, 'blur').and.callThrough();
+
+    drawerItem.focus();
+    component.closeRoundDrawer();
+
+    expect(blurSpy).toHaveBeenCalled();
+  });
 });

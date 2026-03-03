@@ -234,6 +234,13 @@ export class ChampionshipDetailComponent implements OnDestroy {
   }
 
   closeRoundDrawer(): void {
+    if (typeof document !== 'undefined') {
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (activeElement?.closest('#mobile-round-drawer')) {
+        activeElement.blur();
+      }
+    }
+
     this.roundDrawerDragOffset.set(0);
     this.isDrawerDragging = false;
     this.isRoundDrawerOpen.set(false);

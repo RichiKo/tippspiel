@@ -437,7 +437,7 @@
         [attr.aria-label]="'championship.detail.rounds.drawerLabel' | translate"
         [class.open]="isRoundDrawerOpen()"
         [class.is-dragging]="isDrawerDragging"
-        [attr.aria-hidden]="!isRoundDrawerOpen()"
+        [attr.inert]="isRoundDrawerOpen() ? null : ''"
         [style.transform]="getRoundDrawerTransform()"
       >
         <header
