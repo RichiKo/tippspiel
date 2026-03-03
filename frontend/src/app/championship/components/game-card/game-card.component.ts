@@ -68,7 +68,7 @@ export class GameCardComponent {
 
   onHomeGoalsChange(event: Event) {
     const target = event.target as HTMLInputElement;
-    const sanitizedValue = target.value.replace(/\D+/g, '');
+    const sanitizedValue = target.value.replace(/\D+/g, '').slice(0, 1);
     if (target.value !== sanitizedValue) {
       target.value = sanitizedValue;
     }
@@ -77,7 +77,7 @@ export class GameCardComponent {
 
   onAwayGoalsChange(event: Event) {
     const target = event.target as HTMLInputElement;
-    const sanitizedValue = target.value.replace(/\D+/g, '');
+    const sanitizedValue = target.value.replace(/\D+/g, '').slice(0, 1);
     if (target.value !== sanitizedValue) {
       target.value = sanitizedValue;
     }
@@ -94,7 +94,7 @@ export class GameCardComponent {
       return null;
     }
 
-    return Math.max(0, parsed);
+    return Math.min(9, Math.max(0, parsed));
   }
 
   saveTip() {

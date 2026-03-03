@@ -68,6 +68,7 @@ describe('GameDialogComponent', () => {
     expect(homeInput.type).toBe('tel');
     expect(homeInput.getAttribute('inputmode')).toBe('numeric');
     expect(homeInput.getAttribute('pattern')).toBe('[0-9]*');
+    expect(homeInput.getAttribute('maxlength')).toBe('1');
     expect(homeInput.getAttribute('enterkeyhint')).toBe('done');
     expect(homeInput.getAttribute('autocomplete')).toBe('off');
   });
@@ -86,13 +87,13 @@ describe('GameDialogComponent', () => {
     homeInput.value = '1a-2';
     homeInput.dispatchEvent(new Event('input'));
 
-    awayInput.value = '0x3';
+    awayInput.value = '7x3';
     awayInput.dispatchEvent(new Event('input'));
 
-    expect(homeInput.value).toBe('12');
-    expect(awayInput.value).toBe('03');
-    expect(component.homeScore).toBe(12);
-    expect(component.awayScore).toBe(3);
+    expect(homeInput.value).toBe('1');
+    expect(awayInput.value).toBe('7');
+    expect(component.homeScore).toBe(1);
+    expect(component.awayScore).toBe(7);
   });
 
   it('sorts team select options alphabetically by name', () => {

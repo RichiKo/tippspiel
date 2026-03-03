@@ -160,6 +160,8 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
                     (input)="onHomeScoreChange($event)"
                     name="homeScore"
                     min="0"
+                    max="9"
+                    maxlength="1"
                     inputmode="numeric"
                     pattern="[0-9]*"
                     enterkeyhint="done"
@@ -177,6 +179,8 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
                     (input)="onAwayScoreChange($event)"
                     name="awayScore"
                     min="0"
+                    max="9"
+                    maxlength="1"
                     inputmode="numeric"
                     pattern="[0-9]*"
                     enterkeyhint="done"
@@ -468,7 +472,7 @@ export class GameDialogComponent implements OnDestroy {
 
   onHomeScoreChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-    const sanitizedValue = target.value.replace(/\D+/g, '');
+    const sanitizedValue = target.value.replace(/\D+/g, '').slice(0, 1);
     if (target.value !== sanitizedValue) {
       target.value = sanitizedValue;
     }
@@ -478,7 +482,7 @@ export class GameDialogComponent implements OnDestroy {
 
   onAwayScoreChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-    const sanitizedValue = target.value.replace(/\D+/g, '');
+    const sanitizedValue = target.value.replace(/\D+/g, '').slice(0, 1);
     if (target.value !== sanitizedValue) {
       target.value = sanitizedValue;
     }
@@ -560,7 +564,7 @@ export class GameDialogComponent implements OnDestroy {
       return null;
     }
 
-    return Math.max(0, parsed);
+    return Math.min(9, Math.max(0, parsed));
   }
 
   private setBodyScrollLocked(locked: boolean): void {

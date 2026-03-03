@@ -58,6 +58,7 @@ describe('GameCardComponent', () => {
     expect(inputs[0].type).toBe('tel');
     expect(inputs[0].getAttribute('inputmode')).toBe('numeric');
     expect(inputs[0].getAttribute('pattern')).toBe('[0-9]*');
+    expect(inputs[0].getAttribute('maxlength')).toBe('1');
     expect(inputs[0].getAttribute('enterkeyhint')).toBe('done');
     expect(inputs[0].getAttribute('autocomplete')).toBe('off');
   });
@@ -86,8 +87,8 @@ describe('GameCardComponent', () => {
     input.value = '1a-2';
     input.dispatchEvent(new Event('input'));
 
-    expect(input.value).toBe('12');
-    expect(component.homeGoals()).toBe(12);
+    expect(input.value).toBe('1');
+    expect(component.homeGoals()).toBe(1);
   });
 
   it('should render tips table with notTipped entry for started game', () => {

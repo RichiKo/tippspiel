@@ -284,6 +284,18 @@ describe('ChampionshipDetailComponent', () => {
     expect(component.isMobileView()).toBeTrue();
   });
 
+  it('should add mobile back-row offset class when round drawer fab is visible', () => {
+    component.isMobileView.set(true);
+    component.rounds.set([
+      createRound('r-mobile', '2026-02-10T00:00:00.000Z', '2026-02-12T00:00:00.000Z'),
+    ]);
+    fixture.detectChanges();
+
+    const backRow = fixture.nativeElement.querySelector('.detail-back-row') as HTMLElement;
+
+    expect(backRow.classList.contains('detail-back-row--mobile-offset')).toBeTrue();
+  });
+
   it('should keep notTipped tips in started games map', () => {
     const startedGameTips = component.gameTips().get('g2') ?? [];
 

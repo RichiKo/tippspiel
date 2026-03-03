@@ -4,7 +4,10 @@
   } @else if (error()) {
     <div class="error">{{ error() }}</div>
   } @else {
-    <div class="detail-back-row">
+    <div
+      class="detail-back-row"
+      [class.detail-back-row--mobile-offset]="isMobileView() && rounds().length > 0"
+    >
       <button
         type="button"
         class="detail-back-btn"

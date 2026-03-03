@@ -1,7 +1,7 @@
 .championship-detail {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 86px 0 28px;
+  padding: 12px 0 28px;
   background:
     radial-gradient(
       circle at 12% 0%,
@@ -543,7 +543,7 @@ app-game-card:last-child {
 
 @media (max-width: 767px) {
   .championship-detail {
-    padding-top: 76px;
+    padding-top: 8px;
   }
 
   .championship-header,
@@ -560,6 +560,18 @@ app-game-card:last-child {
     margin-left: max(8px, env(safe-area-inset-left, 0px));
     margin-right: max(8px, env(safe-area-inset-right, 0px));
     margin-bottom: 8px;
+  }
+
+  .detail-back-row--mobile-offset {
+    margin-top: 0;
+    padding-left: 100px;
+    margin-left: max(8px, env(safe-area-inset-left, 0px));
+  }
+
+  .detail-back-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 42px;
   }
 
   .championship-header {
