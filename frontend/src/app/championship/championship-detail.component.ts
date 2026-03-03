@@ -182,6 +182,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
   championshipId = '';
 
   constructor() {
+    this.resetScrollPositionOnEntry();
     this.updateViewportState();
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -196,6 +197,14 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.loadTeams();
     this.loadActiveBonusRulesAvailability();
     this.loadRankingParticipants();
+  }
+
+  private resetScrollPositionOnEntry(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.scrollTo(0, 0);
   }
 
   @HostListener('window:resize')

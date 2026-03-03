@@ -284,6 +284,15 @@ describe('ChampionshipDetailComponent', () => {
     expect(component.isMobileView()).toBeTrue();
   });
 
+  it('should scroll to top on component init', () => {
+    const scrollSpy = spyOn(window, 'scrollTo');
+
+    const initFixture = TestBed.createComponent(ChampionshipDetailComponent);
+    initFixture.detectChanges();
+
+    expect(scrollSpy).toHaveBeenCalledWith(0, 0);
+  });
+
   it('should add mobile back-row offset class when round drawer fab is visible', () => {
     component.isMobileView.set(true);
     component.rounds.set([

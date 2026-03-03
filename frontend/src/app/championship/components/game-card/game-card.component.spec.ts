@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { TeamOrigin } from '../../../teams/types/team.interface';
 import { GameCardComponent } from './game-card.component';
@@ -90,6 +90,20 @@ describe('GameCardComponent', () => {
     expect(input.value).toBe('1');
     expect(component.homeGoals()).toBe(1);
   });
+
+  it('should select and scroll input into view on focus', fakeAsync(() => {
+    const input = fixture.nativeElement.querySelector(
+      '.goal-input',
+    ) as HTMLInputElement;
+    const selectSpy = spyOn(input, 'select').and.callThrough();
+    const scrollSpy = spyOn(input, 'scrollIntoView');
+
+    input.dispatchEvent(new FocusEvent('focus'));
+    tick(300);
+
+    expect(selectSpy).toHaveBeenCalled();
+    expect(scrollSpy).toHaveBeenCalled();
+  }));
 
   it('should move focus to away input after entering one home goal digit', () => {
     const inputs = fixture.nativeElement.querySelectorAll(

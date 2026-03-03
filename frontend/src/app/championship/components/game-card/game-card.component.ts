@@ -77,6 +77,7 @@ export class GameCardComponent {
     if (sanitizedValue.length === 1) {
       nextInput.focus();
       nextInput.select();
+      this.ensureInputVisible(nextInput);
     }
   }
 
@@ -106,6 +107,36 @@ export class GameCardComponent {
   selectInputValue(event: FocusEvent): void {
     const target = event.target as HTMLInputElement;
     target.select();
+    this.ensureInputVisible(target);
+  }
+
+  private ensureInputVisible(target: HTMLInputElement): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const alignInputToViewport = () => {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+
+      const viewport = window.visualViewport;
+      if (!viewport) {
+        return;
+      }
+
+      const rect = target.getBoundingClientRect();
+      const safeBottom = viewport.offsetTop + viewport.height - 24;
+      if (rect.bottom > safeBottom) {
+        const delta = rect.bottom - safeBottom;
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+    };
+
+    window.setTimeout(alignInputToViewport, 60);
+    window.setTimeout(alignInputToViewport, 260);
   }
 
   private parseGoalsValue(value: string): number | null {
