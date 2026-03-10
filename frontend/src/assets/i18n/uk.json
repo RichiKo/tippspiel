@@ -332,7 +332,8 @@
       "badges": {
         "rules": "{{count}} правил",
         "participants": "{{count}} учасників",
-        "eliminated": "{{count}} вибулих"
+        "inGame": "{{count}} в грі",
+        "out": "{{count}} вибули"
       },
       "emptyRules": "Немає бонус-правил.",
       "emptyPicks": "Прогнозів ще немає.",

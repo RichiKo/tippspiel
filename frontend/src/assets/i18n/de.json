@@ -332,7 +332,8 @@
       "badges": {
         "rules": "{{count}} Regeln",
         "participants": "{{count}} Teilnehmer",
-        "eliminated": "{{count}} eliminiert"
+        "inGame": "{{count}} im Spiel",
+        "out": "{{count}} raus"
       },
       "emptyRules": "Keine Bonus-Regeln vorhanden.",
       "emptyPicks": "Keine Tipps vorhanden.",

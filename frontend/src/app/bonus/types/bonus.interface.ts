@@ -51,7 +51,7 @@ export interface BonusPick {
     id: number;
     username: string;
     email: string;
-    image: string;
+    image: string | null;
   };
   createdAt: string;
   updatedAt: string;

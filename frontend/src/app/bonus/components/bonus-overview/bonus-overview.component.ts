@@ -10,10 +10,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 import { BonusService } from '../../services/bonus.service';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { BonusPick, BonusRule } from '../../types/bonus.interface';
 import { Championship } from '../../../dashboard/types/championship.interface';
+import { RankingService } from '../../../championship/services/ranking.service';
 import {
   UI_ICONS,
   UiBadgeComponent,
@@ -48,6 +50,7 @@ export class BonusOverviewComponent {
   private readonly router = inject(Router);
   private readonly bonusService = inject(BonusService);
   private readonly championshipService = inject(ChampionshipService);
+  private readonly rankingService = inject(RankingService);
   private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
@@ -68,7 +71,24 @@ export class BonusOverviewComponent {
     for (const row of rows) {
       for (const rule of rules) {
         const pick = row.picks.get(rule.id);
-        if (pick && this.eliminatedTeamIds().has(pick.teamId)) {
+        if (!pick || this.eliminatedTeamIds().has(pick.teamId)) {
+          count += 1;
+        }
+      }
+    }
+
+    return count;
+  });
+
+  readonly inGamePicksCount = computed(() => {
+    const rows = this.userPicksRows();
+    const rules = this.bonusRules();
+
+    let count = 0;
+    for (const row of rows) {
+      for (const rule of rules) {
+        const pick = row.picks.get(rule.id);
+        if (pick && !this.eliminatedTeamIds().has(pick.teamId)) {
           count += 1;
         }
       }
@@ -109,44 +129,64 @@ export class BonusOverviewComponent {
 
     this.bonusService.getBonusRulesForOverview(this.championshipId).subscribe({
       next: async (rules) => {
-        this.bonusRules.set(rules);
+        try {
+          this.bonusRules.set(rules);
 
-        const picksPromises = rules.map((rule) =>
-          this.bonusService.getAllPicksUser(rule.id).toPromise().catch(() => []),
-        );
+          const rankings = await firstValueFrom(
+            this.rankingService.getRankingByChampionship(this.championshipId),
+          ).catch(() => []);
 
-        const allPicksArrays = await Promise.all(picksPromises);
-        const userMap = new Map<number, UserPicksRow>();
-
-        rules.forEach((rule, ruleIndex) => {
-          const picks = allPicksArrays[ruleIndex] || [];
-
-          picks.forEach((pick: BonusPick) => {
-            if (!pick.user || !pick.team) {
-              return;
-            }
-
-            let userRow = userMap.get(pick.userId);
-            if (!userRow) {
-              userRow = {
-                userId: pick.userId,
-                username: pick.user.username,
-                userImage: pick.user.image,
-                picks: new Map(),
-              };
-              userMap.set(pick.userId, userRow);
-            }
-
-            userRow.picks.set(rule.id, {
-              teamId: pick.teamId,
-              teamName: pick.team.name,
-              teamLogo: pick.team.logoUrl,
+          const userMap = new Map<number, UserPicksRow>();
+          rankings.forEach((ranking) => {
+            userMap.set(ranking.user.id, {
+              userId: ranking.user.id,
+              username: ranking.user.username,
+              userImage: ranking.user.image ?? null,
+              picks: new Map(),
             });
           });
-        });
 
-        this.userPicksRows.set(Array.from(userMap.values()));
-        this.isLoading.set(false);
+          const picksPromises = rules.map((rule) =>
+            firstValueFrom(this.bonusService.getAllPicksUser(rule.id)).catch(
+              () => [] as BonusPick[],
+            ),
+          );
+
+          const allPicksArrays = await Promise.all(picksPromises);
+
+          rules.forEach((rule, ruleIndex) => {
+            const picks = allPicksArrays[ruleIndex] || [];
+
+            picks.forEach((pick) => {
+              if (!pick.user || !pick.team) {
+                return;
+              }
+
+              let userRow = userMap.get(pick.userId);
+              if (!userRow) {
+                userRow = {
+                  userId: pick.userId,
+                  username: pick.user.username,
+                  userImage: pick.user.image,
+                  picks: new Map(),
+                };
+                userMap.set(pick.userId, userRow);
+              } else if (!userRow.userImage && pick.user.image) {
+                userRow.userImage = pick.user.image;
+              }
+
+              userRow.picks.set(rule.id, {
+                teamId: pick.teamId,
+                teamName: pick.team.name,
+                teamLogo: pick.team.logoUrl,
+              });
+            });
+          });
+
+          this.userPicksRows.set(Array.from(userMap.values()));
+        } finally {
+          this.isLoading.set(false);
+        }
       },
       error: () => {
         this.errorMessage.set(
