@@ -118,6 +118,14 @@
   background: #f8fbfd;
 }
 
+.bonus-overview-table tbody tr.current-user-row td {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.bonus-overview-table tbody tr.current-user-row:hover td {
+  background: rgba(16, 185, 129, 0.2);
+}
+
 .user-info {
   display: inline-flex;
   align-items: center;
@@ -153,6 +161,10 @@
   color: #0f172a;
 }
 
+.current-user-badge {
+  margin-left: 4px;
+}
+
 .pick-cell {
   text-align: center;
 }
@@ -178,6 +190,14 @@
 
 .pick-cell.eliminated-pick {
   background: rgba(220, 38, 38, 0.08);
+}
+
+.bonus-overview-table tbody tr.current-user-row .pick-cell.eliminated-pick {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.bonus-overview-table tbody tr.current-user-row:hover .pick-cell.eliminated-pick {
+  background: rgba(16, 185, 129, 0.2);
 }
 
 .pick-cell.eliminated-pick .team-name {

@@ -79,7 +79,7 @@
                       userRow of getSortedUserRowsForRule(rule.id);
                       track userRow.userId
                     ) {
-                      <tr>
+                      <tr [class.current-user-row]="isCurrentUser(userRow.userId)">
                         <td
                           class="user-cell"
                           [attr.data-label]="
@@ -103,6 +103,15 @@
                               </div>
                             }
                             <span class="username">{{ userRow.username }}</span>
+                            @if (isCurrentUser(userRow.userId)) {
+                              <ui-badge
+                                tone="info"
+                                appearance="soft"
+                                class="current-user-badge"
+                              >
+                                {{ getCurrentUserBadgeText() }}
+                              </ui-badge>
+                            }
                           </div>
                         </td>
                         <td

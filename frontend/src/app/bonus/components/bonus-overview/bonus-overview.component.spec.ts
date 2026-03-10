@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -6,6 +7,7 @@ import { BonusOverviewComponent } from './bonus-overview.component';
 import { BonusService } from '../../services/bonus.service';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../../championship/services/ranking.service';
+import { PersistingService } from '../../../auth/services/persisisting.service';
 
 describe('BonusOverviewComponent', () => {
   let component: BonusOverviewComponent;
@@ -157,6 +159,17 @@ describe('BonusOverviewComponent', () => {
       ),
   };
 
+  const mockPersistingService = {
+    currentUser: signal({
+      id: 1,
+      username: 'Richi',
+      email: 'richi@test.com',
+      role: 'user',
+      image: null,
+      token: 'token',
+    }),
+  };
+
   const navigateSpy = jasmine.createSpy('navigate');
 
   beforeEach(async () => {
@@ -180,6 +193,7 @@ describe('BonusOverviewComponent', () => {
         { provide: BonusService, useValue: mockBonusService },
         { provide: ChampionshipService, useValue: mockChampionshipService },
         { provide: RankingService, useValue: mockRankingService },
+        { provide: PersistingService, useValue: mockPersistingService },
       ],
     }).compileComponents();
 
@@ -289,6 +303,17 @@ describe('BonusOverviewComponent', () => {
 
     expect(firstTableFirstRow.textContent?.trim()).toBe('Richi');
     expect(secondTableFirstRow.textContent?.trim()).toBe('Richi');
+  });
+
+  it('should highlight current user row', () => {
+    const highlightedRows = fixture.nativeElement.querySelectorAll(
+      '.bonus-overview-table tbody tr.current-user-row',
+    ) as NodeListOf<HTMLTableRowElement>;
+
+    expect(highlightedRows.length).toBe(2);
+    expect(
+      highlightedRows[0].querySelector('.current-user-badge')?.textContent,
+    ).toContain('Du');
   });
 
   it('should navigate back when header back button is clicked', () => {

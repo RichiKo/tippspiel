@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+import { PersistingService } from '../../../auth/services/persisisting.service';
 import { BonusService } from '../../services/bonus.service';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { BonusPick, BonusRule } from '../../types/bonus.interface';
@@ -53,6 +54,7 @@ export class BonusOverviewComponent {
   private readonly bonusService = inject(BonusService);
   private readonly championshipService = inject(ChampionshipService);
   private readonly rankingService = inject(RankingService);
+  private readonly persistingService = inject(PersistingService);
   private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
@@ -64,6 +66,7 @@ export class BonusOverviewComponent {
   brokenAvatarUserIds = signal<Set<number>>(new Set());
 
   readonly icons = UI_ICONS;
+  readonly currentUser = this.persistingService.currentUser;
 
   readonly eliminatedPicksCount = computed(() => {
     const rows = this.userPicksRows();
@@ -103,6 +106,7 @@ export class BonusOverviewComponent {
     const rows = this.userPicksRows();
     const rules = this.bonusRules();
     const eliminatedTeamIds = this.eliminatedTeamIds();
+    const currentUserId = this.currentUser()?.id ?? null;
     const originalOrder = new Map<number, number>();
 
     rows.forEach((row, index) => {
@@ -113,6 +117,13 @@ export class BonusOverviewComponent {
 
     for (const rule of rules) {
       const sortedRows = [...rows].sort((left, right) => {
+        const leftIsCurrentUser = currentUserId !== null && left.userId === currentUserId;
+        const rightIsCurrentUser = currentUserId !== null && right.userId === currentUserId;
+
+        if (leftIsCurrentUser !== rightIsCurrentUser) {
+          return leftIsCurrentUser ? -1 : 1;
+        }
+
         const leftPick = left.picks.get(rule.id);
         const rightPick = right.picks.get(rule.id);
 
@@ -247,6 +258,10 @@ export class BonusOverviewComponent {
     return this.sortedRowsByRule().get(ruleId) ?? this.userPicksRows();
   }
 
+  isCurrentUser(userId: number): boolean {
+    return this.currentUser()?.id === userId;
+  }
+
   isEliminatedTeam(teamId: string): boolean {
     return this.eliminatedTeamIds().has(teamId);
   }
@@ -331,6 +346,10 @@ export class BonusOverviewComponent {
     }
 
     return type === 'inGame' ? 'в грі' : 'поза грою';
+  }
+
+  getCurrentUserBadgeText(): string {
+    return this.translate.currentLang === 'de' ? 'Du' : 'Ти';
   }
 
   private getPickPriority(
