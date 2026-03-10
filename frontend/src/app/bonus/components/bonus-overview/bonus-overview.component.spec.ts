@@ -116,29 +116,10 @@ describe('BonusOverviewComponent', () => {
       .and.returnValue(
         of([
           {
-            id: 'ranking-1',
-            userId: 1,
-            championshipId: 'champ-1',
-            rank: 1,
-            exactHits: 0,
-            goalDiffHits: 0,
-            tendencyHits: 0,
-            missedTips: 0,
-            totalPoints: 0,
-            bonusPoints: 0,
-            updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-            user: {
-              id: 1,
-              username: 'Richi',
-              email: 'richi@test.com',
-              image: null,
-            },
-          },
-          {
             id: 'ranking-2',
             userId: 2,
             championshipId: 'champ-1',
-            rank: 2,
+            rank: 1,
             exactHits: 0,
             goalDiffHits: 0,
             tendencyHits: 0,
@@ -150,6 +131,25 @@ describe('BonusOverviewComponent', () => {
               id: 2,
               username: 'Petya',
               email: 'petya@test.com',
+              image: null,
+            },
+          },
+          {
+            id: 'ranking-1',
+            userId: 1,
+            championshipId: 'champ-1',
+            rank: 2,
+            exactHits: 0,
+            goalDiffHits: 0,
+            tendencyHits: 0,
+            missedTips: 0,
+            totalPoints: 0,
+            bonusPoints: 0,
+            updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+            user: {
+              id: 1,
+              username: 'Richi',
+              email: 'richi@test.com',
               image: null,
             },
           },
@@ -273,6 +273,22 @@ describe('BonusOverviewComponent', () => {
     expect(
       petyaRowInSecondTable?.querySelector('.pick-cell ui-badge')?.textContent,
     ).toContain('Не вибрано');
+  });
+
+  it('should place active users first in each bonus table', () => {
+    const tables = fixture.nativeElement.querySelectorAll(
+      '.bonus-overview-table',
+    ) as NodeListOf<HTMLTableElement>;
+
+    const firstTableFirstRow = tables[0].querySelector(
+      'tbody tr:first-child .username',
+    ) as HTMLElement;
+    const secondTableFirstRow = tables[1].querySelector(
+      'tbody tr:first-child .username',
+    ) as HTMLElement;
+
+    expect(firstTableFirstRow.textContent?.trim()).toBe('Richi');
+    expect(secondTableFirstRow.textContent?.trim()).toBe('Richi');
   });
 
   it('should navigate back when header back button is clicked', () => {

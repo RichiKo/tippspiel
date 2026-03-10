@@ -39,10 +39,7 @@
               [size]="14"
               aria-hidden="true"
             ></lucide-icon>
-            {{
-              "bonus.overview.badges.inGame"
-                | translate: { count: inGamePicksCount() }
-            }}
+            {{ getInGameBadgeText() }}
           </ui-badge>
           <ui-badge
             tone="danger"
@@ -54,10 +51,7 @@
               [size]="14"
               aria-hidden="true"
             ></lucide-icon>
-            {{
-              "bonus.overview.badges.out"
-                | translate: { count: eliminatedPicksCount() }
-            }}
+            {{ getOutBadgeText() }}
           </ui-badge>
         </div>
       </ui-page-header>
@@ -81,7 +75,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @for (userRow of userPicksRows(); track userRow.userId) {
+                    @for (
+                      userRow of getSortedUserRowsForRule(rule.id);
+                      track userRow.userId
+                    ) {
                       <tr>
                         <td
                           class="user-cell"

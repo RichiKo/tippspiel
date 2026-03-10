@@ -30,6 +30,8 @@ interface UserPicksRow {
   picks: Map<string, { teamId: string; teamName: string; teamLogo: string }>;
 }
 
+type BadgeLabelType = 'inGame' | 'out';
+
 @Component({
   selector: 'app-bonus-overview',
   standalone: true,
@@ -95,6 +97,42 @@ export class BonusOverviewComponent {
     }
 
     return count;
+  });
+
+  readonly sortedRowsByRule = computed(() => {
+    const rows = this.userPicksRows();
+    const rules = this.bonusRules();
+    const eliminatedTeamIds = this.eliminatedTeamIds();
+    const originalOrder = new Map<number, number>();
+
+    rows.forEach((row, index) => {
+      originalOrder.set(row.userId, index);
+    });
+
+    const byRule = new Map<string, UserPicksRow[]>();
+
+    for (const rule of rules) {
+      const sortedRows = [...rows].sort((left, right) => {
+        const leftPick = left.picks.get(rule.id);
+        const rightPick = right.picks.get(rule.id);
+
+        const leftPriority = this.getPickPriority(leftPick, eliminatedTeamIds);
+        const rightPriority = this.getPickPriority(rightPick, eliminatedTeamIds);
+
+        if (leftPriority !== rightPriority) {
+          return leftPriority - rightPriority;
+        }
+
+        return (
+          (originalOrder.get(left.userId) ?? Number.MAX_SAFE_INTEGER) -
+          (originalOrder.get(right.userId) ?? Number.MAX_SAFE_INTEGER)
+        );
+      });
+
+      byRule.set(rule.id, sortedRows);
+    }
+
+    return byRule;
   });
 
   championshipId = '';
@@ -205,6 +243,10 @@ export class BonusOverviewComponent {
     return userRow?.picks.get(ruleId) ?? null;
   }
 
+  getSortedUserRowsForRule(ruleId: string): UserPicksRow[] {
+    return this.sortedRowsByRule().get(ruleId) ?? this.userPicksRows();
+  }
+
   isEliminatedTeam(teamId: string): boolean {
     return this.eliminatedTeamIds().has(teamId);
   }
@@ -237,5 +279,72 @@ export class BonusOverviewComponent {
       next.add(userId);
       return next;
     });
+  }
+
+  getInGameBadgeText(): string {
+    return this.getBadgeText({
+      primaryKey: 'bonus.overview.badges.inGame',
+      legacyKey: 'bonus.overview.badges.participants',
+      count: this.inGamePicksCount(),
+      type: 'inGame',
+    });
+  }
+
+  getOutBadgeText(): string {
+    return this.getBadgeText({
+      primaryKey: 'bonus.overview.badges.out',
+      legacyKey: 'bonus.overview.badges.eliminated',
+      count: this.eliminatedPicksCount(),
+      type: 'out',
+    });
+  }
+
+  private getBadgeText({
+    primaryKey,
+    legacyKey,
+    count,
+    type,
+  }: {
+    primaryKey: string;
+    legacyKey: string;
+    count: number;
+    type: BadgeLabelType;
+  }): string {
+    const params = { count };
+    const primary = this.translate.instant(primaryKey, params);
+    if (primary !== primaryKey) {
+      return primary;
+    }
+
+    const legacy = this.translate.instant(legacyKey, params);
+    if (legacy !== legacyKey) {
+      return legacy;
+    }
+
+    return `${count} ${this.getHardcodedBadgeWord(type)}`;
+  }
+
+  private getHardcodedBadgeWord(type: BadgeLabelType): string {
+    const language = this.translate.currentLang === 'de' ? 'de' : 'uk';
+    if (language === 'de') {
+      return type === 'inGame' ? 'im Spiel' : 'raus';
+    }
+
+    return type === 'inGame' ? 'в грі' : 'поза грою';
+  }
+
+  private getPickPriority(
+    pick: { teamId: string } | undefined,
+    eliminatedTeamIds: Set<string>,
+  ): number {
+    if (!pick) {
+      return 2;
+    }
+
+    if (eliminatedTeamIds.has(pick.teamId)) {
+      return 1;
+    }
+
+    return 0;
   }
 }
