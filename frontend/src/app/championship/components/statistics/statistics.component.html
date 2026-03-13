@@ -176,13 +176,15 @@
                   {{ "championship.statistics.rounds.best" | translate }}
                 </p>
                 @if (stats.bestRound) {
-                  <p class="round-name">{{ stats.bestRound.roundName }}</p>
-                  <p class="round-points">
-                    {{
-                      "championship.statistics.rounds.pointsLabel"
-                        | translate: { points: stats.bestRound.points }
-                    }}
-                  </p>
+                  <div class="round-result-line">
+                    <p class="round-name">{{ stats.bestRound.roundName }}</p>
+                    <p class="round-points">
+                      {{
+                        "championship.statistics.rounds.pointsLabel"
+                          | translate: { points: stats.bestRound.points }
+                      }}
+                    </p>
+                  </div>
                 } @else {
                   <p class="round-empty">
                     {{
@@ -202,13 +204,15 @@
                   {{ "championship.statistics.rounds.worst" | translate }}
                 </p>
                 @if (stats.worstRound) {
-                  <p class="round-name">{{ stats.worstRound.roundName }}</p>
-                  <p class="round-points">
-                    {{
-                      "championship.statistics.rounds.pointsLabel"
-                        | translate: { points: stats.worstRound.points }
-                    }}
-                  </p>
+                  <div class="round-result-line">
+                    <p class="round-name">{{ stats.worstRound.roundName }}</p>
+                    <p class="round-points">
+                      {{
+                        "championship.statistics.rounds.pointsLabel"
+                          | translate: { points: stats.worstRound.points }
+                      }}
+                    </p>
+                  </div>
                 } @else {
                   <p class="round-empty">
                     {{

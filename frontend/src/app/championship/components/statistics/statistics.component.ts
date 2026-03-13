@@ -337,16 +337,16 @@ export class StatisticsComponent implements OnDestroy {
     const primary500 = this.resolveCssVar('--ts-primary-500', '#10b981');
     const primary600 = this.resolveCssVar('--ts-primary-600', '#0e7a55');
     const primary700 = this.resolveCssVar('--ts-primary-700', '#0f766e');
+    const trendLineColor = this.withAlpha(primary600, 0.5);
+    const trendFillColor = this.withAlpha(primary500, 0.14);
+    const trendPointColor = this.withAlpha(primary700, 0.5);
 
     if (this.roundTrendChart) {
       this.roundTrendChart.data.labels = labels;
       this.roundTrendChart.data.datasets[0].data = points;
-      this.roundTrendChart.data.datasets[0].borderColor = primary600;
-      this.roundTrendChart.data.datasets[0].backgroundColor = this.withAlpha(
-        primary500,
-        0.28,
-      );
-      this.roundTrendChart.data.datasets[0].pointBackgroundColor = primary700;
+      this.roundTrendChart.data.datasets[0].borderColor = trendLineColor;
+      this.roundTrendChart.data.datasets[0].backgroundColor = trendFillColor;
+      this.roundTrendChart.data.datasets[0].pointBackgroundColor = trendPointColor;
       this.roundTrendChart.update();
       return;
     }
@@ -359,13 +359,13 @@ export class StatisticsComponent implements OnDestroy {
           {
             data: points,
             fill: true,
-            borderColor: primary600,
-            backgroundColor: this.withAlpha(primary500, 0.28),
+            borderColor: trendLineColor,
+            backgroundColor: trendFillColor,
             borderWidth: 2,
             tension: 0.32,
             pointRadius: 4,
             pointHoverRadius: 5,
-            pointBackgroundColor: primary700,
+            pointBackgroundColor: trendPointColor,
             pointBorderColor: '#ffffff',
             pointBorderWidth: 1.5,
           },
