@@ -650,12 +650,19 @@
       },
       "distribution": {
         "title": "Punkteverteilung in ausgewerteten Spielen",
+        "chartAriaLabel": "Kreisdiagramm zur Punkteverteilung",
         "rows": {
           "threePoints": "3 Punkte",
           "twoPoints": "2 Punkte",
           "onePoint": "1 Punkt",
           "zeroPoints": "0 Punkte"
         }
+      },
+      "trend": {
+        "title": "Punkte pro Spieltag",
+        "chartAriaLabel": "Liniendiagramm der Punkte pro Spieltag",
+        "tooltipPoints": "{{points}} Punkte",
+        "empty": "Noch keine ausgewerteten Spieltage vorhanden."
       },
       "rounds": {
         "title": "Spieltag-Extrema",

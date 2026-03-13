@@ -650,6 +650,7 @@
       },
       "distribution": {
         "title": "Розподіл балів за зіграними матчами",
+        "chartAriaLabel": "Кругова діаграма розподілу балів",
         "rows": {
           "threePoints": "3 бали",
           "twoPoints": "2 бали",
@@ -657,8 +658,14 @@
           "zeroPoints": "0 балів"
         }
       },
+      "trend": {
+        "title": "Бали по турах",
+        "chartAriaLabel": "Лінійна діаграма балів по турах",
+        "tooltipPoints": "{{points}} балів",
+        "empty": "Ще немає оцінених турів."
+      },
       "rounds": {
-        "title": "Екстремуми по турах",
+        "title": "Бали по турах",
         "best": "Найкращий тур",
         "worst": "Найслабший тур",
         "pointsLabel": "{{points}} балів",

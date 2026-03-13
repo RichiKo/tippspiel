@@ -236,6 +236,18 @@ describe('RankingService', () => {
     expect(result.pointsDistribution.zeroPoints.count).toBe(2);
     expect(result.pointsDistribution.threePoints.ratio).toBeCloseTo(1 / 3, 5);
     expect(result.pointsDistribution.zeroPoints.ratio).toBeCloseTo(2 / 3, 5);
+    expect(result.pointsByRound).toEqual([
+      {
+        roundId: 'r1',
+        roundName: 'Round 1',
+        points: 3,
+      },
+      {
+        roundId: 'r2',
+        roundName: 'Round 2',
+        points: 0,
+      },
+    ]);
     expect(result.bestRound).toEqual({
       roundId: 'r1',
       roundName: 'Round 1',
@@ -282,6 +294,7 @@ describe('RankingService', () => {
     expect(result.pointsDistribution.twoPoints.ratio).toBe(0);
     expect(result.pointsDistribution.onePoint.ratio).toBe(0);
     expect(result.pointsDistribution.zeroPoints.ratio).toBe(0);
+    expect(result.pointsByRound).toEqual([]);
     expect(result.bestRound).toBeNull();
     expect(result.worstRound).toBeNull();
   });

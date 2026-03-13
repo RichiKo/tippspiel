@@ -1268,6 +1268,18 @@ Authorization: Bearer <token>
   "participatedMatches": 15,
   "missedMatches": 3,
   "averagePointsPerRound": 4.25,
+  "pointsByRound": [
+    {
+      "roundId": "round-uuid-1",
+      "roundName": "Vorrunde 1",
+      "points": 7
+    },
+    {
+      "roundId": "round-uuid-2",
+      "roundName": "Vorrunde 2",
+      "points": 4
+    }
+  ],
   "pointsDistribution": {
     "threePoints": { "count": 6, "ratio": 0.3333333333 },
     "twoPoints": { "count": 3, "ratio": 0.1666666667 },
@@ -1292,6 +1304,7 @@ Authorization: Bearer <token>
 - `participatedMatches`: Geschlossene Spiele mit abgegebenem Tipp
 - `missedMatches`: Geschlossene Spiele ohne abgegebenen Tipp (`notTipped`)
 - `averagePointsPerRound`: Durchschnittliche Punkte pro ausgewertetem Spieltag
+- `pointsByRound`: Punkte des Users je ausgewertetem Spieltag (Reihenfolge nach Spielzeit)
 - `pointsDistribution.*.ratio`: Anteil relativ zu `playedMatches`
 - `bestRound` / `worstRound`: Spieltag mit maximalen/minimalen Punkten (bei fehlenden geschlossenen Spielen = `null`)
 

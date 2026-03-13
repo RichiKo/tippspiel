@@ -35,7 +35,7 @@
   grid-template-columns: 1fr 1.3fr;
   grid-template-areas:
     'summary distribution'
-    'rounds distribution';
+    'rounds rounds';
   gap: var(--ts-space-4);
   align-items: start;
 }
@@ -92,6 +92,25 @@
   font-size: 1.05rem;
 }
 
+.distribution-visuals {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: var(--ts-space-3);
+  align-items: center;
+}
+
+.distribution-chart-shell {
+  position: relative;
+  width: 100%;
+  min-height: 240px;
+  max-height: 260px;
+}
+
+.distribution-chart-shell canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .distribution-list {
   display: flex;
   flex-direction: column;
@@ -127,13 +146,58 @@
   height: 100%;
   min-width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #0ea5e9 0%, #10b981 100%);
+  background: rgba(34, 197, 94, 0.29);
+}
+
+.distribution-bar-fill--success {
+  background: rgba(34, 197, 94, 0.29);
+}
+
+.distribution-bar-fill--info {
+  background: rgba(37, 99, 235, 0.26);
+}
+
+.distribution-bar-fill--warning {
+  background: rgba(245, 158, 11, 0.34);
+}
+
+.distribution-bar-fill--danger {
+  background: rgba(220, 38, 38, 0.29);
 }
 
 .distribution-ratio {
   color: var(--ts-text-secondary);
   font-weight: 700;
   align-self: flex-end;
+}
+
+.rounds-trend {
+  margin-top: var(--ts-space-4);
+  padding-top: var(--ts-space-3);
+  border-top: 1px solid #e5edf2;
+}
+
+.rounds-trend h4 {
+  margin: 0 0 var(--ts-space-2);
+  font-size: 0.95rem;
+  color: var(--ts-text-secondary);
+}
+
+.trend-chart-shell {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+}
+
+.trend-chart-shell canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.trend-empty {
+  margin: 0;
+  color: var(--ts-text-secondary);
+  font-style: italic;
 }
 
 .rounds-grid {
@@ -200,6 +264,15 @@
       'summary'
       'distribution'
       'rounds';
+  }
+
+  .distribution-visuals {
+    grid-template-columns: 1fr;
+  }
+
+  .distribution-chart-shell {
+    min-height: 220px;
+    max-height: 240px;
   }
 }
 

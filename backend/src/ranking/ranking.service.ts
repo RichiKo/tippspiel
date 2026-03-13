@@ -76,6 +76,7 @@ export interface UserChampionshipStatisticsDto {
   participatedMatches: number;
   missedMatches: number;
   averagePointsPerRound: number;
+  pointsByRound: RoundPointsDto[];
   pointsDistribution: {
     threePoints: PointsBucketDto;
     twoPoints: PointsBucketDto;
@@ -558,6 +559,7 @@ export class RankingService {
       participatedMatches,
       missedMatches,
       averagePointsPerRound,
+      pointsByRound: rounds,
       pointsDistribution: {
         threePoints: {
           count: threePointsCount,

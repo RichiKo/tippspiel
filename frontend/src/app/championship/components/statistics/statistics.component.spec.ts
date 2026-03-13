@@ -10,6 +10,37 @@ describe('StatisticsComponent', () => {
   let component: StatisticsComponent;
   let fixture: ComponentFixture<StatisticsComponent>;
 
+  const defaultStatistics = {
+    championshipId: 'champ-1',
+    userId: 1,
+    totalMatches: 24,
+    playedMatches: 10,
+    participatedMatches: 8,
+    missedMatches: 2,
+    averagePointsPerRound: 4.6,
+    pointsByRound: [
+      { roundId: 'r-1', roundName: 'Round 1', points: 7 },
+      { roundId: 'r-2', roundName: 'Round 2', points: 4 },
+      { roundId: 'r-3', roundName: 'Round 3', points: 1 },
+    ],
+    pointsDistribution: {
+      threePoints: { count: 3, ratio: 0.3 },
+      twoPoints: { count: 2, ratio: 0.2 },
+      onePoint: { count: 1, ratio: 0.1 },
+      zeroPoints: { count: 4, ratio: 0.4 },
+    },
+    bestRound: {
+      roundId: 'r-1',
+      roundName: 'Round 1',
+      points: 7,
+    },
+    worstRound: {
+      roundId: 'r-3',
+      roundName: 'Round 3',
+      points: 1,
+    },
+  };
+
   const mockChampionshipService = {
     getChampionshipById: jasmine.createSpy('getChampionshipById').and.returnValue(
       of({
@@ -28,38 +59,14 @@ describe('StatisticsComponent', () => {
   };
 
   const mockRankingService = {
-    getMyStatistics: jasmine.createSpy('getMyStatistics').and.returnValue(
-      of({
-        championshipId: 'champ-1',
-        userId: 1,
-        totalMatches: 24,
-        playedMatches: 10,
-        participatedMatches: 8,
-        missedMatches: 2,
-        averagePointsPerRound: 4.6,
-        pointsDistribution: {
-          threePoints: { count: 3, ratio: 0.3 },
-          twoPoints: { count: 2, ratio: 0.2 },
-          onePoint: { count: 1, ratio: 0.1 },
-          zeroPoints: { count: 4, ratio: 0.4 },
-        },
-        bestRound: {
-          roundId: 'r-1',
-          roundName: 'Round 1',
-          points: 7,
-        },
-        worstRound: {
-          roundId: 'r-3',
-          roundName: 'Round 3',
-          points: 1,
-        },
-      }),
-    ),
+    getMyStatistics: jasmine.createSpy('getMyStatistics'),
   };
 
   const navigateSpy = jasmine.createSpy('navigate');
 
   beforeEach(async () => {
+    mockRankingService.getMyStatistics.and.returnValue(of(defaultStatistics));
+
     await TestBed.configureTestingModule({
       imports: [StatisticsComponent, TranslateModule.forRoot()],
       providers: [
@@ -118,18 +125,32 @@ describe('StatisticsComponent', () => {
   });
 
   it('should show fallback text when best and worst rounds are missing', () => {
-    const currentStats = component.statistics();
-    expect(currentStats).toBeTruthy();
+    mockRankingService.getMyStatistics.and.returnValue(
+      of({
+        championshipId: 'champ-1',
+        userId: 1,
+        totalMatches: 24,
+        playedMatches: 10,
+        participatedMatches: 8,
+        missedMatches: 2,
+        averagePointsPerRound: 4.6,
+        pointsByRound: [],
+        pointsDistribution: {
+          threePoints: { count: 3, ratio: 0.3 },
+          twoPoints: { count: 2, ratio: 0.2 },
+          onePoint: { count: 1, ratio: 0.1 },
+          zeroPoints: { count: 4, ratio: 0.4 },
+        },
+        bestRound: null,
+        worstRound: null,
+      }),
+    );
 
-    component.statistics.set({
-      ...currentStats!,
-      bestRound: null,
-      worstRound: null,
-    });
-    fixture.detectChanges();
+    const fallbackFixture = TestBed.createComponent(StatisticsComponent);
+    fallbackFixture.detectChanges();
 
-    const emptyBlocks = fixture.nativeElement.querySelectorAll('.round-empty');
-    expect(emptyBlocks.length).toBe(2);
+    const text = fallbackFixture.nativeElement.textContent as string;
+    expect(text).toContain('Keine Daten');
   });
 
   it('should navigate back when header back button is clicked', () => {

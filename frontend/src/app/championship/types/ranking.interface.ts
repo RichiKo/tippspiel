@@ -63,6 +63,7 @@ export interface ChampionshipStatistics {
   participatedMatches: number;
   missedMatches: number;
   averagePointsPerRound: number;
+  pointsByRound: RoundPoints[];
   pointsDistribution: {
     threePoints: PointsBucket;
     twoPoints: PointsBucket;

@@ -118,26 +118,49 @@
             <h3>
               {{ "championship.statistics.distribution.title" | translate }}
             </h3>
-            <div class="distribution-list">
-              @for (item of distributionItems(); track item.labelKey) {
-                <div class="distribution-row">
-                  <div class="distribution-label">
-                    <span>{{ item.labelKey | translate }}</span>
-                    <ui-badge [tone]="item.tone" appearance="soft">{{
-                      item.bucket.count
-                    }}</ui-badge>
+            <div class="distribution-visuals">
+              <div class="distribution-chart-shell">
+                <canvas
+                  #distributionChart
+                  [attr.aria-label]="
+                    'championship.statistics.distribution.chartAriaLabel'
+                      | translate
+                  "
+                ></canvas>
+              </div>
+              <div class="distribution-list">
+                @for (item of distributionItems(); track item.labelKey) {
+                  <div class="distribution-row">
+                    <div class="distribution-label">
+                      <span>{{ item.labelKey | translate }}</span>
+                      <ui-badge [tone]="item.tone" appearance="soft">{{
+                        item.bucket.count
+                      }}</ui-badge>
+                    </div>
+                    <div class="distribution-bar">
+                      <span
+                        class="distribution-bar-fill"
+                        [class.distribution-bar-fill--success]="
+                          item.tone === 'success'
+                        "
+                        [class.distribution-bar-fill--info]="
+                          item.tone === 'info'
+                        "
+                        [class.distribution-bar-fill--warning]="
+                          item.tone === 'warning'
+                        "
+                        [class.distribution-bar-fill--danger]="
+                          item.tone === 'danger'
+                        "
+                        [style.width.%]="item.bucket.ratio * 100"
+                      ></span>
+                    </div>
+                    <small class="distribution-ratio">{{
+                      formatPercent(item.bucket.ratio)
+                    }}</small>
                   </div>
-                  <div class="distribution-bar">
-                    <span
-                      class="distribution-bar-fill"
-                      [style.width.%]="item.bucket.ratio * 100"
-                    ></span>
-                  </div>
-                  <small class="distribution-ratio">{{
-                    formatPercent(item.bucket.ratio)
-                  }}</small>
-                </div>
-              }
+                }
+              </div>
             </div>
           </ui-card>
           <ui-card variant="default" padding="md" class="rounds-card">
@@ -194,6 +217,22 @@
                   </p>
                 }
               </div>
+            </div>
+            <div class="rounds-trend">
+              @if (stats.pointsByRound.length > 0) {
+                <div class="trend-chart-shell">
+                  <canvas
+                    #roundTrendChart
+                    [attr.aria-label]="
+                      'championship.statistics.trend.chartAriaLabel' | translate
+                    "
+                  ></canvas>
+                </div>
+              } @else {
+                <p class="trend-empty">
+                  {{ "championship.statistics.trend.empty" | translate }}
+                </p>
+              }
             </div>
           </ui-card>
         </div>
