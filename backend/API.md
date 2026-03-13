@@ -1248,6 +1248,61 @@ Für `champion` wird eine Spalte geliefert, für `champion_finalist` zwei Spalte
 
 ---
 
+### **GET** `/rankings/championship/:championshipId/statistics/me`
+
+Liefert die persönliche Spielstatistik des aktuell eingeloggten Users innerhalb einer Championship.
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Response (JSON)**
+
+```json
+{
+  "championshipId": "championship-uuid",
+  "userId": 1,
+  "totalMatches": 30,
+  "playedMatches": 18,
+  "participatedMatches": 15,
+  "missedMatches": 3,
+  "averagePointsPerRound": 4.25,
+  "pointsDistribution": {
+    "threePoints": { "count": 6, "ratio": 0.3333333333 },
+    "twoPoints": { "count": 3, "ratio": 0.1666666667 },
+    "onePoint": { "count": 4, "ratio": 0.2222222222 },
+    "zeroPoints": { "count": 5, "ratio": 0.2777777778 }
+  },
+  "bestRound": {
+    "roundId": "round-uuid-1",
+    "roundName": "Vorrunde 1",
+    "points": 7
+  },
+  "worstRound": {
+    "roundId": "round-uuid-4",
+    "roundName": "Achtelfinale",
+    "points": 1
+  }
+}
+```
+
+- `totalMatches`: Alle Spiele der Championship (offen + geschlossen)
+- `playedMatches`: Bereits geschlossene Spiele (`isClosed = true`)
+- `participatedMatches`: Geschlossene Spiele mit abgegebenem Tipp
+- `missedMatches`: Geschlossene Spiele ohne abgegebenen Tipp (`notTipped`)
+- `averagePointsPerRound`: Durchschnittliche Punkte pro ausgewertetem Spieltag
+- `pointsDistribution.*.ratio`: Anteil relativ zu `playedMatches`
+- `bestRound` / `worstRound`: Spieltag mit maximalen/minimalen Punkten (bei fehlenden geschlossenen Spielen = `null`)
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Abfrage
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - User ist kein aktiver Teilnehmer der Championship
+- `404 Not Found` - Championship existiert nicht
+
+---
+
 ## Upload API
 
 ### **POST** `/upload/team-logo`

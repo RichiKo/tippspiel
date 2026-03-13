@@ -471,6 +471,7 @@
       "links": {
         "ranking": "Перевірка нарахувань",
         "standings": "Таблиця результатів",
+        "statistics": "Статистика гравця",
         "bonusOverview": "Огляд бонусів",
         "editChampionship": "Редагувати чемпіонат"
       },
@@ -625,6 +626,47 @@
       "errors": {
         "loadChampionship": "Помилка завантаження даних чемпіонату.",
         "loadStandings": "Помилка завантаження таблиці результатів."
+      }
+    },
+    "statistics": {
+      "loading": "Завантаження...",
+      "page": {
+        "kicker": "Статистика",
+        "title": "Статистика гравця",
+        "backLabel": "Назад до чемпіонату"
+      },
+      "badges": {
+        "playedMatches": "{{played}} з {{total}} матчів завершено",
+        "participation": "Участь: {{percent}}%"
+      },
+      "summary": {
+        "title": "Короткий підсумок",
+        "totalMatches": "Усього матчів",
+        "participatedMatches": "Поклав",
+        "missedMatches": "Забув",
+        "averagePointsPerRound": "В cередньому за тур",
+        "resultativeVsNotGuessed": "Результативні / Не вгадані %",
+        "resultativeVsNotGuessedInNumbers": "Результативні / Не вгадані у числах"
+      },
+      "distribution": {
+        "title": "Розподіл балів за зіграними матчами",
+        "rows": {
+          "threePoints": "3 бали",
+          "twoPoints": "2 бали",
+          "onePoint": "1 бал",
+          "zeroPoints": "0 балів"
+        }
+      },
+      "rounds": {
+        "title": "Екстремуми по турах",
+        "best": "Найкращий тур",
+        "worst": "Найслабший тур",
+        "pointsLabel": "{{points}} балів",
+        "notAvailable": "Ще немає оцінених матчів."
+      },
+      "errors": {
+        "loadChampionship": "Помилка завантаження даних чемпіонату.",
+        "loadStatistics": "Помилка завантаження статистики."
       }
     },
     "tipsTable": {

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { RankingEntity } from './ranking.entity';
@@ -12,6 +16,7 @@ import { BonusRuleEntity } from '../bonus/bonus-rule.entity';
 import { BonusRuleStatus } from '../bonus/bonus-rule-status.enum';
 import { BonusRuleType } from '../bonus/bonus-rule-type.enum';
 import { GameEntity } from '../game/game.entity';
+import { computeTipOutcome } from '../tip/tip-calculation';
 
 export interface EvaluatedBonusRuleDto {
   id: string;
@@ -50,6 +55,35 @@ export interface StandingsResponseDto {
   evaluatedBonusRules: EvaluatedBonusRuleDto[];
   bonusColumns: BonusColumnDto[];
   standings: StandingRowDto[];
+}
+
+export interface PointsBucketDto {
+  count: number;
+  ratio: number;
+}
+
+export interface RoundPointsDto {
+  roundId: string;
+  roundName: string;
+  points: number;
+}
+
+export interface UserChampionshipStatisticsDto {
+  championshipId: string;
+  userId: number;
+  totalMatches: number;
+  playedMatches: number;
+  participatedMatches: number;
+  missedMatches: number;
+  averagePointsPerRound: number;
+  pointsDistribution: {
+    threePoints: PointsBucketDto;
+    twoPoints: PointsBucketDto;
+    onePoint: PointsBucketDto;
+    zeroPoints: PointsBucketDto;
+  };
+  bestRound: RoundPointsDto | null;
+  worstRound: RoundPointsDto | null;
 }
 
 interface UserRankingData {
@@ -408,6 +442,145 @@ export class RankingService {
     return { evaluatedBonusRules, bonusColumns, standings };
   }
 
+  async findUserStatisticsByChampionship(
+    championshipId: string,
+    userId: number,
+  ): Promise<UserChampionshipStatisticsDto> {
+    await this.recalculateForChampionship(championshipId);
+
+    const activeMembership = await this.membershipRepository.findOne({
+      where: {
+        championshipId,
+        userId,
+        status: MembershipStatus.ACTIVE,
+      },
+      select: ['id'],
+    });
+
+    if (!activeMembership) {
+      throw new ForbiddenException(
+        'You are not an active participant in this championship',
+      );
+    }
+
+    const games = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.round', 'round')
+      .where('round.championshipId = :championshipId', { championshipId })
+      .orderBy('game.kickoffTime', 'ASC')
+      .getMany();
+
+    const closedGames = games.filter((game) => game.isClosed);
+    const tips = await this.tipRepository.find({
+      where: { championshipId, userId },
+      select: [
+        'id',
+        'gameId',
+        'homeTeamGoals',
+        'awayTeamGoals',
+        'points',
+        'outcomeType',
+      ],
+    });
+    const tipByGameId = new Map(tips.map((tip) => [tip.gameId, tip]));
+
+    let participatedMatches = 0;
+    let missedMatches = 0;
+    let threePointsCount = 0;
+    let twoPointsCount = 0;
+    let onePointCount = 0;
+    let zeroPointsCount = 0;
+
+    const roundTotals = new Map<string, RoundPointsDto>();
+
+    for (const game of closedGames) {
+      const tip = tipByGameId.get(game.id);
+      const participated = this.hasParticipatedInGame(tip);
+
+      if (participated) {
+        participatedMatches++;
+      } else {
+        missedMatches++;
+      }
+
+      const gamePoints = this.resolvePointsForClosedGame(tip, game);
+
+      if (gamePoints === 3) {
+        threePointsCount++;
+      } else if (gamePoints === 2) {
+        twoPointsCount++;
+      } else if (gamePoints === 1) {
+        onePointCount++;
+      } else {
+        zeroPointsCount++;
+      }
+
+      const roundId = game.round?.id ?? game.roundId;
+      const roundName = game.round?.name ?? roundId;
+      const existingRound = roundTotals.get(roundId);
+
+      if (existingRound) {
+        existingRound.points += gamePoints;
+      } else {
+        roundTotals.set(roundId, { roundId, roundName, points: gamePoints });
+      }
+    }
+
+    const playedMatches = closedGames.length;
+    const ratio = (count: number): number =>
+      playedMatches === 0 ? 0 : count / playedMatches;
+
+    const rounds = Array.from(roundTotals.values());
+    const totalPointsAcrossRounds = rounds.reduce(
+      (sum, round) => sum + round.points,
+      0,
+    );
+    const averagePointsPerRound =
+      rounds.length === 0 ? 0 : totalPointsAcrossRounds / rounds.length;
+    const bestRound =
+      rounds.length === 0
+        ? null
+        : rounds.reduce((best, current) =>
+            current.points > best.points ? current : best,
+          );
+    const worstRound =
+      rounds.length === 0
+        ? null
+        : rounds.reduce((worst, current) =>
+            current.points < worst.points ? current : worst,
+          );
+
+    return {
+      championshipId,
+      userId,
+      totalMatches: games.length,
+      playedMatches,
+      participatedMatches,
+      missedMatches,
+      averagePointsPerRound,
+      pointsDistribution: {
+        threePoints: {
+          count: threePointsCount,
+          ratio: ratio(threePointsCount),
+        },
+        twoPoints: {
+          count: twoPointsCount,
+          ratio: ratio(twoPointsCount),
+        },
+        onePoint: {
+          count: onePointCount,
+          ratio: ratio(onePointCount),
+        },
+        zeroPoints: {
+          count: zeroPointsCount,
+          ratio: ratio(zeroPointsCount),
+        },
+      },
+      bestRound,
+      worstRound,
+    };
+  }
+
   private async backfillMissingNotTipped(
     championshipId: string,
     closedGameIds: string[],
@@ -493,5 +666,67 @@ export class RankingService {
     }
 
     return ranking;
+  }
+
+  private hasParticipatedInGame(tip: TipEntity | undefined): boolean {
+    return !!tip &&
+      tip.outcomeType !== TipOutcome.NOT_TIPPED &&
+      tip.homeTeamGoals !== null &&
+      tip.awayTeamGoals !== null;
+  }
+
+  private resolvePointsForClosedGame(
+    tip: TipEntity | undefined,
+    game: GameEntity,
+  ): 0 | 1 | 2 | 3 {
+    if (!tip || !this.hasParticipatedInGame(tip)) {
+      return 0;
+    }
+
+    if (tip.points !== null) {
+      if (tip.points >= 3) {
+        return 3;
+      }
+      if (tip.points === 2) {
+        return 2;
+      }
+      if (tip.points === 1) {
+        return 1;
+      }
+      return 0;
+    }
+
+    if (tip.outcomeType !== null) {
+      return this.mapOutcomeToPoints(tip.outcomeType);
+    }
+
+    if (
+      tip.homeTeamGoals !== null &&
+      tip.awayTeamGoals !== null &&
+      game.homeScore !== null &&
+      game.awayScore !== null
+    ) {
+      return computeTipOutcome(
+        tip.homeTeamGoals,
+        tip.awayTeamGoals,
+        game.homeScore,
+        game.awayScore,
+      ).points;
+    }
+
+    return 0;
+  }
+
+  private mapOutcomeToPoints(outcome: TipOutcome): 0 | 1 | 2 | 3 {
+    if (outcome === TipOutcome.EXACT) {
+      return 3;
+    }
+    if (outcome === TipOutcome.GOAL_DIFF) {
+      return 2;
+    }
+    if (outcome === TipOutcome.TENDENCY) {
+      return 1;
+    }
+    return 0;
   }
 }

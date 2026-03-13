@@ -22,6 +22,7 @@ describe('RankingService', () => {
 
   const membershipRepository = {
     find: jest.fn(),
+    findOne: jest.fn(),
   };
 
   const bonusEvaluationRepository = {
@@ -57,8 +58,10 @@ describe('RankingService', () => {
 
     const closedGamesBuilder = {
       leftJoin: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
       getMany: jest.fn().mockResolvedValue([{ id: 'game-1' }]),
     };
     gameRepository.createQueryBuilder.mockReturnValue(closedGamesBuilder);
@@ -142,5 +145,155 @@ describe('RankingService', () => {
     expect(tipRepository.createQueryBuilder).toHaveBeenCalled();
     expect(rankingRepository.delete).toHaveBeenCalled();
     expect(rankingRepository.save).toHaveBeenCalledTimes(2);
+  });
+
+  it('findUserStatisticsByChampionship should aggregate closed games and round points', async () => {
+    const recalculateSpy = jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+
+    const gamesBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([
+        {
+          id: 'g1',
+          isClosed: true,
+          roundId: 'r1',
+          round: { id: 'r1', name: 'Round 1' },
+          homeScore: 2,
+          awayScore: 1,
+        },
+        {
+          id: 'g2',
+          isClosed: true,
+          roundId: 'r1',
+          round: { id: 'r1', name: 'Round 1' },
+          homeScore: 1,
+          awayScore: 1,
+        },
+        {
+          id: 'g3',
+          isClosed: true,
+          roundId: 'r2',
+          round: { id: 'r2', name: 'Round 2' },
+          homeScore: 0,
+          awayScore: 1,
+        },
+        {
+          id: 'g4',
+          isClosed: false,
+          roundId: 'r2',
+          round: { id: 'r2', name: 'Round 2' },
+          homeScore: null,
+          awayScore: null,
+        },
+      ]),
+    };
+    gameRepository.createQueryBuilder.mockReturnValue(gamesBuilder);
+
+    tipRepository.find.mockResolvedValue([
+      {
+        id: 'tip-1',
+        gameId: 'g1',
+        homeTeamGoals: 2,
+        awayTeamGoals: 1,
+        points: 3,
+        outcomeType: TipOutcome.EXACT,
+      },
+      {
+        id: 'tip-2',
+        gameId: 'g2',
+        homeTeamGoals: null,
+        awayTeamGoals: null,
+        points: 0,
+        outcomeType: TipOutcome.NOT_TIPPED,
+      },
+      {
+        id: 'tip-3',
+        gameId: 'g3',
+        homeTeamGoals: 1,
+        awayTeamGoals: 0,
+        points: 0,
+        outcomeType: TipOutcome.MISSED,
+      },
+    ]);
+
+    const result = await service.findUserStatisticsByChampionship('champ-1', 1);
+
+    expect(recalculateSpy).toHaveBeenCalledWith('champ-1');
+    expect(result.totalMatches).toBe(4);
+    expect(result.playedMatches).toBe(3);
+    expect(result.participatedMatches).toBe(2);
+    expect(result.missedMatches).toBe(1);
+    expect(result.averagePointsPerRound).toBeCloseTo(1.5, 5);
+    expect(result.pointsDistribution.threePoints.count).toBe(1);
+    expect(result.pointsDistribution.twoPoints.count).toBe(0);
+    expect(result.pointsDistribution.onePoint.count).toBe(0);
+    expect(result.pointsDistribution.zeroPoints.count).toBe(2);
+    expect(result.pointsDistribution.threePoints.ratio).toBeCloseTo(1 / 3, 5);
+    expect(result.pointsDistribution.zeroPoints.ratio).toBeCloseTo(2 / 3, 5);
+    expect(result.bestRound).toEqual({
+      roundId: 'r1',
+      roundName: 'Round 1',
+      points: 3,
+    });
+    expect(result.worstRound).toEqual({
+      roundId: 'r2',
+      roundName: 'Round 2',
+      points: 0,
+    });
+  });
+
+  it('findUserStatisticsByChampionship should return zero ratios and null rounds when no closed games exist', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+
+    const gamesBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([
+        {
+          id: 'g-open',
+          isClosed: false,
+          roundId: 'r-open',
+          round: { id: 'r-open', name: 'Round Open' },
+          homeScore: null,
+          awayScore: null,
+        },
+      ]),
+    };
+    gameRepository.createQueryBuilder.mockReturnValue(gamesBuilder);
+    tipRepository.find.mockResolvedValue([]);
+
+    const result = await service.findUserStatisticsByChampionship('champ-1', 1);
+
+    expect(result.playedMatches).toBe(0);
+    expect(result.participatedMatches).toBe(0);
+    expect(result.missedMatches).toBe(0);
+    expect(result.averagePointsPerRound).toBe(0);
+    expect(result.pointsDistribution.threePoints.ratio).toBe(0);
+    expect(result.pointsDistribution.twoPoints.ratio).toBe(0);
+    expect(result.pointsDistribution.onePoint.ratio).toBe(0);
+    expect(result.pointsDistribution.zeroPoints.ratio).toBe(0);
+    expect(result.bestRound).toBeNull();
+    expect(result.worstRound).toBeNull();
+  });
+
+  it('findUserStatisticsByChampionship should throw when user is not an active member', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue(null);
+
+    await expect(
+      service.findUserStatisticsByChampionship('champ-1', 99),
+    ).rejects.toThrow('You are not an active participant in this championship');
   });
 });

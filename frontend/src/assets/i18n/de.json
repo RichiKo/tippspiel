@@ -471,6 +471,7 @@
       "links": {
         "ranking": "Pruef-Kalkulation",
         "standings": "Ergebnis-Tabelle",
+        "statistics": "Spieler-Statistik",
         "bonusOverview": "Bonus-Uebersicht",
         "editChampionship": "Championship bearbeiten"
       },
@@ -625,6 +626,47 @@
       "errors": {
         "loadChampionship": "Fehler beim Laden der Championship-Daten.",
         "loadStandings": "Fehler beim Laden der Ergebnis-Tabelle."
+      }
+    },
+    "statistics": {
+      "loading": "Laden...",
+      "page": {
+        "kicker": "Statistik",
+        "title": "Spieler-Statistik",
+        "backLabel": "Zurueck zur Championship"
+      },
+      "badges": {
+        "playedMatches": "{{played}} von {{total}} Spielen beendet",
+        "participation": "Teilnahme: {{percent}}%"
+      },
+      "summary": {
+        "title": "Kurzuebersicht",
+        "totalMatches": "Alle Spiele",
+        "participatedMatches": "Spiele mit Tipp",
+        "missedMatches": "Verpasste Spiele",
+        "averagePointsPerRound": "Durchschnittspunkte pro Spieltag",
+        "resultativeVsNotGuessed": "Erfolgreich (3/2/1) / Nicht getroffen (0)",
+        "resultativeVsNotGuessedInNumbers": "Erfolgreich (3/2/1) / Nicht getroffen (0) in Zahlen"
+      },
+      "distribution": {
+        "title": "Punkteverteilung in ausgewerteten Spielen",
+        "rows": {
+          "threePoints": "3 Punkte",
+          "twoPoints": "2 Punkte",
+          "onePoint": "1 Punkt",
+          "zeroPoints": "0 Punkte"
+        }
+      },
+      "rounds": {
+        "title": "Spieltag-Extrema",
+        "best": "Bester Spieltag",
+        "worst": "Schwaechster Spieltag",
+        "pointsLabel": "{{points}} Punkte",
+        "notAvailable": "Noch keine ausgewerteten Spiele vorhanden."
+      },
+      "errors": {
+        "loadChampionship": "Fehler beim Laden der Championship-Daten.",
+        "loadStatistics": "Fehler beim Laden der Statistik."
       }
     },
     "tipsTable": {

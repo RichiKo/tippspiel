@@ -43,3 +43,32 @@ export interface StandingsResponse {
   bonusColumns: BonusColumn[];
   standings: StandingRow[];
 }
+
+export interface PointsBucket {
+  count: number;
+  ratio: number;
+}
+
+export interface RoundPoints {
+  roundId: string;
+  roundName: string;
+  points: number;
+}
+
+export interface ChampionshipStatistics {
+  championshipId: string;
+  userId: number;
+  totalMatches: number;
+  playedMatches: number;
+  participatedMatches: number;
+  missedMatches: number;
+  averagePointsPerRound: number;
+  pointsDistribution: {
+    threePoints: PointsBucket;
+    twoPoints: PointsBucket;
+    onePoint: PointsBucket;
+    zeroPoints: PointsBucket;
+  };
+  bestRound: RoundPoints | null;
+  worstRound: RoundPoints | null;
+}

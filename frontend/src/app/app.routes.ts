@@ -79,6 +79,15 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'championship/:id/statistics',
+    canActivate: [AuthGuard],
+    data: { seo: PRIVATE_SEO },
+    loadComponent: () =>
+      import('./championship/components/statistics/statistics.component').then(
+        (m) => m.StatisticsComponent,
+      ),
+  },
+  {
     path: 'championship/:id/bonus-overview',
     canActivate: [AuthGuard],
     data: { seo: PRIVATE_SEO },

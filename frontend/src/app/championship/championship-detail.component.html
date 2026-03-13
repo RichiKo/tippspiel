@@ -64,6 +64,20 @@
               }}</span>
             </a>
             <a
+              [routerLink]="['/championship', championshipId, 'statistics']"
+              class="statistics-link"
+            >
+              <lucide-icon
+                [img]="icons.medal"
+                [size]="18"
+                class="action-link__icon"
+                aria-hidden="true"
+              ></lucide-icon>
+              <span class="action-link__label">{{
+                "championship.detail.links.statistics" | translate
+              }}</span>
+            </a>
+            <a
               [routerLink]="['/championship', championshipId, 'bonus-overview']"
               class="bonus-link"
             >
