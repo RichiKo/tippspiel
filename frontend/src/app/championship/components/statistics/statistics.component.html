@@ -12,235 +12,533 @@
       </p>
     </ui-card>
   } @else {
-    @if (statistics(); as stats) {
-      <ui-card variant="elevated" padding="lg" class="statistics-shell">
-        <ui-page-header
-          [kicker]="'championship.statistics.page.kicker' | translate"
-          [title]="'championship.statistics.page.title' | translate"
-          [subtitle]="championship()?.name ?? null"
-          [showBack]="true"
-          [backLabel]="'championship.statistics.page.backLabel' | translate"
-          (back)="backToChampionship()"
+    <ui-card variant="elevated" padding="lg" class="statistics-shell">
+      <ui-page-header
+        [kicker]="'championship.statistics.page.kicker' | translate"
+        [title]="pageTitleKey() | translate"
+        [subtitle]="championship()?.name ?? null"
+        [showBack]="true"
+        [backLabel]="'championship.statistics.page.backLabel' | translate"
+        (back)="backToChampionship()"
+      >
+        <div uiPageHeaderActions class="statistics-actions">
+          @if (statisticsMode() === "user") {
+            @if (statistics(); as stats) {
+              <ui-badge tone="info" appearance="soft">
+                <lucide-icon
+                  [img]="icons.table"
+                  [size]="14"
+                  aria-hidden="true"
+                ></lucide-icon>
+                {{
+                  "championship.statistics.badges.playedMatches"
+                    | translate
+                      : {
+                          played: stats.playedMatches,
+                          total: stats.totalMatches,
+                        }
+                }}
+              </ui-badge>
+              <ui-badge tone="success" appearance="soft">
+                <lucide-icon
+                  [img]="icons.medal"
+                  [size]="14"
+                  aria-hidden="true"
+                ></lucide-icon>
+                {{
+                  "championship.statistics.badges.participation"
+                    | translate: { percent: participationPercent() }
+                }}
+              </ui-badge>
+            }
+          } @else {
+            @if (championshipStatistics(); as roundStats) {
+              <ui-badge tone="info" appearance="soft">
+                <lucide-icon
+                  [img]="icons.table"
+                  [size]="14"
+                  aria-hidden="true"
+                ></lucide-icon>
+                {{
+                  "championship.statistics.badges.playedMatches"
+                    | translate
+                      : {
+                          played: roundStats.playedMatches,
+                          total: roundStats.totalMatches,
+                        }
+                }}
+              </ui-badge>
+              <ui-badge tone="success" appearance="soft">
+                <lucide-icon
+                  [img]="icons.users"
+                  [size]="14"
+                  aria-hidden="true"
+                ></lucide-icon>
+                {{
+                  "championship.statistics.badges.participants"
+                    | translate: { count: roundStats.participantsCount }
+                }}
+              </ui-badge>
+            }
+          }
+        </div>
+      </ui-page-header>
+
+      <div
+        class="statistics-mode-toggle"
+        role="tablist"
+        [attr.aria-label]="'championship.statistics.views.ariaLabel' | translate"
+      >
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="statisticsMode() === 'user'"
+          [class.is-active]="statisticsMode() === 'user'"
+          (click)="setStatisticsMode('user')"
         >
-          <div uiPageHeaderActions class="statistics-actions">
-            <ui-badge tone="info" appearance="soft">
-              <lucide-icon
-                [img]="icons.table"
-                [size]="14"
-                aria-hidden="true"
-              ></lucide-icon>
-              {{
-                "championship.statistics.badges.playedMatches"
-                  | translate
-                    : { played: stats.playedMatches, total: stats.totalMatches }
-              }}
-            </ui-badge>
-            <ui-badge tone="success" appearance="soft">
-              <lucide-icon
-                [img]="icons.medal"
-                [size]="14"
-                aria-hidden="true"
-              ></lucide-icon>
-              {{
-                "championship.statistics.badges.participation"
-                  | translate: { percent: participationPercent() }
-              }}
-            </ui-badge>
-          </div>
-        </ui-page-header>
+          {{ "championship.statistics.views.user" | translate }}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="statisticsMode() === 'championship'"
+          [class.is-active]="statisticsMode() === 'championship'"
+          (click)="setStatisticsMode('championship')"
+        >
+          {{ "championship.statistics.views.championship" | translate }}
+        </button>
+      </div>
 
-        <div class="statistics-grid">
-          <ui-card variant="default" padding="md" class="summary-card">
-            <h3>{{ "championship.statistics.summary.title" | translate }}</h3>
-            <dl class="summary-list">
-              <div class="summary-row">
-                <dt>
-                  {{
-                    "championship.statistics.summary.totalMatches" | translate
-                  }}
-                </dt>
-                <dd>{{ stats.totalMatches }}</dd>
-              </div>
-              <div class="summary-row">
-                <dt>
-                  {{
-                    "championship.statistics.summary.participatedMatches"
-                      | translate
-                  }}
-                </dt>
-                <dd>{{ stats.participatedMatches }}</dd>
-              </div>
-              <div class="summary-row">
-                <dt>
-                  {{
-                    "championship.statistics.summary.missedMatches" | translate
-                  }}
-                </dt>
-                <dd>{{ stats.missedMatches }}</dd>
-              </div>
-              <div class="summary-row">
-                <dt>
-                  {{
-                    "championship.statistics.summary.averagePointsPerRound"
-                      | translate
-                  }}
-                </dt>
-                <dd>{{ stats.averagePointsPerRound | number: "1.1-1" }}</dd>
-              </div>
-              <div class="summary-row">
-                <dt>
-                  {{
-                    "championship.statistics.summary.resultativeVsNotGuessedInNumbers"
-                      | translate
-                  }}
-                </dt>
-                <dd>
-                  {{ resultativeGamesCount() }} /
-                  {{ notResultativeGamesCount() }}
-                </dd>
-              </div>
-              <div class="summary-row">
-                <dt>
-                  {{
-                    "championship.statistics.summary.resultativeVsNotGuessed"
-                      | translate
-                  }}
-                </dt>
-                <dd>
-                  {{ formatPercent(resultativeGamesRatio()) }} /
-                  {{ formatPercent(notGuessedGamesRatio()) }}
-                </dd>
-              </div>
-            </dl>
-          </ui-card>
-
-          <ui-card variant="default" padding="md" class="distribution-card">
-            <h3>
-              {{ "championship.statistics.distribution.title" | translate }}
-            </h3>
-            <div class="distribution-visuals">
-              <div class="distribution-chart-shell">
-                <canvas
-                  #distributionChart
-                  [attr.aria-label]="
-                    'championship.statistics.distribution.chartAriaLabel'
-                      | translate
-                  "
-                ></canvas>
-              </div>
-              <div class="distribution-list">
-                @for (item of distributionItems(); track item.labelKey) {
-                  <div class="distribution-row">
-                    <div class="distribution-label">
-                      <span>{{ item.labelKey | translate }}</span>
-                      <ui-badge [tone]="item.tone" appearance="soft">{{
-                        item.bucket.count
-                      }}</ui-badge>
-                    </div>
-                    <div class="distribution-bar">
-                      <span
-                        class="distribution-bar-fill"
-                        [class.distribution-bar-fill--success]="
-                          item.tone === 'success'
-                        "
-                        [class.distribution-bar-fill--info]="
-                          item.tone === 'info'
-                        "
-                        [class.distribution-bar-fill--warning]="
-                          item.tone === 'warning'
-                        "
-                        [class.distribution-bar-fill--danger]="
-                          item.tone === 'danger'
-                        "
-                        [style.width.%]="item.bucket.ratio * 100"
-                      ></span>
-                    </div>
-                    <small class="distribution-ratio">{{
-                      formatPercent(item.bucket.ratio)
-                    }}</small>
-                  </div>
-                }
-              </div>
-            </div>
-          </ui-card>
-          <ui-card variant="default" padding="md" class="rounds-card">
-            <h3>{{ "championship.statistics.rounds.title" | translate }}</h3>
-            <div class="rounds-grid">
-              <div class="round-box round-box--best">
-                <p class="round-label">
-                  <lucide-icon
-                    [img]="icons.trophy"
-                    [size]="15"
-                    aria-hidden="true"
-                  ></lucide-icon>
-                  {{ "championship.statistics.rounds.best" | translate }}
-                </p>
-                @if (stats.bestRound) {
-                  <div class="round-result-line">
-                    <p class="round-name">{{ stats.bestRound.roundName }}</p>
-                    <p class="round-points">
-                      {{
-                        "championship.statistics.rounds.pointsLabel"
-                          | translate: { points: stats.bestRound.points }
-                      }}
-                    </p>
-                  </div>
-                } @else {
-                  <p class="round-empty">
+      @if (statisticsMode() === "user") {
+        @if (statistics(); as stats) {
+          <div class="statistics-grid">
+            <ui-card variant="default" padding="md" class="summary-card">
+              <h3>{{ "championship.statistics.summary.title" | translate }}</h3>
+              <dl class="summary-list">
+                <div class="summary-row">
+                  <dt>
                     {{
-                      "championship.statistics.rounds.notAvailable" | translate
+                      "championship.statistics.summary.totalMatches" | translate
                     }}
-                  </p>
-                }
-              </div>
-
-              <div class="round-box round-box--worst">
-                <p class="round-label">
-                  <lucide-icon
-                    [img]="icons.circleX"
-                    [size]="15"
-                    aria-hidden="true"
-                  ></lucide-icon>
-                  {{ "championship.statistics.rounds.worst" | translate }}
-                </p>
-                @if (stats.worstRound) {
-                  <div class="round-result-line">
-                    <p class="round-name">{{ stats.worstRound.roundName }}</p>
-                    <p class="round-points">
-                      {{
-                        "championship.statistics.rounds.pointsLabel"
-                          | translate: { points: stats.worstRound.points }
-                      }}
-                    </p>
-                  </div>
-                } @else {
-                  <p class="round-empty">
+                  </dt>
+                  <dd>{{ stats.totalMatches }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
                     {{
-                      "championship.statistics.rounds.notAvailable" | translate
+                      "championship.statistics.summary.participatedMatches"
+                        | translate
                     }}
-                  </p>
-                }
-              </div>
-            </div>
-            <div class="rounds-trend">
-              @if (stats.pointsByRound.length > 0) {
-                <div class="trend-chart-shell">
+                  </dt>
+                  <dd>{{ stats.participatedMatches }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.missedMatches" | translate
+                    }}
+                  </dt>
+                  <dd>{{ stats.missedMatches }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.averagePointsPerRound"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ stats.averagePointsPerRound | number: "1.1-1" }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.resultativeVsNotGuessedInNumbers"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>
+                    {{ resultativeGamesCount() }} /
+                    {{ notResultativeGamesCount() }}
+                  </dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.resultativeVsNotGuessed"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>
+                    {{ formatPercent(resultativeGamesRatio()) }} /
+                    {{ formatPercent(notGuessedGamesRatio()) }}
+                  </dd>
+                </div>
+              </dl>
+            </ui-card>
+
+            <ui-card variant="default" padding="md" class="distribution-card">
+              <h3>
+                {{ "championship.statistics.distribution.title" | translate }}
+              </h3>
+              <div class="distribution-visuals">
+                <div class="distribution-chart-shell">
                   <canvas
-                    #roundTrendChart
+                    #distributionChart
                     [attr.aria-label]="
-                      'championship.statistics.trend.chartAriaLabel' | translate
+                      'championship.statistics.distribution.chartAriaLabel'
+                        | translate
                     "
                   ></canvas>
                 </div>
-              } @else {
-                <p class="trend-empty">
-                  {{ "championship.statistics.trend.empty" | translate }}
-                </p>
-              }
-            </div>
-          </ui-card>
-        </div>
-      </ui-card>
-    }
+                <div class="distribution-list">
+                  @for (item of distributionItems(); track item.labelKey) {
+                    <div class="distribution-row">
+                      <div class="distribution-label">
+                        <span>{{ item.labelKey | translate }}</span>
+                        <ui-badge [tone]="item.tone" appearance="soft">{{
+                          item.bucket.count
+                        }}</ui-badge>
+                      </div>
+                      <div class="distribution-bar">
+                        <span
+                          class="distribution-bar-fill"
+                          [class.distribution-bar-fill--success]="
+                            item.tone === 'success'
+                          "
+                          [class.distribution-bar-fill--info]="
+                            item.tone === 'info'
+                          "
+                          [class.distribution-bar-fill--warning]="
+                            item.tone === 'warning'
+                          "
+                          [class.distribution-bar-fill--danger]="
+                            item.tone === 'danger'
+                          "
+                          [style.width.%]="item.bucket.ratio * 100"
+                        ></span>
+                      </div>
+                      <small class="distribution-ratio">{{
+                        formatPercent(item.bucket.ratio)
+                      }}</small>
+                    </div>
+                  }
+                </div>
+              </div>
+            </ui-card>
+
+            <ui-card variant="default" padding="md" class="rounds-card">
+              <h3>{{ "championship.statistics.rounds.title" | translate }}</h3>
+              <div class="rounds-grid">
+                <div class="round-box round-box--best">
+                  <p class="round-label">
+                    <lucide-icon
+                      [img]="icons.trophy"
+                      [size]="15"
+                      aria-hidden="true"
+                    ></lucide-icon>
+                    {{ "championship.statistics.rounds.best" | translate }}
+                  </p>
+                  @if (stats.bestRound) {
+                    <div class="round-result-line">
+                      <p class="round-name">{{ stats.bestRound.roundName }}</p>
+                      <p class="round-points">
+                        {{
+                          "championship.statistics.rounds.pointsLabel"
+                            | translate: { points: stats.bestRound.points }
+                        }}
+                      </p>
+                    </div>
+                  } @else {
+                    <p class="round-empty">
+                      {{
+                        "championship.statistics.rounds.notAvailable" | translate
+                      }}
+                    </p>
+                  }
+                </div>
+
+                <div class="round-box round-box--worst">
+                  <p class="round-label">
+                    <lucide-icon
+                      [img]="icons.circleX"
+                      [size]="15"
+                      aria-hidden="true"
+                    ></lucide-icon>
+                    {{ "championship.statistics.rounds.worst" | translate }}
+                  </p>
+                  @if (stats.worstRound) {
+                    <div class="round-result-line">
+                      <p class="round-name">{{ stats.worstRound.roundName }}</p>
+                      <p class="round-points">
+                        {{
+                          "championship.statistics.rounds.pointsLabel"
+                            | translate: { points: stats.worstRound.points }
+                        }}
+                      </p>
+                    </div>
+                  } @else {
+                    <p class="round-empty">
+                      {{
+                        "championship.statistics.rounds.notAvailable" | translate
+                      }}
+                    </p>
+                  }
+                </div>
+              </div>
+              <div class="rounds-trend">
+                @if (stats.pointsByRound.length > 0) {
+                  <div class="trend-chart-shell">
+                    <canvas
+                      #roundTrendChart
+                      [attr.aria-label]="
+                        'championship.statistics.trend.chartAriaLabel'
+                          | translate
+                      "
+                    ></canvas>
+                  </div>
+                } @else {
+                  <p class="trend-empty">
+                    {{ "championship.statistics.trend.empty" | translate }}
+                  </p>
+                }
+              </div>
+            </ui-card>
+          </div>
+        }
+      } @else {
+        @if (championshipStatistics(); as roundStats) {
+          <div class="statistics-grid">
+            <ui-card variant="default" padding="md" class="summary-card">
+              <h3>{{ "championship.statistics.roundMode.summary.title" | translate }}</h3>
+              <dl class="summary-list">
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.totalMatches" | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.totalMatches }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.participatedMatches"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.participatedMatches }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.missedMatches"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.missedMatches }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.roundMode.summary.totalPointsAllUsers"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundTotalPointsAllUsers() }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.roundMode.summary.exactHits"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.pointsDistribution.threePoints.count }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.roundMode.summary.goalDiffHits"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.pointsDistribution.twoPoints.count }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.roundMode.summary.tendencyHits"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.pointsDistribution.onePoint.count }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.roundMode.summary.losses"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>{{ roundStats.pointsDistribution.zeroPoints.count }}</dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.resultativeVsNotGuessedInNumbers"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>
+                    {{ roundResultativeGamesCount() }} /
+                    {{ roundNotResultativeGamesCount() }}
+                  </dd>
+                </div>
+                <div class="summary-row">
+                  <dt>
+                    {{
+                      "championship.statistics.summary.resultativeVsNotGuessed"
+                        | translate
+                    }}
+                  </dt>
+                  <dd>
+                    {{ formatPercent(roundResultativeGamesRatio()) }} /
+                    {{ formatPercent(roundNotGuessedGamesRatio()) }}
+                  </dd>
+                </div>
+              </dl>
+            </ui-card>
+
+            <ui-card variant="default" padding="md" class="distribution-card">
+              <h3>
+                {{ "championship.statistics.distribution.title" | translate }}
+              </h3>
+              <div class="distribution-visuals">
+                <div class="distribution-chart-shell">
+                  <canvas
+                    #distributionChart
+                    [attr.aria-label]="
+                      'championship.statistics.distribution.chartAriaLabel'
+                        | translate
+                    "
+                  ></canvas>
+                </div>
+                <div class="distribution-list">
+                  @for (item of roundDistributionItems(); track item.labelKey) {
+                    <div class="distribution-row">
+                      <div class="distribution-label">
+                        <span>{{ item.labelKey | translate }}</span>
+                        <ui-badge [tone]="item.tone" appearance="soft">{{
+                          item.bucket.count
+                        }}</ui-badge>
+                      </div>
+                      <div class="distribution-bar">
+                        <span
+                          class="distribution-bar-fill"
+                          [class.distribution-bar-fill--success]="
+                            item.tone === 'success'
+                          "
+                          [class.distribution-bar-fill--info]="
+                            item.tone === 'info'
+                          "
+                          [class.distribution-bar-fill--warning]="
+                            item.tone === 'warning'
+                          "
+                          [class.distribution-bar-fill--danger]="
+                            item.tone === 'danger'
+                          "
+                          [style.width.%]="item.bucket.ratio * 100"
+                        ></span>
+                      </div>
+                      <small class="distribution-ratio">{{
+                        formatPercent(item.bucket.ratio)
+                      }}</small>
+                    </div>
+                  }
+                </div>
+              </div>
+            </ui-card>
+
+            <ui-card variant="default" padding="md" class="rounds-card">
+              <h3>{{ "championship.statistics.rounds.title" | translate }}</h3>
+              <div class="rounds-grid">
+                <div class="round-box round-box--best">
+                  <p class="round-label">
+                    <lucide-icon
+                      [img]="icons.trophy"
+                      [size]="15"
+                      aria-hidden="true"
+                    ></lucide-icon>
+                    {{ "championship.statistics.rounds.best" | translate }}
+                  </p>
+                  @if (roundStats.bestRound) {
+                    <div class="round-result-line">
+                      <p class="round-name">{{ roundStats.bestRound.roundName }}</p>
+                      <p class="round-points">
+                        {{
+                          "championship.statistics.rounds.pointsLabel"
+                            | translate: { points: roundStats.bestRound.points }
+                        }}
+                      </p>
+                    </div>
+                  } @else {
+                    <p class="round-empty">
+                      {{
+                        "championship.statistics.rounds.notAvailable" | translate
+                      }}
+                    </p>
+                  }
+                </div>
+
+                <div class="round-box round-box--worst">
+                  <p class="round-label">
+                    <lucide-icon
+                      [img]="icons.circleX"
+                      [size]="15"
+                      aria-hidden="true"
+                    ></lucide-icon>
+                    {{ "championship.statistics.rounds.worst" | translate }}
+                  </p>
+                  @if (roundStats.worstRound) {
+                    <div class="round-result-line">
+                      <p class="round-name">{{ roundStats.worstRound.roundName }}</p>
+                      <p class="round-points">
+                        {{
+                          "championship.statistics.rounds.pointsLabel"
+                            | translate: { points: roundStats.worstRound.points }
+                        }}
+                      </p>
+                    </div>
+                  } @else {
+                    <p class="round-empty">
+                      {{
+                        "championship.statistics.rounds.notAvailable" | translate
+                      }}
+                    </p>
+                  }
+                </div>
+              </div>
+              <div class="rounds-trend">
+                @if (roundStats.pointsByRound.length > 0) {
+                  <div class="trend-chart-shell">
+                    <canvas
+                      #roundTrendChart
+                      [attr.aria-label]="
+                        'championship.statistics.trend.chartAriaLabel'
+                          | translate
+                      "
+                    ></canvas>
+                  </div>
+                } @else {
+                  <p class="trend-empty">
+                    {{ "championship.statistics.trend.empty" | translate }}
+                  </p>
+                }
+              </div>
+            </ui-card>
+          </div>
+        }
+      }
+    </ui-card>
   }
 </section>

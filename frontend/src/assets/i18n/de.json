@@ -633,11 +633,18 @@
       "page": {
         "kicker": "Statistik",
         "title": "Spieler-Statistik",
+        "championshipTitle": "Championship-Statistik",
         "backLabel": "Zurueck zur Championship"
+      },
+      "views": {
+        "ariaLabel": "Statistik-Modus",
+        "user": "Mein Profil",
+        "championship": "Championship"
       },
       "badges": {
         "playedMatches": "{{played}} von {{total}} Spielen beendet",
-        "participation": "Teilnahme: {{percent}}%"
+        "participation": "Teilnahme: {{percent}}%",
+        "participants": "{{count}} Teilnehmer"
       },
       "summary": {
         "title": "Kurzuebersicht",
@@ -670,6 +677,17 @@
         "worst": "Schwaechster Spieltag",
         "pointsLabel": "{{points}} Punkte",
         "notAvailable": "Noch keine ausgewerteten Spiele vorhanden."
+      },
+      "roundMode": {
+        "tableTitle": "Teilnehmer in der Championship",
+        "summary": {
+          "title": "Championship-Uebersicht",
+          "totalPointsAllUsers": "Summe der Punkte aller Teilnehmer",
+          "exactHits": "Anzahl Exakt",
+          "goalDiffHits": "Anzahl Differenz",
+          "tendencyHits": "Anzahl Tendenz",
+          "losses": "Anzahl Niederlagen"
+        }
       },
       "errors": {
         "loadChampionship": "Fehler beim Laden der Championship-Daten.",

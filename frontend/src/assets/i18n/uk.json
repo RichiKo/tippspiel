@@ -471,7 +471,7 @@
       "links": {
         "ranking": "Перевірка нарахувань",
         "standings": "Таблиця результатів",
-        "statistics": "Статистика гравця",
+        "statistics": "Статистика",
         "bonusOverview": "Огляд бонусів",
         "editChampionship": "Редагувати чемпіонат"
       },
@@ -633,17 +633,24 @@
       "page": {
         "kicker": "Статистика",
         "title": "Статистика гравця",
+        "championshipTitle": "Статистика чемпіонату",
         "backLabel": "Назад до чемпіонату"
+      },
+      "views": {
+        "ariaLabel": "Режим статистики",
+        "user": "Моя статистика",
+        "championship": "Статистика чемпіонату"
       },
       "badges": {
         "playedMatches": "{{played}} з {{total}} матчів завершено",
-        "participation": "Участь: {{percent}}%"
+        "participation": "Участь: {{percent}}%",
+        "participants": "{{count}} учасників"
       },
       "summary": {
         "title": "Короткий підсумок",
         "totalMatches": "Усього матчів",
-        "participatedMatches": "Поклав",
-        "missedMatches": "Забув",
+        "participatedMatches": "Покладено",
+        "missedMatches": "Забуто",
         "averagePointsPerRound": "В cередньому за тур",
         "resultativeVsNotGuessed": "Результативні / Не вгадані %",
         "resultativeVsNotGuessedInNumbers": "Результативні / Не вгадані у числах"
@@ -670,6 +677,17 @@
         "worst": "Найслабший тур",
         "pointsLabel": "{{points}} балів",
         "notAvailable": "Ще немає оцінених матчів."
+      },
+      "roundMode": {
+        "tableTitle": "Учасники чемпіонату",
+        "summary": {
+          "title": "Підсумок чемпіонату",
+          "totalPointsAllUsers": "Сума балів усіх учасників",
+          "exactHits": "Кількість точних",
+          "goalDiffHits": "Кількість різниць",
+          "tendencyHits": "Кількість тенденцій",
+          "losses": "Кількість програшів"
+        }
       },
       "errors": {
         "loadChampionship": "Помилка завантаження даних чемпіонату.",

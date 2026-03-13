@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
+  ChampionshipAggregateStatistics,
   ChampionshipStatistics,
   Ranking,
   StandingsResponse,
@@ -24,6 +25,14 @@ export class RankingService {
   getMyStatistics(championshipId: string): Observable<ChampionshipStatistics> {
     return this.http.get<ChampionshipStatistics>(
       `/api/rankings/championship/${championshipId}/statistics/me`,
+    );
+  }
+
+  getChampionshipStatistics(
+    championshipId: string,
+  ): Observable<ChampionshipAggregateStatistics> {
+    return this.http.get<ChampionshipAggregateStatistics>(
+      `/api/rankings/championship/${championshipId}/statistics/championship`,
     );
   }
 }

@@ -117,13 +117,13 @@
     </header>
 
     @if (hasActiveBonusRules()) {
-      <section class="bonus-section-full">
+      <section class="bonus-section-full bonus-section-full--active">
         <div class="bonus-section-header">
           <h2>{{ "championship.detail.bonus.title" | translate }}</h2>
           @if (isMobileView()) {
             <button
               type="button"
-              class="bonus-toggle-btn"
+              class="bonus-toggle-btn bonus-toggle-btn--active"
               (click)="toggleBonusSection()"
               [attr.aria-expanded]="isBonusExpanded()"
             >

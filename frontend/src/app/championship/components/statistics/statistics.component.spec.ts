@@ -41,6 +41,64 @@ describe('StatisticsComponent', () => {
     },
   };
 
+  const defaultRoundStatistics = {
+    championshipId: 'champ-1',
+    totalMatches: 8,
+    playedMatches: 6,
+    participantsCount: 12,
+    participatedMatches: 58,
+    missedMatches: 14,
+    averagePointsPerRound: 31,
+    averagePointsPerParticipant: 5.2,
+    totalPointsAllParticipants: 62,
+    pointsByRound: [
+      { roundId: 'r-1', roundName: 'Round 1', points: 34 },
+      { roundId: 'r-2', roundName: 'Round 2', points: 28 },
+    ],
+    pointsDistribution: {
+      threePoints: { count: 18, ratio: 0.25 },
+      twoPoints: { count: 12, ratio: 0.1666666667 },
+      onePoint: { count: 10, ratio: 0.1388888889 },
+      zeroPoints: { count: 32, ratio: 0.4444444444 },
+    },
+    bestRound: {
+      roundId: 'r-1',
+      roundName: 'Round 1',
+      points: 34,
+    },
+    worstRound: {
+      roundId: 'r-2',
+      roundName: 'Round 2',
+      points: 28,
+    },
+    bestParticipant: {
+      userId: 1,
+      username: 'Round Pro',
+      points: 11,
+    },
+    worstParticipant: {
+      userId: 9,
+      username: 'No Luck',
+      points: 0,
+    },
+    participants: [
+      {
+        place: 1,
+        userId: 1,
+        username: 'Round Pro',
+        totalPoints: 11,
+        participatedMatches: 6,
+        missedMatches: 0,
+        pointsDistribution: {
+          threePoints: { count: 3, ratio: 0.5 },
+          twoPoints: { count: 1, ratio: 0.1666666667 },
+          onePoint: { count: 1, ratio: 0.1666666667 },
+          zeroPoints: { count: 1, ratio: 0.1666666667 },
+        },
+      },
+    ],
+  };
+
   const mockChampionshipService = {
     getChampionshipById: jasmine.createSpy('getChampionshipById').and.returnValue(
       of({
@@ -60,12 +118,16 @@ describe('StatisticsComponent', () => {
 
   const mockRankingService = {
     getMyStatistics: jasmine.createSpy('getMyStatistics'),
+    getChampionshipStatistics: jasmine.createSpy('getChampionshipStatistics'),
   };
 
   const navigateSpy = jasmine.createSpy('navigate');
 
   beforeEach(async () => {
     mockRankingService.getMyStatistics.and.returnValue(of(defaultStatistics));
+    mockRankingService.getChampionshipStatistics.and.returnValue(
+      of(defaultRoundStatistics),
+    );
 
     await TestBed.configureTestingModule({
       imports: [StatisticsComponent, TranslateModule.forRoot()],
@@ -161,5 +223,22 @@ describe('StatisticsComponent', () => {
     backButton.click();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/championship', 'champ-1']);
+  });
+
+  it('should switch to championship statistics mode and load aggregate data', () => {
+    const roundModeButton = fixture.nativeElement.querySelectorAll(
+      '.statistics-mode-toggle button',
+    )[1] as HTMLButtonElement;
+
+    roundModeButton.click();
+    fixture.detectChanges();
+
+    expect(mockRankingService.getChampionshipStatistics).toHaveBeenCalledWith(
+      'champ-1',
+    );
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('62');
+    expect(text).toContain('Round 1');
+    expect(text).toContain('Round 2');
   });
 });

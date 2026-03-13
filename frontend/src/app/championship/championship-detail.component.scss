@@ -214,6 +214,14 @@
   backdrop-filter: blur(4px);
 }
 
+.bonus-section-full--active {
+  border-color: rgba(37, 99, 235, 0.72);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 58%, #3b82f6 100%);
+  box-shadow:
+    0 12px 30px rgba(29, 78, 216, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
 .bonus-section-header {
   padding: 14px 20px;
   display: flex;
@@ -228,6 +236,15 @@
   font-size: 1.2rem;
 }
 
+.bonus-section-full--active .bonus-section-header {
+  background: transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.28);
+}
+
+.bonus-section-full--active .bonus-section-header h2 {
+  color: #ffffff;
+}
+
 .bonus-toggle-btn {
   display: none;
   min-height: 40px;
@@ -239,6 +256,22 @@
   font-family: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.bonus-toggle-btn--active {
+  border-color: rgba(255, 255, 255, 0.66);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.bonus-toggle-btn--active:hover {
+  border-color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.bonus-section-full--active .bonus-section-content {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 0 0 14px 14px;
 }
 
 .bonus-section-content {

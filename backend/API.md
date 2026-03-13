@@ -1316,6 +1316,106 @@ Authorization: Bearer <token>
 
 ---
 
+### **GET** `/rankings/championship/:championshipId/statistics/championship`
+
+Liefert die aggregierte Statistik der gesamten Championship fuer alle aktiven Teilnehmer.
+
+**Legacy Alias:** `/rankings/championship/:championshipId/statistics/round` liefert weiterhin dieselbe Championship-weite Statistik.
+
+#### **Headers**
+```
+Authorization: Bearer <token>
+```
+
+#### **Response (JSON)**
+
+```json
+{
+  "championshipId": "championship-uuid",
+  "totalMatches": 30,
+  "playedMatches": 18,
+  "participantsCount": 12,
+  "participatedMatches": 170,
+  "missedMatches": 46,
+  "averagePointsPerRound": 27.5,
+  "averagePointsPerParticipant": 6.5,
+  "totalPointsAllParticipants": 495,
+  "pointsByRound": [
+    {
+      "roundId": "round-uuid-1",
+      "roundName": "Vorrunde 1",
+      "points": 74
+    },
+    {
+      "roundId": "round-uuid-2",
+      "roundName": "Vorrunde 2",
+      "points": 68
+    }
+  ],
+  "pointsDistribution": {
+    "threePoints": { "count": 20, "ratio": 0.2777777778 },
+    "twoPoints": { "count": 14, "ratio": 0.1944444444 },
+    "onePoint": { "count": 10, "ratio": 0.1388888889 },
+    "zeroPoints": { "count": 28, "ratio": 0.3888888889 }
+  },
+  "bestRound": {
+    "roundId": "round-uuid-1",
+    "roundName": "Vorrunde 1",
+    "points": 74
+  },
+  "worstRound": {
+    "roundId": "round-uuid-4",
+    "roundName": "Achtelfinale",
+    "points": 39
+  },
+  "bestParticipant": {
+    "userId": 7,
+    "username": "max",
+    "points": 13
+  },
+  "worstParticipant": {
+    "userId": 11,
+    "username": "tom",
+    "points": 0
+  },
+  "participants": [
+    {
+      "place": 1,
+      "userId": 7,
+      "username": "max",
+      "totalPoints": 13,
+      "participatedMatches": 6,
+      "missedMatches": 0,
+      "pointsDistribution": {
+        "threePoints": { "count": 3, "ratio": 0.5 },
+        "twoPoints": { "count": 2, "ratio": 0.3333333333 },
+        "onePoint": { "count": 1, "ratio": 0.1666666667 },
+        "zeroPoints": { "count": 0, "ratio": 0 }
+      }
+    }
+  ]
+}
+```
+
+- `totalMatches`: Alle Spiele der Championship (offen + geschlossen)
+- `playedMatches`: Geschlossene Spiele der Championship (`isClosed = true`)
+- `participantsCount`: Anzahl aktiver Teilnehmer in der Championship
+- `participatedMatches` / `missedMatches`: Summe der abgegebenen bzw. verpassten Tipps ueber alle Teilnehmer und geschlossenen Spiele
+- `averagePointsPerRound`: Durchschnittliche Gesamtpunkte aller Teilnehmer pro ausgewertetem Spieltag
+- `totalPointsAllParticipants`: Summe aller erzielten Punkte aller Teilnehmer in der Championship
+- `pointsByRound`: Gesamtpunkte aller Teilnehmer je ausgewertetem Spieltag
+- `pointsDistribution`: Aggregiert ueber alle Teilnehmer und alle geschlossenen Spiele der Championship
+- `bestRound` / `worstRound`: Spieltag mit maximalen/minimalen Gesamtpunkten (bei fehlenden geschlossenen Spielen = `null`)
+- `participants`: Statistik pro Teilnehmer ueber die gesamte Championship
+
+#### **Status Codes**
+- `200 OK` - Erfolgreiche Abfrage
+- `401 Unauthorized` - Nicht authentifiziert
+- `403 Forbidden` - User ist kein aktiver Teilnehmer der Championship
+- `404 Not Found` - Championship nicht gefunden
+
+---
+
 ## Upload API
 
 ### **POST** `/upload/team-logo`

@@ -15,6 +15,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Championship } from '../../../dashboard/types/championship.interface';
 import {
+  ChampionshipAggregateStatistics,
   ChampionshipStatistics,
   PointsBucket,
 } from '../../types/ranking.interface';
@@ -35,6 +36,8 @@ interface DistributionItem {
   tone: UiBadgeTone;
   bucket: PointsBucket;
 }
+
+type StatisticsMode = 'user' | 'championship';
 
 @Component({
   selector: 'app-statistics',
@@ -59,7 +62,9 @@ export class StatisticsComponent implements OnDestroy {
   private readonly translate = inject(TranslateService);
 
   championship = signal<Championship | null>(null);
+  statisticsMode = signal<StatisticsMode>('user');
   statistics = signal<ChampionshipStatistics | null>(null);
+  championshipStatistics = signal<ChampionshipAggregateStatistics | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
@@ -86,12 +91,20 @@ export class StatisticsComponent implements OnDestroy {
     value: ElementRef<HTMLCanvasElement> | undefined,
   ) {
     this.distributionCanvasRef = value ?? null;
+    if (!this.distributionCanvasRef) {
+      this.destroyDistributionChart();
+      return;
+    }
     this.renderDistributionChart();
   }
 
   @ViewChild('roundTrendChart')
   set roundTrendChartCanvas(value: ElementRef<HTMLCanvasElement> | undefined) {
     this.roundTrendCanvasRef = value ?? null;
+    if (!this.roundTrendCanvasRef) {
+      this.destroyRoundTrendChart();
+      return;
+    }
     this.renderRoundTrendChart();
   }
 
@@ -153,34 +166,111 @@ export class StatisticsComponent implements OnDestroy {
   });
 
   readonly distributionItems = computed<DistributionItem[]>(() => {
-    const stats = this.statistics();
-    if (!stats) {
+    const distribution = this.statistics()?.pointsDistribution;
+    if (!distribution) {
       return [];
     }
 
+    return this.buildDistributionItems(distribution);
+  });
+
+  readonly roundDistributionItems = computed<DistributionItem[]>(() => {
+    const distribution = this.championshipStatistics()?.pointsDistribution;
+    if (!distribution) {
+      return [];
+    }
+
+    return this.buildDistributionItems(distribution);
+  });
+
+  readonly roundTotalPointsAllUsers = computed(() => {
+    const stats = this.championshipStatistics();
+    if (!stats) {
+      return 0;
+    }
+
+    return stats.totalPointsAllParticipants;
+  });
+
+  readonly roundResultativeGamesCount = computed(() => {
+    const stats = this.championshipStatistics();
+    if (!stats) {
+      return 0;
+    }
+
+    return (
+      stats.pointsDistribution.threePoints.count +
+      stats.pointsDistribution.twoPoints.count +
+      stats.pointsDistribution.onePoint.count
+    );
+  });
+
+  readonly roundNotResultativeGamesCount = computed(() => {
+    const stats = this.championshipStatistics();
+    if (!stats) {
+      return 0;
+    }
+
+    return stats.pointsDistribution.zeroPoints.count;
+  });
+
+  readonly roundResultativeGamesRatio = computed(() => {
+    const stats = this.championshipStatistics();
+    if (!stats) {
+      return 0;
+    }
+
+    return (
+      stats.pointsDistribution.threePoints.ratio +
+      stats.pointsDistribution.twoPoints.ratio +
+      stats.pointsDistribution.onePoint.ratio
+    );
+  });
+
+  readonly roundNotGuessedGamesRatio = computed(() => {
+    const stats = this.championshipStatistics();
+    if (!stats) {
+      return 0;
+    }
+
+    return stats.pointsDistribution.zeroPoints.ratio;
+  });
+
+  readonly pageTitleKey = computed(() =>
+    this.statisticsMode() === 'user'
+      ? 'championship.statistics.page.title'
+      : 'championship.statistics.page.championshipTitle',
+  );
+
+  private buildDistributionItems(distribution: {
+    threePoints: PointsBucket;
+    twoPoints: PointsBucket;
+    onePoint: PointsBucket;
+    zeroPoints: PointsBucket;
+  }): DistributionItem[] {
     return [
       {
         labelKey: 'championship.statistics.distribution.rows.threePoints',
         tone: 'success',
-        bucket: stats.pointsDistribution.threePoints,
+        bucket: distribution.threePoints,
       },
       {
         labelKey: 'championship.statistics.distribution.rows.twoPoints',
         tone: 'info',
-        bucket: stats.pointsDistribution.twoPoints,
+        bucket: distribution.twoPoints,
       },
       {
         labelKey: 'championship.statistics.distribution.rows.onePoint',
         tone: 'warning',
-        bucket: stats.pointsDistribution.onePoint,
+        bucket: distribution.onePoint,
       },
       {
         labelKey: 'championship.statistics.distribution.rows.zeroPoints',
         tone: 'danger',
-        bucket: stats.pointsDistribution.zeroPoints,
+        bucket: distribution.zeroPoints,
       },
     ];
-  });
+  }
 
   championshipId = '';
 
@@ -205,7 +295,7 @@ export class StatisticsComponent implements OnDestroy {
     this.isLoading.set(true);
     this.error.set(null);
     this.loadChampionship();
-    this.loadStatistics();
+    this.loadStatisticsForCurrentMode();
   }
 
   loadChampionship(): void {
@@ -223,10 +313,52 @@ export class StatisticsComponent implements OnDestroy {
     });
   }
 
-  loadStatistics(): void {
+  setStatisticsMode(mode: StatisticsMode): void {
+    if (this.statisticsMode() === mode) {
+      return;
+    }
+
+    this.statisticsMode.set(mode);
+    this.loadStatisticsForCurrentMode();
+  }
+
+  private loadStatisticsForCurrentMode(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    if (this.statisticsMode() === 'user') {
+      this.loadUserStatistics();
+      return;
+    }
+
+    this.loadChampionshipStatistics();
+  }
+
+  private loadUserStatistics(): void {
     this.rankingService.getMyStatistics(this.championshipId).subscribe({
       next: (statistics) => {
         this.statistics.set(statistics);
+        this.championshipStatistics.set(null);
+        this.isLoading.set(false);
+        this.renderDistributionChart();
+        this.renderRoundTrendChart();
+      },
+      error: () => {
+        this.error.set(
+          this.translate.instant('championship.statistics.errors.loadStatistics'),
+        );
+        this.isLoading.set(false);
+        this.destroyDistributionChart();
+        this.destroyRoundTrendChart();
+      },
+    });
+  }
+
+  private loadChampionshipStatistics(): void {
+    this.rankingService.getChampionshipStatistics(this.championshipId).subscribe({
+      next: (statistics) => {
+        this.championshipStatistics.set(statistics);
+        this.statistics.set(null);
         this.isLoading.set(false);
         this.renderDistributionChart();
         this.renderRoundTrendChart();
@@ -252,9 +384,12 @@ export class StatisticsComponent implements OnDestroy {
 
   private renderDistributionChart(): void {
     const canvas = this.distributionCanvasRef?.nativeElement;
-    const stats = this.statistics();
+    const distribution =
+      this.statisticsMode() === 'user'
+        ? this.statistics()?.pointsDistribution
+        : this.championshipStatistics()?.pointsDistribution;
 
-    if (!canvas || !stats) {
+    if (!canvas || !distribution) {
       return;
     }
 
@@ -269,10 +404,10 @@ export class StatisticsComponent implements OnDestroy {
       ),
     ];
     const data = [
-      stats.pointsDistribution.threePoints.count,
-      stats.pointsDistribution.twoPoints.count,
-      stats.pointsDistribution.onePoint.count,
-      stats.pointsDistribution.zeroPoints.count,
+      distribution.threePoints.count,
+      distribution.twoPoints.count,
+      distribution.onePoint.count,
+      distribution.zeroPoints.count,
     ];
 
     if (this.distributionChart) {
@@ -325,15 +460,18 @@ export class StatisticsComponent implements OnDestroy {
 
   private renderRoundTrendChart(): void {
     const canvas = this.roundTrendCanvasRef?.nativeElement;
-    const stats = this.statistics();
+    const pointsByRound =
+      this.statisticsMode() === 'user'
+        ? this.statistics()?.pointsByRound
+        : this.championshipStatistics()?.pointsByRound;
 
-    if (!canvas || !stats || stats.pointsByRound.length === 0) {
+    if (!canvas || !pointsByRound || pointsByRound.length === 0) {
       this.destroyRoundTrendChart();
       return;
     }
 
-    const labels = stats.pointsByRound.map((round) => round.roundName);
-    const points = stats.pointsByRound.map((round) => round.points);
+    const labels = pointsByRound.map((round) => round.roundName);
+    const points = pointsByRound.map((round) => round.points);
     const primary500 = this.resolveCssVar('--ts-primary-500', '#10b981');
     const primary600 = this.resolveCssVar('--ts-primary-600', '#0e7a55');
     const primary700 = this.resolveCssVar('--ts-primary-700', '#0f766e');

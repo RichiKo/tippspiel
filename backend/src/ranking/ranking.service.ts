@@ -87,6 +87,51 @@ export interface UserChampionshipStatisticsDto {
   worstRound: RoundPointsDto | null;
 }
 
+export interface ChampionshipParticipantStatisticsDto {
+  place: number;
+  userId: number;
+  username: string;
+  totalPoints: number;
+  participatedMatches: number;
+  missedMatches: number;
+  pointsDistribution: {
+    threePoints: PointsBucketDto;
+    twoPoints: PointsBucketDto;
+    onePoint: PointsBucketDto;
+    zeroPoints: PointsBucketDto;
+  };
+}
+
+export interface ChampionshipParticipantExtremumDto {
+  userId: number;
+  username: string;
+  points: number;
+}
+
+export interface ChampionshipAggregateStatisticsDto {
+  championshipId: string;
+  totalMatches: number;
+  playedMatches: number;
+  participantsCount: number;
+  participatedMatches: number;
+  missedMatches: number;
+  averagePointsPerRound: number;
+  averagePointsPerParticipant: number;
+  totalPointsAllParticipants: number;
+  pointsByRound: RoundPointsDto[];
+  pointsDistribution: {
+    threePoints: PointsBucketDto;
+    twoPoints: PointsBucketDto;
+    onePoint: PointsBucketDto;
+    zeroPoints: PointsBucketDto;
+  };
+  bestRound: RoundPointsDto | null;
+  worstRound: RoundPointsDto | null;
+  bestParticipant: ChampionshipParticipantExtremumDto | null;
+  worstParticipant: ChampionshipParticipantExtremumDto | null;
+  participants: ChampionshipParticipantStatisticsDto[];
+}
+
 interface UserRankingData {
   userId: number;
   exactHits: number;
@@ -580,6 +625,282 @@ export class RankingService {
       },
       bestRound,
       worstRound,
+    };
+  }
+
+  async findChampionshipStatisticsByChampionship(
+    championshipId: string,
+    userId: number,
+  ): Promise<ChampionshipAggregateStatisticsDto> {
+    await this.recalculateForChampionship(championshipId);
+
+    const activeMembership = await this.membershipRepository.findOne({
+      where: {
+        championshipId,
+        userId,
+        status: MembershipStatus.ACTIVE,
+      },
+      select: ['id'],
+    });
+
+    if (!activeMembership) {
+      throw new ForbiddenException(
+        'You are not an active participant in this championship',
+      );
+    }
+
+    const games = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.round', 'round')
+      .where('round.championshipId = :championshipId', { championshipId })
+      .orderBy('game.kickoffTime', 'ASC')
+      .getMany();
+
+    const closedGames = games.filter((game) => game.isClosed);
+    const closedGameIds = closedGames.map((game) => game.id);
+
+    const rankings = await this.rankingRepository.find({
+      where: { championshipId },
+      relations: ['user'],
+      order: { rank: 'ASC' },
+    });
+
+    const participants = rankings.map((ranking) => ({
+      userId: ranking.userId,
+      username: ranking.user.username,
+    }));
+    const activeUserIds = participants.map((participant) => participant.userId);
+
+    await this.backfillMissingNotTipped(
+      championshipId,
+      closedGameIds,
+      activeUserIds,
+    );
+
+    const tips =
+      closedGameIds.length === 0
+        ? []
+        : await this.tipRepository.find({
+            where: { championshipId, gameId: In(closedGameIds) },
+            select: [
+              'id',
+              'userId',
+              'gameId',
+              'homeTeamGoals',
+              'awayTeamGoals',
+              'points',
+              'outcomeType',
+            ],
+          });
+    const tipByUserAndGameId = new Map<string, TipEntity>(
+      tips.map((tip) => [`${tip.userId}:${tip.gameId}`, tip]),
+    );
+
+    const playedMatches = closedGames.length;
+    const participantsCount = participants.length;
+    const totalPlayedSlots = playedMatches * participantsCount;
+
+    let threePointsTotal = 0;
+    let twoPointsTotal = 0;
+    let onePointTotal = 0;
+    let zeroPointsTotal = 0;
+    let participatedMatchesTotal = 0;
+    let missedMatchesTotal = 0;
+
+    const roundTotals = new Map<string, RoundPointsDto>();
+
+    const participantRows = participants.map((participant) => {
+      let participatedMatches = 0;
+      let missedMatches = 0;
+      let totalPoints = 0;
+      let threePointsCount = 0;
+      let twoPointsCount = 0;
+      let onePointCount = 0;
+      let zeroPointsCount = 0;
+
+      for (const game of closedGames) {
+        const tip = tipByUserAndGameId.get(`${participant.userId}:${game.id}`);
+        const participated = this.hasParticipatedInGame(tip);
+
+        if (participated) {
+          participatedMatches++;
+        } else {
+          missedMatches++;
+        }
+
+        const gamePoints = this.resolvePointsForClosedGame(tip, game);
+        totalPoints += gamePoints;
+
+        const roundId = game.round?.id ?? game.roundId;
+        const roundName = game.round?.name ?? roundId;
+        const existingRound = roundTotals.get(roundId);
+
+        if (existingRound) {
+          existingRound.points += gamePoints;
+        } else {
+          roundTotals.set(roundId, {
+            roundId,
+            roundName,
+            points: gamePoints,
+          });
+        }
+
+        if (gamePoints === 3) {
+          threePointsCount++;
+        } else if (gamePoints === 2) {
+          twoPointsCount++;
+        } else if (gamePoints === 1) {
+          onePointCount++;
+        } else {
+          zeroPointsCount++;
+        }
+      }
+
+      threePointsTotal += threePointsCount;
+      twoPointsTotal += twoPointsCount;
+      onePointTotal += onePointCount;
+      zeroPointsTotal += zeroPointsCount;
+      participatedMatchesTotal += participatedMatches;
+      missedMatchesTotal += missedMatches;
+
+      const perParticipantRatio = (count: number): number =>
+        playedMatches === 0 ? 0 : count / playedMatches;
+
+      return {
+        userId: participant.userId,
+        username: participant.username,
+        totalPoints,
+        participatedMatches,
+        missedMatches,
+        pointsDistribution: {
+          threePoints: {
+            count: threePointsCount,
+            ratio: perParticipantRatio(threePointsCount),
+          },
+          twoPoints: {
+            count: twoPointsCount,
+            ratio: perParticipantRatio(twoPointsCount),
+          },
+          onePoint: {
+            count: onePointCount,
+            ratio: perParticipantRatio(onePointCount),
+          },
+          zeroPoints: {
+            count: zeroPointsCount,
+            ratio: perParticipantRatio(zeroPointsCount),
+          },
+        },
+      };
+    });
+
+    participantRows.sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) {
+        return b.totalPoints - a.totalPoints;
+      }
+      if (b.pointsDistribution.threePoints.count !== a.pointsDistribution.threePoints.count) {
+        return (
+          b.pointsDistribution.threePoints.count -
+          a.pointsDistribution.threePoints.count
+        );
+      }
+      if (b.pointsDistribution.twoPoints.count !== a.pointsDistribution.twoPoints.count) {
+        return (
+          b.pointsDistribution.twoPoints.count -
+          a.pointsDistribution.twoPoints.count
+        );
+      }
+      return a.username.localeCompare(b.username);
+    });
+
+    const rankedParticipants: ChampionshipParticipantStatisticsDto[] =
+      participantRows.map((participant, index) => ({
+        place: index + 1,
+        ...participant,
+      }));
+
+    const aggregateRatio = (count: number): number =>
+      totalPlayedSlots === 0 ? 0 : count / totalPlayedSlots;
+    const averagePointsPerParticipant =
+      rankedParticipants.length === 0
+        ? 0
+        : rankedParticipants.reduce(
+            (sum, participant) => sum + participant.totalPoints,
+            0,
+          ) / rankedParticipants.length;
+    const totalPointsAllParticipants = rankedParticipants.reduce(
+      (sum, participant) => sum + participant.totalPoints,
+      0,
+    );
+    const pointsByRound = Array.from(roundTotals.values());
+    const averagePointsPerRound =
+      pointsByRound.length === 0
+        ? 0
+        : totalPointsAllParticipants / pointsByRound.length;
+    const bestRound =
+      pointsByRound.length === 0
+        ? null
+        : pointsByRound.reduce((best, current) =>
+            current.points > best.points ? current : best,
+          );
+    const worstRound =
+      pointsByRound.length === 0
+        ? null
+        : pointsByRound.reduce((worst, current) =>
+            current.points < worst.points ? current : worst,
+          );
+
+    const bestParticipant =
+      rankedParticipants.length === 0
+        ? null
+        : {
+            userId: rankedParticipants[0].userId,
+            username: rankedParticipants[0].username,
+            points: rankedParticipants[0].totalPoints,
+          };
+    const worstParticipant =
+      rankedParticipants.length === 0
+        ? null
+        : {
+            userId: rankedParticipants[rankedParticipants.length - 1].userId,
+            username:
+              rankedParticipants[rankedParticipants.length - 1].username,
+            points: rankedParticipants[rankedParticipants.length - 1].totalPoints,
+          };
+
+    return {
+      championshipId,
+      totalMatches: games.length,
+      playedMatches,
+      participantsCount,
+      participatedMatches: participatedMatchesTotal,
+      missedMatches: missedMatchesTotal,
+      averagePointsPerRound,
+      averagePointsPerParticipant,
+      totalPointsAllParticipants,
+      pointsByRound,
+      pointsDistribution: {
+        threePoints: {
+          count: threePointsTotal,
+          ratio: aggregateRatio(threePointsTotal),
+        },
+        twoPoints: {
+          count: twoPointsTotal,
+          ratio: aggregateRatio(twoPointsTotal),
+        },
+        onePoint: {
+          count: onePointTotal,
+          ratio: aggregateRatio(onePointTotal),
+        },
+        zeroPoints: {
+          count: zeroPointsTotal,
+          ratio: aggregateRatio(zeroPointsTotal),
+        },
+      },
+      bestRound,
+      worstRound,
+      bestParticipant,
+      worstParticipant,
+      participants: rankedParticipants,
     };
   }
 

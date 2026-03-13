@@ -73,3 +73,48 @@ export interface ChampionshipStatistics {
   bestRound: RoundPoints | null;
   worstRound: RoundPoints | null;
 }
+
+export interface ChampionshipParticipantExtremum {
+  userId: number;
+  username: string;
+  points: number;
+}
+
+export interface ChampionshipStatisticsParticipant {
+  place: number;
+  userId: number;
+  username: string;
+  totalPoints: number;
+  participatedMatches: number;
+  missedMatches: number;
+  pointsDistribution: {
+    threePoints: PointsBucket;
+    twoPoints: PointsBucket;
+    onePoint: PointsBucket;
+    zeroPoints: PointsBucket;
+  };
+}
+
+export interface ChampionshipAggregateStatistics {
+  championshipId: string;
+  totalMatches: number;
+  playedMatches: number;
+  participantsCount: number;
+  participatedMatches: number;
+  missedMatches: number;
+  averagePointsPerRound: number;
+  averagePointsPerParticipant: number;
+  totalPointsAllParticipants: number;
+  pointsByRound: RoundPoints[];
+  pointsDistribution: {
+    threePoints: PointsBucket;
+    twoPoints: PointsBucket;
+    onePoint: PointsBucket;
+    zeroPoints: PointsBucket;
+  };
+  bestRound: RoundPoints | null;
+  worstRound: RoundPoints | null;
+  bestParticipant: ChampionshipParticipantExtremum | null;
+  worstParticipant: ChampionshipParticipantExtremum | null;
+  participants: ChampionshipStatisticsParticipant[];
+}
