@@ -29,6 +29,33 @@ export class ChampionshipCardComponent implements OnInit {
   readonly isDeleting = signal(false);
   readonly pendingRequestsCount = signal(0);
   readonly hasPendingRequests = computed(() => this.pendingRequestsCount() > 0);
+  readonly currentRoundTipLabel = computed(
+    () => this.championship()?.currentRoundTipLabel ?? null,
+  );
+  readonly currentRoundTipTextKey = computed(() => {
+    const status = this.currentRoundTipLabel()?.status;
+    if (status === 'missing_all') {
+      return 'championshipCard.roundTipLabel.missingAll';
+    }
+    if (status === 'missing_some') {
+      return 'championshipCard.roundTipLabel.missingSome';
+    }
+    if (status === 'all_tipped') {
+      return 'championshipCard.roundTipLabel.allTipped';
+    }
+    return null;
+  });
+  readonly currentRoundTipTextParams = computed(() => {
+    const label = this.currentRoundTipLabel();
+    if (!label || label.status !== 'missing_some') {
+      return {};
+    }
+
+    return {
+      missing: label.missingGamesCount,
+      total: label.totalGamesCount,
+    };
+  });
 
   // Membership state signals
   readonly membershipStatus = signal<MembershipStatus | null>(null);

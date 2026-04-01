@@ -21,14 +21,17 @@ import { User } from '../user/decoratos/user.decorator';
 import { ChampionshipOwnerGuard } from '../membership/guards/championship-owner.guard';
 import { UpdateEliminatedTeamsDto } from './dto/update-eliminated-teams.dto';
 import { UpdateSingleEliminatedTeamDto } from './dto/update-single-eliminated-team.dto';
+import { ChampionshipCardResponseDto } from './types/championship-response';
 
 @Controller('championships')
 export class ChampionshipController {
   constructor(private readonly championshipService: ChampionshipService) {}
 
   @Get()
-  async findAll(): Promise<ChampionshipEntity[]> {
-    return this.championshipService.findAll();
+  async findAll(
+    @User('id') userId: number | null,
+  ): Promise<ChampionshipCardResponseDto[]> {
+    return this.championshipService.findAll(userId);
   }
 
   @Get(':id')

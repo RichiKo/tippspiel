@@ -152,6 +152,11 @@
     },
     "pendingRequests": "{{count}} нових заявок",
     "ended": "Чемпіонат завершено",
+    "roundTipLabel": {
+      "missingAll": "Новий тур — прогнози відсутні",
+      "missingSome": "Не всі матчі спрогнозовано {{missing}}/{{total}}",
+      "allTipped": "Усі матчі спрогнозовано"
+    },
     "membership": {
       "pending": "Твою заявку ще не підтверджено",
       "rejected": "Вступ відхилено",

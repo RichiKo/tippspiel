@@ -6,6 +6,9 @@ import { ChampionshipService } from './championship.service';
 import { ChampionshipController } from './championship.controller';
 import { MembershipModule } from '../membership/membership.module';
 import { MembershipEntity } from '../membership/membership.entity';
+import { RoundEntity } from '../round/round.entity';
+import { GameEntity } from '../game/game.entity';
+import { TipEntity } from '../tip/tip.entity';
 
 @Module({
   imports: [
@@ -13,6 +16,9 @@ import { MembershipEntity } from '../membership/membership.entity';
       ChampionshipEntity,
       TeamEntity,
       MembershipEntity,
+      RoundEntity,
+      GameEntity,
+      TipEntity,
     ]),
     forwardRef(() => MembershipModule),
   ],

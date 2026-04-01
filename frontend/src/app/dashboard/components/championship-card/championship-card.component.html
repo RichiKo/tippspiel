@@ -4,6 +4,23 @@
   (click)="onCardClick()"
 >
   <div class="card-image-wrap">
+    @if (currentRoundTipTextKey(); as textKey) {
+      <div
+        class="round-tip-label"
+        [class.round-tip-label--missing-all]="
+          currentRoundTipLabel()?.status === 'missing_all'
+        "
+        [class.round-tip-label--missing-some]="
+          currentRoundTipLabel()?.status === 'missing_some'
+        "
+        [class.round-tip-label--all-tipped]="
+          currentRoundTipLabel()?.status === 'all_tipped'
+        "
+        [attr.title]="textKey | translate : currentRoundTipTextParams()"
+      >
+        {{ textKey | translate : currentRoundTipTextParams() }}
+      </div>
+    }
     <img
       class="championship-image"
       [src]="championship()?.image"

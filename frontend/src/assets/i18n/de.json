@@ -152,6 +152,11 @@
     },
     "pendingRequests": "{{count}} neue Anfrage(n)",
     "ended": "Championship beendet",
+    "roundTipLabel": {
+      "missingAll": "Ein neuer Tour, du hast noch nicht angetippt",
+      "missingSome": "Noch nicht angetippte Spiele {{missing}}/{{total}}",
+      "allTipped": "Alles getippt"
+    },
     "membership": {
       "pending": "Deine Anfrage wurde noch nicht freigegeben",
       "rejected": "Beitritt abgelehnt",
