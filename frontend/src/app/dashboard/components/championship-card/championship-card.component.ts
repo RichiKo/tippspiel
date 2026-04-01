@@ -52,7 +52,7 @@ export class ChampionshipCardComponent implements OnInit {
     }
 
     return {
-      missing: label.missingGamesCount,
+      tipped: label.tippedGamesCount,
       total: label.totalGamesCount,
     };
   });

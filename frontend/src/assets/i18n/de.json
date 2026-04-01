@@ -154,7 +154,7 @@
     "ended": "Championship beendet",
     "roundTipLabel": {
       "missingAll": "Ein neuer Tour, du hast noch nicht angetippt",
-      "missingSome": "Noch nicht angetippte Spiele {{missing}}/{{total}}",
+      "missingSome": "Noch nicht alle Spiele getippt {{tipped}}/{{total}}",
       "allTipped": "Alles getippt"
     },
     "membership": {
