@@ -21,3 +21,18 @@ export interface CurrentRoundTipLabelDto {
 export type ChampionshipCardResponseDto = ChampionshipEntity & {
   currentRoundTipLabel: CurrentRoundTipLabelDto | null;
 };
+
+export interface RoundPredictionProgressDto {
+  roundId: string;
+  roundName: string;
+  isRoundActive: boolean;
+  totalUsers: number;
+  totalMatchesInRound: number;
+  totalPossiblePredictions: number;
+  submittedPredictions: number;
+  progressPercent: number;
+}
+
+export type ChampionshipDetailResponseDto = ChampionshipEntity & {
+  roundPredictionProgress: RoundPredictionProgressDto[];
+};

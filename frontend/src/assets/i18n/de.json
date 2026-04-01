@@ -503,6 +503,9 @@
         "noFinishedResults": "Momentan gibt es noch keine Ergebnisse.",
         "openGames": "Offene Spiele",
         "openGamesTipsProgress": "Abgegebene Tipps bei offenen Spielen: {{filled}} von {{total}}",
+        "activeTourPredictionProgressTitle": "Tippfortschritt im Spieltag",
+        "activeTourPredictionProgressAria": "{{submitted}} von {{total}} Tipps abgegeben ({{percent}}%)",
+        "activeTourPredictionProgressMeta": "{{submitted}}/{{total}} (Teilnehmer: {{users}}, Spiele: {{matches}})",
         "noOpenGames": "Momentan gibt es keine offenen Spiele."
       },
       "views": {

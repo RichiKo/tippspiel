@@ -171,6 +171,54 @@
                 {{ "championship.detail.rounds.activeRound" | translate }}:
                 <strong>{{ round.name }} - {{ formatRoundDate(round) }}</strong>
               </p>
+              @if (
+                showSelectedRoundPredictionProgress() &&
+                selectedRoundPredictionProgress();
+                as progress
+              ) {
+                <div class="active-tour-progress" data-testid="active-tour-progress">
+                  <div class="active-tour-progress__header">
+                    <span>{{
+                      "championship.detail.sections.activeTourPredictionProgressTitle"
+                        | translate
+                    }}</span>
+                    <strong>{{ progress.progressPercent }}%</strong>
+                  </div>
+                  <div
+                    class="active-tour-progress__track"
+                    role="progressbar"
+                    [attr.aria-valuemin]="0"
+                    [attr.aria-valuemax]="100"
+                    [attr.aria-valuenow]="progress.progressPercent"
+                    [attr.aria-label]="
+                      'championship.detail.sections.activeTourPredictionProgressAria'
+                        | translate
+                          : {
+                              submitted: progress.submittedPredictions,
+                              total: progress.totalPossiblePredictions,
+                              percent: progress.progressPercent,
+                            }
+                    "
+                  >
+                    <div
+                      class="active-tour-progress__fill"
+                      [style.width.%]="progress.progressPercent"
+                    ></div>
+                  </div>
+                  <p class="active-tour-progress__meta">
+                    {{
+                      "championship.detail.sections.activeTourPredictionProgressMeta"
+                        | translate
+                          : {
+                              submitted: progress.submittedPredictions,
+                              total: progress.totalPossiblePredictions,
+                              users: progress.totalUsers,
+                              matches: progress.totalMatchesInRound,
+                            }
+                    }}
+                  </p>
+                </div>
+              }
             }
           } @else {
             <p class="mobile-no-rounds">
@@ -260,6 +308,55 @@
               </div>
             }
           </div>
+          @if (
+            !isMobileView() &&
+            showSelectedRoundPredictionProgress() &&
+            selectedRoundPredictionProgress();
+            as progress
+          ) {
+            <div class="active-tour-progress" data-testid="active-tour-progress">
+              <div class="active-tour-progress__header">
+                <span>{{
+                  "championship.detail.sections.activeTourPredictionProgressTitle"
+                    | translate
+                }}</span>
+                <strong>{{ progress.progressPercent }}%</strong>
+              </div>
+              <div
+                class="active-tour-progress__track"
+                role="progressbar"
+                [attr.aria-valuemin]="0"
+                [attr.aria-valuemax]="100"
+                [attr.aria-valuenow]="progress.progressPercent"
+                [attr.aria-label]="
+                  'championship.detail.sections.activeTourPredictionProgressAria'
+                    | translate
+                      : {
+                          submitted: progress.submittedPredictions,
+                          total: progress.totalPossiblePredictions,
+                          percent: progress.progressPercent,
+                        }
+                "
+              >
+                <div
+                  class="active-tour-progress__fill"
+                  [style.width.%]="progress.progressPercent"
+                ></div>
+              </div>
+              <p class="active-tour-progress__meta">
+                {{
+                  "championship.detail.sections.activeTourPredictionProgressMeta"
+                    | translate
+                      : {
+                          submitted: progress.submittedPredictions,
+                          total: progress.totalPossiblePredictions,
+                          users: progress.totalUsers,
+                          matches: progress.totalMatchesInRound,
+                        }
+                }}
+              </p>
+            </div>
+          }
 
           <section class="finished-games-section">
             <div class="section-title-row">

@@ -516,6 +516,51 @@
   color: var(--ts-text-primary);
 }
 
+.active-tour-progress {
+  margin: 0 0 14px;
+  padding: 12px;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f5fbf9 0%, #edf8f5 100%);
+}
+
+.active-tour-progress__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: #0f172a;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.active-tour-progress__header strong {
+  color: #0f5f4c;
+  font-size: 0.95rem;
+}
+
+.active-tour-progress__track {
+  height: 10px;
+  border-radius: 999px;
+  background: #d8e4dd;
+  overflow: hidden;
+}
+
+.active-tour-progress__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0f5f4c 0%, #10b981 100%);
+  transition: width 220ms ease;
+}
+
+.active-tour-progress__meta {
+  margin: 8px 0 0;
+  color: #395266;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .games-list {
   display: flex;
   flex-direction: column;
@@ -696,6 +741,10 @@ app-game-card:last-child {
     border-radius: 14px;
     box-shadow: 0 8px 24px rgba(16, 24, 39, 0.08);
     padding: 12px;
+  }
+
+  .mobile-round-switcher .active-tour-progress {
+    margin: 0;
   }
 
   .round-drawer-fab {

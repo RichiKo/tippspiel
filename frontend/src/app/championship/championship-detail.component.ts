@@ -166,6 +166,25 @@ export class ChampionshipDetailComponent implements OnDestroy {
     }, 0),
   );
 
+  readonly selectedRoundPredictionProgress = computed(() => {
+    const championship = this.championship();
+    const round = this.selectedRound();
+
+    if (!championship || !round) {
+      return null;
+    }
+
+    const allRoundProgress = championship.roundPredictionProgress ?? [];
+    return (
+      allRoundProgress.find((progress) => progress.roundId === round.id) ?? null
+    );
+  });
+
+  readonly showSelectedRoundPredictionProgress = computed(() => {
+    const progress = this.selectedRoundPredictionProgress();
+    return progress !== null;
+  });
+
   readonly roundDialogInitialData = computed<CreateRoundDto | null>(() => {
     const round = this.roundInDialog();
     if (!round) {

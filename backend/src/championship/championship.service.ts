@@ -14,7 +14,9 @@ import { UpdateChampionshipDto } from './dto/update-championship.dto';
 import { MembershipService } from '../membership/membership.service';
 import {
   ChampionshipCardResponseDto,
+  ChampionshipDetailResponseDto,
   CurrentRoundTipLabelDto,
+  RoundPredictionProgressDto,
 } from './types/championship-response';
 import { MembershipEntity } from '../membership/membership.entity';
 import { MembershipStatus } from '../membership/membership-status.enum';
@@ -172,6 +174,100 @@ export class ChampionshipService {
       throw new NotFoundException('Championship not found');
     }
     return championship;
+  }
+
+  async findOneDetail(id: string): Promise<ChampionshipDetailResponseDto> {
+    const championship = await this.findOne(id);
+
+    const activeMemberships = await this.membershipRepository.find({
+      where: {
+        championshipId: id,
+        status: MembershipStatus.ACTIVE,
+      },
+      select: ['userId'],
+    });
+    const activeUserIds = activeMemberships.map((membership) => membership.userId);
+    const totalUsers = activeUserIds.length;
+
+    const rounds = await this.roundRepository.find({
+      where: { championshipId: id },
+      order: {
+        startDate: 'ASC',
+        createdAt: 'ASC',
+      },
+    });
+
+    if (rounds.length === 0) {
+      return {
+        ...championship,
+        roundPredictionProgress: [],
+      };
+    }
+
+    const roundIds = rounds.map((round) => round.id);
+    const games =
+      roundIds.length > 0
+        ? await this.gameRepository.find({
+            where: { roundId: In(roundIds) },
+            select: ['id', 'roundId'],
+          })
+        : [];
+
+    const totalMatchesByRoundId = new Map<string, number>();
+    const gameRoundByGameId = new Map<string, string>();
+    for (const game of games) {
+      totalMatchesByRoundId.set(
+        game.roundId,
+        (totalMatchesByRoundId.get(game.roundId) ?? 0) + 1,
+      );
+      gameRoundByGameId.set(game.id, game.roundId);
+    }
+
+    const gameIds = games.map((game) => game.id);
+    const submittedTips =
+      gameIds.length > 0 && activeUserIds.length > 0
+        ? await this.tipRepository.find({
+            where: {
+              championshipId: id,
+              gameId: In(gameIds),
+              userId: In(activeUserIds),
+            },
+            select: ['gameId', 'homeTeamGoals', 'awayTeamGoals'],
+          })
+        : [];
+
+    const submittedPredictionsByRoundId = new Map<string, number>();
+    for (const tip of submittedTips) {
+      if (tip.homeTeamGoals === null || tip.awayTeamGoals === null) {
+        continue;
+      }
+
+      const roundId = gameRoundByGameId.get(tip.gameId);
+      if (!roundId) {
+        continue;
+      }
+
+      submittedPredictionsByRoundId.set(
+        roundId,
+        (submittedPredictionsByRoundId.get(roundId) ?? 0) + 1,
+      );
+    }
+
+    const activeRoundIds = await this.getActiveRoundIdSetForChampionship(id);
+    const roundPredictionProgress = rounds.map((round) =>
+      this.buildRoundPredictionProgress(
+        round,
+        totalUsers,
+        totalMatchesByRoundId,
+        submittedPredictionsByRoundId,
+        activeRoundIds,
+      ),
+    );
+
+    return {
+      ...championship,
+      roundPredictionProgress,
+    };
   }
 
   async create(
@@ -396,6 +492,49 @@ export class ChampionshipService {
       totalGamesCount,
       tippedGamesCount,
       missingGamesCount,
+    };
+  }
+
+  private async getActiveRoundIdSetForChampionship(
+    championshipId: string,
+  ): Promise<Set<string>> {
+    const activeRounds = await this.roundRepository
+      .createQueryBuilder('round')
+      .where('round.championshipId = :championshipId', {
+        championshipId,
+      })
+      .andWhere('round.startDate <= CURRENT_DATE')
+      .andWhere('COALESCE(round.endDate, round.startDate) >= CURRENT_DATE')
+      .getMany();
+
+    return new Set(activeRounds.map((round) => round.id));
+  }
+
+  private buildRoundPredictionProgress(
+    round: RoundEntity,
+    totalUsers: number,
+    totalMatchesByRoundId: Map<string, number>,
+    submittedPredictionsByRoundId: Map<string, number>,
+    activeRoundIds: Set<string>,
+  ): RoundPredictionProgressDto {
+    const totalMatchesInRound = totalMatchesByRoundId.get(round.id) ?? 0;
+    const submittedPredictions = submittedPredictionsByRoundId.get(round.id) ?? 0;
+    const totalPossiblePredictions = totalUsers * totalMatchesInRound;
+    const rawProgressPercent =
+      totalPossiblePredictions === 0
+        ? 0
+        : Math.round((submittedPredictions / totalPossiblePredictions) * 100);
+    const progressPercent = Math.max(0, Math.min(100, rawProgressPercent));
+
+    return {
+      roundId: round.id,
+      roundName: round.name,
+      isRoundActive: activeRoundIds.has(round.id),
+      totalUsers,
+      totalMatchesInRound,
+      totalPossiblePredictions,
+      submittedPredictions,
+      progressPercent,
     };
   }
 }

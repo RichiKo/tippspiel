@@ -12,6 +12,17 @@ export interface CurrentRoundTipLabel {
   missingGamesCount: number;
 }
 
+export interface RoundPredictionProgress {
+  roundId: string;
+  roundName: string;
+  isRoundActive: boolean;
+  totalUsers: number;
+  totalMatchesInRound: number;
+  totalPossiblePredictions: number;
+  submittedPredictions: number;
+  progressPercent: number;
+}
+
 export interface Championship {
   id: string;
   name: string;
@@ -21,6 +32,7 @@ export interface Championship {
   isActive: boolean;
   eliminatedTeamIds?: string[];
   currentRoundTipLabel?: CurrentRoundTipLabel | null;
+  roundPredictionProgress?: RoundPredictionProgress[];
   createdByUserId: string;
   createdAt: Date;
   updatedAt: Date;

@@ -21,7 +21,10 @@ import { User } from '../user/decoratos/user.decorator';
 import { ChampionshipOwnerGuard } from '../membership/guards/championship-owner.guard';
 import { UpdateEliminatedTeamsDto } from './dto/update-eliminated-teams.dto';
 import { UpdateSingleEliminatedTeamDto } from './dto/update-single-eliminated-team.dto';
-import { ChampionshipCardResponseDto } from './types/championship-response';
+import {
+  ChampionshipCardResponseDto,
+  ChampionshipDetailResponseDto,
+} from './types/championship-response';
 
 @Controller('championships')
 export class ChampionshipController {
@@ -35,8 +38,8 @@ export class ChampionshipController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ChampionshipEntity> {
-    return this.championshipService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<ChampionshipDetailResponseDto> {
+    return this.championshipService.findOneDetail(id);
   }
 
   @Post()

@@ -83,6 +83,18 @@ describe('ChampionshipDetailComponent', () => {
           updatedAt: new Date('2026-01-01T00:00:00.000Z'),
           teamIds: [],
           eliminatedTeamIds: [],
+          roundPredictionProgress: [
+            {
+              roundId: 'r1',
+              roundName: 'Runde 1',
+              isRoundActive: true,
+              totalUsers: 20,
+              totalMatchesInRound: 3,
+              totalPossiblePredictions: 60,
+              submittedPredictions: 9,
+              progressPercent: 15,
+            },
+          ],
         }),
       ),
     getChampionshipTeams: jasmine
@@ -353,6 +365,75 @@ describe('ChampionshipDetailComponent', () => {
 
     expect(progressBadge).toBeTruthy();
     expect(progressBadge?.textContent?.replace(/\s+/g, ' ').trim()).toContain('1/2');
+  });
+
+  it('should show active tour prediction progress when selected round is active', () => {
+    const progressBlock = fixture.nativeElement.querySelector(
+      '[data-testid="active-tour-progress"]',
+    ) as HTMLElement | null;
+    const progressTrack = fixture.nativeElement.querySelector(
+      '.active-tour-progress__track',
+    ) as HTMLElement | null;
+    const progressFill = fixture.nativeElement.querySelector(
+      '.active-tour-progress__fill',
+    ) as HTMLElement | null;
+
+    expect(progressBlock).toBeTruthy();
+    expect(progressBlock?.textContent?.replace(/\s+/g, ' ').trim()).toContain(
+      '15%',
+    );
+    expect(component.selectedRoundPredictionProgress()?.submittedPredictions).toBe(9);
+    expect(component.selectedRoundPredictionProgress()?.totalPossiblePredictions).toBe(
+      60,
+    );
+    expect(progressTrack?.getAttribute('aria-valuenow')).toBe('15');
+    expect(progressFill?.style.width).toContain('15%');
+  });
+
+  it('should show tour prediction progress when selected round is not active', () => {
+    const currentChampionship = component.championship();
+    expect(currentChampionship).toBeTruthy();
+
+    component.championship.set({
+      ...currentChampionship!,
+      roundPredictionProgress: [
+        {
+          roundId: 'r1',
+          roundName: 'Runde 1',
+          isRoundActive: false,
+          totalUsers: 20,
+          totalMatchesInRound: 3,
+          totalPossiblePredictions: 60,
+          submittedPredictions: 9,
+          progressPercent: 15,
+        },
+      ],
+    });
+    fixture.detectChanges();
+
+    const progressBlock = fixture.nativeElement.querySelector(
+      '[data-testid="active-tour-progress"]',
+    ) as HTMLElement | null;
+
+    expect(progressBlock).toBeTruthy();
+    expect(progressBlock?.textContent?.replace(/\s+/g, ' ').trim()).toContain(
+      '15%',
+    );
+  });
+
+  it('should render tour prediction progress inside mobile active tour block', () => {
+    component.isMobileView.set(true);
+    fixture.detectChanges();
+
+    const mobileSwitcher = fixture.nativeElement.querySelector(
+      '.mobile-round-switcher',
+    ) as HTMLElement | null;
+    const progressInMobile = mobileSwitcher?.querySelector(
+      '[data-testid="active-tour-progress"]',
+    ) as HTMLElement | null;
+
+    expect(mobileSwitcher).toBeTruthy();
+    expect(progressInMobile).toBeTruthy();
   });
 
   it('should pick active round initially when today is inside round range', () => {

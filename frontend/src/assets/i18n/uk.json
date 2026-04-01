@@ -503,6 +503,9 @@
         "noFinishedResults": "Наразі ще немає результатів.",
         "openGames": "Відкриті матчі",
         "openGamesTipsProgress": "Подано прогнозів на відкриті матчі: {{filled}} з {{total}}",
+        "activeTourPredictionProgressTitle": "Прогрес прогнозів у турі",
+        "activeTourPredictionProgressAria": "Подано {{submitted}} з {{total}} прогнозів ({{percent}}%)",
+        "activeTourPredictionProgressMeta": "{{submitted}}/{{total}} матчів спрогнозовано",
         "noOpenGames": "Наразі немає відкритих матчів."
       },
       "views": {

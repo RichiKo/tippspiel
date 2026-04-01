@@ -25,6 +25,7 @@ describe('ChampionshipService', () => {
   } as unknown as Repository<MembershipEntity>;
   const roundRepository = {
     createQueryBuilder: jest.fn(),
+    find: jest.fn(),
   } as unknown as Repository<RoundEntity>;
   const gameRepository = {
     find: jest.fn(),
@@ -49,10 +50,14 @@ describe('ChampionshipService', () => {
       eliminatedTeamIds: [],
     }) as unknown as ChampionshipEntity;
 
-  const createRound = (championshipId: string): RoundEntity =>
+  const createRound = (
+    championshipId: string,
+    id = 'round-1',
+    name = 'Spieltag 1',
+  ): RoundEntity =>
     ({
-      id: 'round-1',
-      name: 'Spieltag 1',
+      id,
+      name,
       championshipId,
       startDate: new Date('2026-02-01'),
       endDate: new Date('2026-02-03'),
@@ -231,6 +236,83 @@ describe('ChampionshipService', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]?.currentRoundTipLabel).toBeNull();
+    expect(tipRepository.find).not.toHaveBeenCalled();
+  });
+
+  it('should return round prediction progress for championship detail', async () => {
+    const championship = createChampionship('champ-1');
+    const activeRound = createRound('champ-1', 'round-1', 'Spieltag 1');
+    const pastRound = createRound('champ-1', 'round-2', 'Spieltag 2');
+
+    (championshipRepository.findOne as jest.Mock).mockResolvedValue(championship);
+    (membershipRepository.find as jest.Mock).mockResolvedValue([
+      { userId: 1 },
+      { userId: 2 },
+    ]);
+    (roundRepository.find as jest.Mock).mockResolvedValue([activeRound, pastRound]);
+    mockActiveRounds([activeRound]);
+    (gameRepository.find as jest.Mock).mockResolvedValue([
+      { id: 'game-1', roundId: 'round-1' },
+      { id: 'game-2', roundId: 'round-1' },
+      { id: 'game-3', roundId: 'round-2' },
+    ]);
+    (tipRepository.find as jest.Mock).mockResolvedValue([
+      { gameId: 'game-1', homeTeamGoals: 1, awayTeamGoals: 0 },
+      { gameId: 'game-2', homeTeamGoals: 2, awayTeamGoals: 2 },
+      { gameId: 'game-1', homeTeamGoals: 0, awayTeamGoals: 1 },
+      { gameId: 'game-3', homeTeamGoals: null, awayTeamGoals: null },
+    ]);
+
+    const result = await service.findOneDetail('champ-1');
+
+    expect(result.roundPredictionProgress).toEqual([
+      {
+        roundId: 'round-1',
+        roundName: 'Spieltag 1',
+        isRoundActive: true,
+        totalUsers: 2,
+        totalMatchesInRound: 2,
+        totalPossiblePredictions: 4,
+        submittedPredictions: 3,
+        progressPercent: 75,
+      },
+      {
+        roundId: 'round-2',
+        roundName: 'Spieltag 2',
+        isRoundActive: false,
+        totalUsers: 2,
+        totalMatchesInRound: 1,
+        totalPossiblePredictions: 2,
+        submittedPredictions: 0,
+        progressPercent: 0,
+      },
+    ]);
+  });
+
+  it('should return zero progress when no active users or matches exist', async () => {
+    const championship = createChampionship('champ-1');
+    const activeRound = createRound('champ-1', 'round-1', 'Spieltag 1');
+
+    (championshipRepository.findOne as jest.Mock).mockResolvedValue(championship);
+    (membershipRepository.find as jest.Mock).mockResolvedValue([]);
+    (roundRepository.find as jest.Mock).mockResolvedValue([activeRound]);
+    mockActiveRounds([activeRound]);
+    (gameRepository.find as jest.Mock).mockResolvedValue([]);
+
+    const result = await service.findOneDetail('champ-1');
+
+    expect(result.roundPredictionProgress).toEqual([
+      {
+        roundId: 'round-1',
+        roundName: 'Spieltag 1',
+        isRoundActive: true,
+        totalUsers: 0,
+        totalMatchesInRound: 0,
+        totalPossiblePredictions: 0,
+        submittedPredictions: 0,
+        progressPercent: 0,
+      },
+    ]);
     expect(tipRepository.find).not.toHaveBeenCalled();
   });
 });
