@@ -54,14 +54,19 @@ describe('ChampionshipService', () => {
     championshipId: string,
     id = 'round-1',
     name = 'Spieltag 1',
+    options?: {
+      startDate?: Date;
+      endDate?: Date | null;
+      createdAt?: Date;
+    },
   ): RoundEntity =>
     ({
       id,
       name,
       championshipId,
-      startDate: new Date('2026-02-01'),
-      endDate: new Date('2026-02-03'),
-      createdAt: new Date('2026-01-20T00:00:00.000Z'),
+      startDate: options?.startDate ?? new Date('2026-02-01'),
+      endDate: options?.endDate ?? new Date('2026-02-03'),
+      createdAt: options?.createdAt ?? new Date('2026-01-20T00:00:00.000Z'),
     }) as unknown as RoundEntity;
 
   const mockActiveRounds = (rounds: RoundEntity[]) => {
@@ -239,6 +244,54 @@ describe('ChampionshipService', () => {
     expect(tipRepository.find).not.toHaveBeenCalled();
   });
 
+  it('should choose the round with the closest deadline for card label', async () => {
+    const closerDeadlineRound = createRound(
+      'champ-1',
+      'round-closer',
+      'Spieltag Nah',
+      {
+        startDate: new Date('2026-02-25'),
+        endDate: new Date('2026-02-27'),
+        createdAt: new Date('2026-02-01T00:00:00.000Z'),
+      },
+    );
+    const fartherDeadlineRound = createRound(
+      'champ-1',
+      'round-farther',
+      'Spieltag Fern',
+      {
+        startDate: new Date('2026-03-10'),
+        endDate: new Date('2026-03-15'),
+        createdAt: new Date('2026-02-01T00:00:00.000Z'),
+      },
+    );
+
+    (championshipRepository.find as jest.Mock).mockResolvedValue([
+      createChampionship('champ-1'),
+    ]);
+    (membershipRepository.find as jest.Mock).mockResolvedValue([
+      { championshipId: 'champ-1' },
+    ]);
+    mockActiveRounds([fartherDeadlineRound, closerDeadlineRound]);
+    (gameRepository.find as jest.Mock).mockResolvedValue([
+      { id: 'game-closer', roundId: 'round-closer' },
+      { id: 'game-farther', roundId: 'round-farther' },
+    ]);
+    (tipRepository.find as jest.Mock).mockResolvedValue([
+      {
+        gameId: 'game-closer',
+        homeTeamGoals: 1,
+        awayTeamGoals: 0,
+      },
+    ]);
+
+    const result = await service.findAll(7);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.currentRoundTipLabel?.currentRoundId).toBe('round-closer');
+    expect(result[0]?.currentRoundTipLabel?.currentRoundName).toBe('Spieltag Nah');
+  });
+
   it('should return round prediction progress for championship detail', async () => {
     const championship = createChampionship('champ-1');
     const activeRound = createRound('champ-1', 'round-1', 'Spieltag 1');
@@ -269,7 +322,7 @@ describe('ChampionshipService', () => {
       {
         roundId: 'round-1',
         roundName: 'Spieltag 1',
-        isRoundActive: true,
+        isRoundOpenForTips: true,
         totalUsers: 2,
         totalMatchesInRound: 2,
         totalPossiblePredictions: 4,
@@ -279,7 +332,7 @@ describe('ChampionshipService', () => {
       {
         roundId: 'round-2',
         roundName: 'Spieltag 2',
-        isRoundActive: false,
+        isRoundOpenForTips: false,
         totalUsers: 2,
         totalMatchesInRound: 1,
         totalPossiblePredictions: 2,
@@ -305,7 +358,7 @@ describe('ChampionshipService', () => {
       {
         roundId: 'round-1',
         roundName: 'Spieltag 1',
-        isRoundActive: true,
+        isRoundOpenForTips: true,
         totalUsers: 0,
         totalMatchesInRound: 0,
         totalPossiblePredictions: 0,

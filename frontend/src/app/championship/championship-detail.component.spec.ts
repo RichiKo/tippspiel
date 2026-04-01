@@ -87,7 +87,7 @@ describe('ChampionshipDetailComponent', () => {
             {
               roundId: 'r1',
               roundName: 'Runde 1',
-              isRoundActive: true,
+              isRoundOpenForTips: true,
               totalUsers: 20,
               totalMatchesInRound: 3,
               totalPossiblePredictions: 60,
@@ -400,7 +400,7 @@ describe('ChampionshipDetailComponent', () => {
         {
           roundId: 'r1',
           roundName: 'Runde 1',
-          isRoundActive: false,
+          isRoundOpenForTips: false,
           totalUsers: 20,
           totalMatchesInRound: 3,
           totalPossiblePredictions: 60,

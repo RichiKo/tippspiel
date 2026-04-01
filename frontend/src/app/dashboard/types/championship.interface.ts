@@ -15,7 +15,7 @@ export interface CurrentRoundTipLabel {
 export interface RoundPredictionProgress {
   roundId: string;
   roundName: string;
-  isRoundActive: boolean;
+  isRoundOpenForTips: boolean;
   totalUsers: number;
   totalMatchesInRound: number;
   totalPossiblePredictions: number;

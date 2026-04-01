@@ -25,7 +25,7 @@ export type ChampionshipCardResponseDto = ChampionshipEntity & {
 export interface RoundPredictionProgressDto {
   roundId: string;
   roundName: string;
-  isRoundActive: boolean;
+  isRoundOpenForTips: boolean;
   totalUsers: number;
   totalMatchesInRound: number;
   totalPossiblePredictions: number;

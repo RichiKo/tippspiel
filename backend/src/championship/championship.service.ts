@@ -81,16 +81,20 @@ export class ChampionshipService {
       .where('round.championshipId IN (:...championshipIds)', {
         championshipIds: Array.from(activeChampionshipIdSet),
       })
-      .andWhere('round.startDate <= CURRENT_DATE')
+      // Tip-label relevance is deadline-driven: show until round end date.
       .andWhere('COALESCE(round.endDate, round.startDate) >= CURRENT_DATE')
-      .orderBy('round.startDate', 'DESC')
-      .addOrderBy('COALESCE(round.endDate, round.startDate)', 'DESC')
-      .addOrderBy('round.createdAt', 'DESC')
+      .orderBy('COALESCE(round.endDate, round.startDate)', 'ASC')
+      .addOrderBy('round.startDate', 'ASC')
+      .addOrderBy('round.createdAt', 'ASC')
       .getMany();
 
     const activeRoundByChampionshipId = new Map<string, RoundEntity>();
     for (const round of activeRounds) {
-      if (!activeRoundByChampionshipId.has(round.championshipId)) {
+      const existingRound = activeRoundByChampionshipId.get(round.championshipId);
+      if (
+        !existingRound ||
+        this.compareRoundsByClosestDeadline(round, existingRound) < 0
+      ) {
         activeRoundByChampionshipId.set(round.championshipId, round);
       }
     }
@@ -253,14 +257,14 @@ export class ChampionshipService {
       );
     }
 
-    const activeRoundIds = await this.getActiveRoundIdSetForChampionship(id);
+    const roundIdsOpenForTips = await this.getRoundIdSetOpenForTips(id);
     const roundPredictionProgress = rounds.map((round) =>
       this.buildRoundPredictionProgress(
         round,
         totalUsers,
         totalMatchesByRoundId,
         submittedPredictionsByRoundId,
-        activeRoundIds,
+        roundIdsOpenForTips,
       ),
     );
 
@@ -495,19 +499,19 @@ export class ChampionshipService {
     };
   }
 
-  private async getActiveRoundIdSetForChampionship(
+  private async getRoundIdSetOpenForTips(
     championshipId: string,
   ): Promise<Set<string>> {
-    const activeRounds = await this.roundRepository
+    const roundsOpenForTips = await this.roundRepository
       .createQueryBuilder('round')
       .where('round.championshipId = :championshipId', {
         championshipId,
       })
-      .andWhere('round.startDate <= CURRENT_DATE')
+      // Tip-label relevance is deadline-driven: show until round end date.
       .andWhere('COALESCE(round.endDate, round.startDate) >= CURRENT_DATE')
       .getMany();
 
-    return new Set(activeRounds.map((round) => round.id));
+    return new Set(roundsOpenForTips.map((round) => round.id));
   }
 
   private buildRoundPredictionProgress(
@@ -515,7 +519,7 @@ export class ChampionshipService {
     totalUsers: number,
     totalMatchesByRoundId: Map<string, number>,
     submittedPredictionsByRoundId: Map<string, number>,
-    activeRoundIds: Set<string>,
+    roundIdsOpenForTips: Set<string>,
   ): RoundPredictionProgressDto {
     const totalMatchesInRound = totalMatchesByRoundId.get(round.id) ?? 0;
     const submittedPredictions = submittedPredictionsByRoundId.get(round.id) ?? 0;
@@ -529,12 +533,38 @@ export class ChampionshipService {
     return {
       roundId: round.id,
       roundName: round.name,
-      isRoundActive: activeRoundIds.has(round.id),
+      isRoundOpenForTips: roundIdsOpenForTips.has(round.id),
       totalUsers,
       totalMatchesInRound,
       totalPossiblePredictions,
       submittedPredictions,
       progressPercent,
     };
+  }
+
+  private compareRoundsByClosestDeadline(
+    roundA: RoundEntity,
+    roundB: RoundEntity,
+  ): number {
+    const endA = this.toTimestamp(roundA.endDate ?? roundA.startDate);
+    const endB = this.toTimestamp(roundB.endDate ?? roundB.startDate);
+    if (endA !== endB) {
+      return endA - endB;
+    }
+
+    const startA = this.toTimestamp(roundA.startDate);
+    const startB = this.toTimestamp(roundB.startDate);
+    if (startA !== startB) {
+      return startA - startB;
+    }
+
+    const createdA = this.toTimestamp(roundA.createdAt);
+    const createdB = this.toTimestamp(roundB.createdAt);
+    return createdA - createdB;
+  }
+
+  private toTimestamp(value: Date): number {
+    const timestamp = new Date(value).getTime();
+    return Number.isNaN(timestamp) ? 0 : timestamp;
   }
 }

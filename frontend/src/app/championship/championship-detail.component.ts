@@ -44,7 +44,11 @@ import {
   groupGamesByKickoff,
   isFinishedGame,
 } from './utils/spieltag-views.util';
-import { UI_ICONS, UiBadgeComponent, UiButtonComponent } from '../ui-lib/public-api';
+import {
+  UI_ICONS,
+  UiBadgeComponent,
+  UiButtonComponent,
+} from '../ui-lib/public-api';
 
 @Component({
   selector: 'app-championship-detail',
@@ -120,8 +124,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
       .filter((game) => isFinishedGame(game))
       .sort(
         (a, b) =>
-          new Date(a.kickoffTime).getTime() -
-          new Date(b.kickoffTime).getTime(),
+          new Date(a.kickoffTime).getTime() - new Date(b.kickoffTime).getTime(),
       ),
   );
 
@@ -130,8 +133,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
       .filter((game) => !isFinishedGame(game))
       .sort(
         (a, b) =>
-          new Date(a.kickoffTime).getTime() -
-          new Date(b.kickoffTime).getTime(),
+          new Date(a.kickoffTime).getTime() - new Date(b.kickoffTime).getTime(),
       ),
   );
 
@@ -403,7 +405,9 @@ export class ChampionshipDetailComponent implements OnDestroy {
         },
         error: () => {
           this.error.set(
-            this.translate.instant('championship.detail.errors.loadChampionship'),
+            this.translate.instant(
+              'championship.detail.errors.loadChampionship',
+            ),
           );
           this.isLoading.set(false);
         },
@@ -507,23 +511,25 @@ export class ChampionshipDetailComponent implements OnDestroy {
   }
 
   private loadRankingParticipants(): void {
-    this.rankingService.getRankingByChampionship(this.championshipId).subscribe({
-      next: (rankings) => {
-        const map = new Map<number, RankingParticipant>();
-        for (const ranking of rankings) {
-          if (!map.has(ranking.userId)) {
-            map.set(ranking.userId, {
-              userId: ranking.userId,
-              username: ranking.user.username,
-            });
+    this.rankingService
+      .getRankingByChampionship(this.championshipId)
+      .subscribe({
+        next: (rankings) => {
+          const map = new Map<number, RankingParticipant>();
+          for (const ranking of rankings) {
+            if (!map.has(ranking.userId)) {
+              map.set(ranking.userId, {
+                userId: ranking.userId,
+                username: ranking.user.username,
+              });
+            }
           }
-        }
-        this.rankingParticipants.set(Array.from(map.values()));
-      },
-      error: () => {
-        this.rankingParticipants.set([]);
-      },
-    });
+          this.rankingParticipants.set(Array.from(map.values()));
+        },
+        error: () => {
+          this.rankingParticipants.set([]);
+        },
+      });
   }
 
   onTipChanged(tip: CreateTipDto) {
@@ -728,7 +734,9 @@ export class ChampionshipDetailComponent implements OnDestroy {
             },
             error: () => {
               this.error.set(
-                this.translate.instant('championship.detail.errors.updateResult'),
+                this.translate.instant(
+                  'championship.detail.errors.updateResult',
+                ),
               );
               this.showGameDialog.set(false);
             },
@@ -853,7 +861,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
     });
 
     const active = normalized
-      .filter((entry) => entry.startTime <= todayDayTime && todayDayTime <= entry.endTime)
+      .filter(
+        (entry) =>
+          entry.startTime <= todayDayTime && todayDayTime <= entry.endTime,
+      )
       .sort(
         (a, b) =>
           b.startTime - a.startTime ||
@@ -1018,9 +1029,14 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.isBodyScrollLockedByDrawer = false;
 
     if (nextCount === 0) {
-      const scrollY = Number.parseInt(document.body.dataset[scrollYKey] ?? '0', 10);
-      document.body.style.overflow = document.body.dataset[bodyOverflowKey] ?? '';
-      document.body.style.position = document.body.dataset[bodyPositionKey] ?? '';
+      const scrollY = Number.parseInt(
+        document.body.dataset[scrollYKey] ?? '0',
+        10,
+      );
+      document.body.style.overflow =
+        document.body.dataset[bodyOverflowKey] ?? '';
+      document.body.style.position =
+        document.body.dataset[bodyPositionKey] ?? '';
       document.body.style.top = document.body.dataset[bodyTopKey] ?? '';
       document.body.style.width = document.body.dataset[bodyWidthKey] ?? '';
       document.documentElement.style.overflow =
