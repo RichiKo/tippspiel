@@ -95,6 +95,22 @@
   border-left: 1px solid #d7e7df;
 }
 
+.standings-header-label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.standings-header-label__text,
+.standings-header-label__suffix {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .standings-table tbody tr {
   transition: background-color var(--ts-transition-fast);
 }
@@ -299,15 +315,22 @@
   }
 
   .standings-table.standings-table--with-bonus thead th {
-    font-size: 0.5rem;
+    font-size: 0.47rem;
     line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    overflow-wrap: normal;
-    hyphens: none;
+    text-align: center;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    hyphens: auto;
     padding-left: 3px;
     padding-right: 3px;
+    vertical-align: bottom;
+  }
+
+  .standings-table.standings-table--with-bonus .standings-header-label {
+    align-items: center;
+    width: 100%;
   }
 
   .username-cell {
@@ -323,7 +346,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
   }
 
   .standings-table.standings-table--base .username-text {
@@ -365,7 +388,7 @@
   .standings-table tbody td.points,
   .standings-table tbody td.bonus-points,
   .standings-table tbody td.total-points {
-    font-size: 0.74rem;
+    font-size: 0.7rem;
   }
 
   .rank-pill {

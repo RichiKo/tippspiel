@@ -152,6 +152,54 @@ describe('BonusService', () => {
     });
   });
 
+  describe('updateBonusRule', () => {
+    it('should allow correcting the name and deadline of an evaluated bonus rule', async () => {
+      const bonusRule = {
+        id: 'rule-1',
+        name: 'Old name',
+        status: BonusRuleStatus.EVALUATED,
+        config: { championPoints: 10 },
+        deadline: new Date('2026-03-01T20:00:00.000Z'),
+      };
+      const correctedDeadline = '2026-03-08T20:00:00.000Z';
+      const savedRule = {
+        ...bonusRule,
+        name: 'Corrected name',
+        deadline: new Date(correctedDeadline),
+      };
+
+      mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
+      mockBonusRuleRepository.save.mockResolvedValue(savedRule);
+
+      const result = await service.updateBonusRule('rule-1', {
+        name: 'Corrected name',
+        deadline: correctedDeadline,
+      });
+
+      expect(result.name).toBe('Corrected name');
+      expect(result.deadline).toEqual(new Date(correctedDeadline));
+      expect(bonusRuleRepository.save).toHaveBeenCalledWith(savedRule);
+    });
+
+    it('should reject ruleset changes for evaluated bonus rules', async () => {
+      const bonusRule = {
+        id: 'rule-1',
+        status: BonusRuleStatus.EVALUATED,
+        config: { championPoints: 10 },
+        deadline: new Date('2026-03-01T20:00:00.000Z'),
+      };
+
+      mockBonusRuleRepository.findOne.mockResolvedValue(bonusRule);
+
+      await expect(
+        service.updateBonusRule('rule-1', {
+          config: { championPoints: 12 },
+        }),
+      ).rejects.toThrow(BadRequestException);
+      expect(bonusRuleRepository.save).not.toHaveBeenCalled();
+    });
+  });
+
   describe('publishBonusRule', () => {
     it('should publish a DRAFT bonus rule', async () => {
       const bonusRule = {

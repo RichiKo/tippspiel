@@ -4,7 +4,7 @@
     <button
       type="button"
       class="btn-create"
-      (click)="showCreateForm.set(!showCreateForm())"
+      (click)="onToggleCreateForm()"
       [disabled]="isLoading()"
     >
       @if (!showCreateForm()) {
@@ -176,16 +176,14 @@
               rule.status === BonusRuleStatus.LOCKED ||
               rule.status === BonusRuleStatus.PARTIALLY_EVALUATED
             ) {
-              @if (isBeforeDeadline(rule)) {
-                <button
-                  type="button"
-                  class="btn-action btn-edit"
-                  (click)="onEditRule(rule)"
-                  [disabled]="isLoading()"
-                >
-                  {{ 'common.edit' | translate }}
-                </button>
-              }
+              <button
+                type="button"
+                class="btn-action btn-edit"
+                (click)="onEditRule(rule)"
+                [disabled]="isLoading()"
+              >
+                {{ 'common.edit' | translate }}
+              </button>
               <button
                 type="button"
                 class="btn-action btn-evaluate"

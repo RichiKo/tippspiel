@@ -100,13 +100,18 @@ export class BonusService {
   ): Promise<BonusRuleEntity> {
     const bonusRule = await this.getBonusRuleById(id);
 
-    // Only DRAFT and PUBLISHED can be edited
-    if (
-      bonusRule.status !== BonusRuleStatus.DRAFT &&
-      bonusRule.status !== BonusRuleStatus.PUBLISHED
-    ) {
+    const allowsFullEdit =
+      bonusRule.status === BonusRuleStatus.DRAFT ||
+      bonusRule.status === BonusRuleStatus.PUBLISHED;
+    const isMetadataCorrection =
+      (dto.name !== undefined || dto.deadline !== undefined) &&
+      dto.config === undefined &&
+      dto.type === undefined &&
+      dto.championshipId === undefined;
+
+    if (!allowsFullEdit && !isMetadataCorrection) {
       throw new BadRequestException(
-        'Only DRAFT or PUBLISHED bonus rules can be edited',
+        'Only name and deadline can be edited after bonus evaluation has started',
       );
     }
 

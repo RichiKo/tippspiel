@@ -139,6 +139,25 @@ export class StandingsComponent {
     return label.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
   }
 
+  getBonusColumnDisplayLabel(column: BonusColumn): string {
+    const baseLabel = this.getColumnDisplayLabel(column.label);
+    const suffix = this.getBonusColumnSubruleSuffix(column);
+
+    return suffix ? `${baseLabel} ${suffix}` : baseLabel;
+  }
+
+  getBonusColumnSubruleSuffix(column: BonusColumn): string {
+    if (column.subrule === 'finalist') {
+      return '(FN)';
+    }
+
+    if (column.subrule === 'champion') {
+      return '(CH)';
+    }
+
+    return '';
+  }
+
   backToChampionship(): void {
     this.router.navigate(['/championship', this.championshipId]);
   }

@@ -35,6 +35,12 @@ describe('StandingsComponent', () => {
         evaluatedBonusRules: [{ id: 'b-1', name: 'Meister' }],
         bonusColumns: [
           {
+            key: 'b-1:finalist',
+            ruleId: 'b-1',
+            subrule: 'finalist',
+            label: 'Meister (Finalist)',
+          },
+          {
             key: 'b-1:champion',
             ruleId: 'b-1',
             subrule: 'champion',
@@ -55,7 +61,7 @@ describe('StandingsComponent', () => {
             gamePoints: 5,
             bonusPoints: 1,
             bonusPointsByRule: { 'b-1': 1 },
-            bonusPointsByColumn: { 'b-1:champion': 1 },
+            bonusPointsByColumn: { 'b-1:finalist': 0, 'b-1:champion': 1 },
             updatedAt: new Date('2026-02-01T13:00:00.000Z'),
             user: { id: 2, username: 'Alice', email: 'alice@test.com' },
           },
@@ -72,7 +78,7 @@ describe('StandingsComponent', () => {
             gamePoints: 8,
             bonusPoints: 2,
             bonusPointsByRule: { 'b-1': 2 },
-            bonusPointsByColumn: { 'b-1:champion': 2 },
+            bonusPointsByColumn: { 'b-1:finalist': 1, 'b-1:champion': 2 },
             updatedAt: new Date('2026-02-01T13:00:00.000Z'),
             user: { id: 1, username: 'Richi', email: 'richi@test.com' },
           },
@@ -177,13 +183,34 @@ describe('StandingsComponent', () => {
     expect(table.classList).toContain('standings-table--with-bonus');
   });
 
-  it('should render bonus column labels without bracketed suffixes', () => {
-    const bonusHeader = fixture.nativeElement.querySelector(
+  it('should render champion finalist bonus column labels with compact subrule suffixes', () => {
+    const bonusHeaders = fixture.nativeElement.querySelectorAll(
       'th.bonus-col',
-    ) as HTMLTableCellElement;
+    ) as NodeListOf<HTMLTableCellElement>;
 
-    expect(bonusHeader.textContent?.trim()).toBe('Meister');
-    expect(bonusHeader.getAttribute('title')).toBe('Meister (Champion)');
+    expect(bonusHeaders[0].textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Meister (FN)',
+    );
+    expect(bonusHeaders[0].getAttribute('title')).toBe('Meister (Finalist)');
+    expect(bonusHeaders[1].textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'Meister (CH)',
+    );
+    expect(bonusHeaders[1].getAttribute('title')).toBe('Meister (Champion)');
+  });
+
+  it('should render champion finalist suffixes as separate header lines', () => {
+    const bonusHeaders = fixture.nativeElement.querySelectorAll(
+      'th.bonus-col',
+    ) as NodeListOf<HTMLTableCellElement>;
+
+    expect(
+      bonusHeaders[0].querySelector('.standings-header-label__suffix')
+        ?.textContent?.trim(),
+    ).toBe('(FN)');
+    expect(
+      bonusHeaders[1].querySelector('.standings-header-label__suffix')
+        ?.textContent?.trim(),
+    ).toBe('(CH)');
   });
 
   it('should render the game points column label without bracketed suffixes', () => {

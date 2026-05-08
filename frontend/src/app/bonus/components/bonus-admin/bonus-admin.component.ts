@@ -53,12 +53,17 @@ export class BonusAdminComponent {
 
   championshipId = input.required<string>();
   availableTeams = input.required<TeamOption[]>();
+  eliminatedTeamIds = input<string[]>([]);
 
-  readonly sortedAvailableTeams = computed(() =>
-    [...this.availableTeams()].sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
-    ),
-  );
+  readonly sortedAvailableTeams = computed(() => {
+    const eliminatedTeamIds = new Set(this.eliminatedTeamIds());
+
+    return this.availableTeams()
+      .filter((team) => !eliminatedTeamIds.has(team.id))
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+      );
+  });
 
   bonusRules = signal<BonusRule[]>([]);
   isLoading = signal<boolean>(false);
@@ -167,10 +172,27 @@ export class BonusAdminComponent {
     });
   }
 
+  onToggleCreateForm(): void {
+    const shouldShowCreateForm = !this.showCreateForm();
+    this.showCreateForm.set(shouldShowCreateForm);
+    this.showEditForm.set(false);
+    this.editingRule.set(null);
+
+    if (shouldShowCreateForm) {
+      this.enableRuleFormControls();
+      this.createForm.reset({
+        type: BonusRuleType.CHAMPION,
+        championPoints: 10,
+        finalistPoints: 5,
+      });
+    }
+  }
+
   onEditRule(rule: BonusRule): void {
     this.editingRule.set(rule);
     this.showEditForm.set(true);
     this.showCreateForm.set(false);
+    this.configureEditFormControls(rule);
 
     // Pre-fill form with existing values
     const config = rule.config as any;
@@ -190,7 +212,18 @@ export class BonusAdminComponent {
     const rule = this.editingRule();
     if (!rule) return;
 
-    const formValue = this.createForm.value;
+    const formValue = this.createForm.getRawValue();
+
+    if (this.isLimitedEdit(rule)) {
+      const dto: UpdateBonusRuleDto = {
+        name: formValue.name!,
+        deadline: new Date(formValue.deadline!).toISOString(),
+      };
+
+      this.updateBonusRule(rule.id, dto);
+      return;
+    }
+
     const type = formValue.type as BonusRuleType;
 
     const config: any = {
@@ -207,37 +240,14 @@ export class BonusAdminComponent {
       deadline: new Date(formValue.deadline!).toISOString(),
     };
 
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-
-    this.bonusService.updateBonusRule(rule.id, dto).subscribe({
-      next: () => {
-        this.successMessage.set(
-          this.translate.instant('bonus.admin.success.updated'),
-        );
-        this.showEditForm.set(false);
-        this.editingRule.set(null);
-        this.createForm.reset({
-          type: BonusRuleType.CHAMPION,
-          championPoints: 10,
-          finalistPoints: 5,
-        });
-        this.loadBonusRules();
-        setTimeout(() => this.successMessage.set(null), 3000);
-      },
-      error: () => {
-        this.errorMessage.set(
-          this.translate.instant('bonus.admin.errors.updateRule'),
-        );
-        this.isLoading.set(false);
-      },
-    });
+    this.updateBonusRule(rule.id, dto);
   }
 
   onCancelForm(): void {
     this.showCreateForm.set(false);
     this.showEditForm.set(false);
     this.editingRule.set(null);
+    this.enableRuleFormControls();
     this.createForm.reset({
       type: BonusRuleType.CHAMPION,
       championPoints: 10,
@@ -504,6 +514,17 @@ export class BonusAdminComponent {
     return new Date(rule.deadline) > new Date();
   }
 
+  isLimitedEdit(rule: BonusRule): boolean {
+    return !this.canFullyEditRule(rule);
+  }
+
+  canFullyEditRule(rule: BonusRule): boolean {
+    return (
+      rule.status === BonusRuleStatus.DRAFT ||
+      (rule.status === BonusRuleStatus.PUBLISHED && this.isBeforeDeadline(rule))
+    );
+  }
+
   getChampionOptions(): TeamOption[] {
     const rule = this.currentEvaluatingRule();
     if (!rule) {
@@ -517,5 +538,54 @@ export class BonusAdminComponent {
     const finalist2 = this.evaluateForm.value.finalistTeam2Id || '';
     const finalistIds = new Set([finalist1, finalist2].filter(Boolean));
     return this.sortedAvailableTeams().filter((team) => finalistIds.has(team.id));
+  }
+
+  private updateBonusRule(ruleId: string, dto: UpdateBonusRuleDto): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.bonusService.updateBonusRule(ruleId, dto).subscribe({
+      next: () => {
+        this.successMessage.set(
+          this.translate.instant('bonus.admin.success.updated'),
+        );
+        this.showEditForm.set(false);
+        this.editingRule.set(null);
+        this.enableRuleFormControls();
+        this.createForm.reset({
+          type: BonusRuleType.CHAMPION,
+          championPoints: 10,
+          finalistPoints: 5,
+        });
+        this.loadBonusRules();
+        setTimeout(() => this.successMessage.set(null), 3000);
+      },
+      error: () => {
+        this.errorMessage.set(
+          this.translate.instant('bonus.admin.errors.updateRule'),
+        );
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  private configureEditFormControls(rule: BonusRule): void {
+    this.enableRuleFormControls();
+
+    if (!this.isLimitedEdit(rule)) {
+      return;
+    }
+
+    this.createForm.controls.type.disable();
+    this.createForm.controls.championPoints.disable();
+    this.createForm.controls.finalistPoints.disable();
+  }
+
+  private enableRuleFormControls(): void {
+    this.createForm.controls.type.enable();
+    this.createForm.controls.name.enable();
+    this.createForm.controls.deadline.enable();
+    this.createForm.controls.championPoints.enable();
+    this.createForm.controls.finalistPoints.enable();
   }
 }

@@ -69,7 +69,16 @@
                 </th>
                 @for (column of bonusColumns(); track column.key) {
                   <th class="bonus-col" [attr.title]="column.label">
-                    {{ getColumnDisplayLabel(column.label) }}
+                    <span class="standings-header-label">
+                      <span class="standings-header-label__text">
+                        {{ getColumnDisplayLabel(column.label) }}
+                      </span>
+                      @if (getBonusColumnSubruleSuffix(column)) {
+                        <span class="standings-header-label__suffix">
+                          {{ getBonusColumnSubruleSuffix(column) }}
+                        </span>
+                      }
+                    </span>
                   </th>
                 }
                 @if (showTotalColumn()) {
