@@ -36,6 +36,18 @@
 
 .standings-table-wrapper {
   overflow-x: hidden;
+  max-width: 100%;
+}
+
+.standings-table-wrapper--scrollable {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.standings-table-wrapper--scrollable:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: -2px;
 }
 
 .standings-table {
@@ -234,6 +246,8 @@
 
   .standings-table.standings-table--with-bonus {
     table-layout: fixed;
+    width: 100%;
+    min-width: 0;
   }
 
   .standings-table thead th,
@@ -318,24 +332,24 @@
 
   .standings-table.standings-table--with-bonus thead th.rank-col,
   .standings-table.standings-table--with-bonus tbody td.rank {
-    width: 13%;
+    width: 10%;
   }
 
   .standings-table.standings-table--with-bonus thead th.participant-col,
   .standings-table.standings-table--with-bonus tbody td.username {
-    width: 31%;
+    width: 24%;
   }
 
   .standings-table.standings-table--with-bonus thead th.points-col,
   .standings-table.standings-table--with-bonus tbody td.points {
-    width: 20%;
+    width: 16.5%;
   }
 
   .standings-table.standings-table--with-bonus thead th.bonus-col,
   .standings-table.standings-table--with-bonus tbody td.bonus-points,
   .standings-table.standings-table--with-bonus thead th.total-col,
   .standings-table.standings-table--with-bonus tbody td.total-points {
-    width: 16%;
+    width: 16.5%;
   }
 
   .standings-table.standings-table--with-bonus thead th.points-col,

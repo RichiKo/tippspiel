@@ -149,16 +149,45 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
                 {{ 'championship.dialogs.game.resultSection' | translate }}
               </h3>
 
-              <div class="form-row">
-                <div class="form-field">
-                  <label>{{
-                    'championship.dialogs.game.homeGoalsLabel' | translate
-                  }}</label>
+              <div class="result-score-row">
+                <div class="result-team result-team--home">
+                  @if (getSelectedHomeTeam(); as homeTeam) {
+                    <img [src]="homeTeam.logoUrl" [alt]="homeTeam.name" />
+                    <span>{{ homeTeam.name }}</span>
+                  } @else {
+                    <span>{{
+                      'championship.dialogs.game.homeTeamLabel' | translate
+                    }}</span>
+                  }
+                </div>
+
+                <div class="result-score-editor">
                   <input
+                    #homeScoreInput
                     type="tel"
                     [value]="homeScore ?? ''"
-                    (input)="onHomeScoreChange($event)"
+                    (input)="onHomeScoreChange($event, awayScoreInput)"
+                    (focus)="selectInputValue($event)"
                     name="homeScore"
+                    min="0"
+                    max="9"
+                    maxlength="1"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    enterkeyhint="done"
+                    autocomplete="off"
+                  />
+
+                  <span class="result-score-separator" aria-hidden="true">:</span>
+
+                  <input
+                    #awayScoreInput
+                    type="tel"
+                    [value]="awayScore ?? ''"
+                    (input)="onAwayScoreChange($event)"
+                    (keydown)="onAwayScoreKeydown($event, homeScoreInput)"
+                    (focus)="selectInputValue($event)"
+                    name="awayScore"
                     min="0"
                     max="9"
                     maxlength="1"
@@ -169,23 +198,15 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
                   />
                 </div>
 
-                <div class="form-field">
-                  <label>{{
-                    'championship.dialogs.game.awayGoalsLabel' | translate
-                  }}</label>
-                  <input
-                    type="tel"
-                    [value]="awayScore ?? ''"
-                    (input)="onAwayScoreChange($event)"
-                    name="awayScore"
-                    min="0"
-                    max="9"
-                    maxlength="1"
-                    inputmode="numeric"
-                    pattern="[0-9]*"
-                    enterkeyhint="done"
-                    autocomplete="off"
-                  />
+                <div class="result-team result-team--away">
+                  @if (getSelectedAwayTeam(); as awayTeam) {
+                    <img [src]="awayTeam.logoUrl" [alt]="awayTeam.name" />
+                    <span>{{ awayTeam.name }}</span>
+                  } @else {
+                    <span>{{
+                      'championship.dialogs.game.awayTeamLabel' | translate
+                    }}</span>
+                  }
                 </div>
               </div>
 
@@ -269,6 +290,58 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
           gap: 1rem;
         }
 
+        .result-score-row {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+          align-items: center;
+          gap: 0.85rem;
+          margin-bottom: 1rem;
+        }
+
+        .result-team {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.45rem;
+          text-align: center;
+          color: #0f172a;
+          font-size: 0.9rem;
+          font-weight: 700;
+          line-height: 1.15;
+        }
+
+        .result-team img {
+          width: 44px;
+          height: 44px;
+          object-fit: contain;
+        }
+
+        .result-team span {
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .result-score-editor {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.45rem;
+        }
+
+        .result-score-separator {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 48px;
+          color: #64748b;
+          font-size: 1.45rem;
+          font-weight: 800;
+          line-height: 1;
+        }
+
         .form-field {
           margin-bottom: 1.5rem;
 
@@ -317,6 +390,18 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
               }
             }
           }
+        }
+
+        .result-score-editor input {
+          width: 58px;
+          min-height: 48px;
+          padding: 0.45rem;
+          text-align: center;
+          font-size: 1.35rem;
+          font-weight: 700;
+          background: #f8fbfd;
+          border-color: #cfd8e1;
+          border-radius: 10px;
         }
 
         .dialog-actions {
@@ -382,6 +467,35 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
         .dialog-content .form-field input {
           min-height: 44px;
           font-size: 16px;
+        }
+
+        .dialog-content .result-score-row {
+          grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+          gap: 0.65rem;
+        }
+
+        .dialog-content .result-team {
+          font-size: 0.82rem;
+        }
+
+        .dialog-content .result-team img {
+          width: 40px;
+          height: 40px;
+        }
+
+        .dialog-content .result-score-editor {
+          gap: 0.35rem;
+        }
+
+        .dialog-content .result-score-editor input {
+          width: 54px;
+          min-height: 50px;
+          padding: 0.35rem;
+          font-size: 1.5rem;
+        }
+
+        .dialog-content .result-score-separator {
+          min-height: 50px;
         }
 
         .dialog-content .dialog-actions {
@@ -470,7 +584,15 @@ export class GameDialogComponent implements OnDestroy {
       : this.awayTeamId !== teamId;
   }
 
-  onHomeScoreChange(event: Event): void {
+  getSelectedHomeTeam(): Team | null {
+    return this.teams().find((team) => team.id === this.homeTeamId) ?? null;
+  }
+
+  getSelectedAwayTeam(): Team | null {
+    return this.teams().find((team) => team.id === this.awayTeamId) ?? null;
+  }
+
+  onHomeScoreChange(event: Event, nextInput?: HTMLInputElement): void {
     const target = event.target as HTMLInputElement;
     const sanitizedValue = target.value.replace(/\D+/g, '').slice(0, 1);
     if (target.value !== sanitizedValue) {
@@ -478,6 +600,12 @@ export class GameDialogComponent implements OnDestroy {
     }
 
     this.homeScore = this.parseScoreValue(sanitizedValue);
+
+    if (sanitizedValue.length === 1 && nextInput) {
+      nextInput.focus();
+      nextInput.select();
+      this.ensureInputVisible(nextInput);
+    }
   }
 
   onAwayScoreChange(event: Event): void {
@@ -488,6 +616,26 @@ export class GameDialogComponent implements OnDestroy {
     }
 
     this.awayScore = this.parseScoreValue(sanitizedValue);
+  }
+
+  onAwayScoreKeydown(
+    event: KeyboardEvent,
+    previousInput: HTMLInputElement,
+  ): void {
+    const target = event.target as HTMLInputElement;
+    if (event.key !== 'Backspace' || target.value !== '') {
+      return;
+    }
+
+    event.preventDefault();
+    previousInput.focus();
+    previousInput.select();
+  }
+
+  selectInputValue(event: FocusEvent): void {
+    const target = event.target as HTMLInputElement;
+    target.select();
+    this.ensureInputVisible(target);
   }
 
   onSubmit() {
@@ -565,6 +713,35 @@ export class GameDialogComponent implements OnDestroy {
     }
 
     return Math.min(9, Math.max(0, parsed));
+  }
+
+  private ensureInputVisible(target: HTMLInputElement): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const alignInputToViewport = () => {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+
+      const viewport = window.visualViewport;
+      if (!viewport) {
+        return;
+      }
+
+      const rect = target.getBoundingClientRect();
+      const safeBottom = viewport.offsetTop + viewport.height - 24;
+      if (rect.bottom > safeBottom) {
+        const delta = rect.bottom - safeBottom;
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+    };
+
+    window.setTimeout(alignInputToViewport, 60);
+    window.setTimeout(alignInputToViewport, 260);
   }
 
   private setBodyScrollLocked(locked: boolean): void {

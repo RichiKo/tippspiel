@@ -73,6 +73,88 @@ describe('GameDialogComponent', () => {
     expect(homeInput.getAttribute('autocomplete')).toBe('off');
   });
 
+  it('renders result score inputs in a compact score row', () => {
+    fixture.componentRef.setInput('gameId', 'game-1');
+    fixture.componentRef.setInput('teams', [
+      {
+        id: 'team-1',
+        name: 'Arsenal',
+        shortName: 'ARS',
+        logoUrl: 'https://example.com/arsenal.png',
+        origin: TeamOrigin.ENGLAND,
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      },
+      {
+        id: 'team-2',
+        name: 'Chelsea',
+        shortName: 'CHE',
+        logoUrl: 'https://example.com/chelsea.png',
+        origin: TeamOrigin.ENGLAND,
+        createdAt: new Date('2026-01-02T00:00:00.000Z'),
+      },
+    ]);
+    component.homeTeamId = 'team-1';
+    component.awayTeamId = 'team-2';
+    fixture.detectChanges();
+
+    const scoreRow = fixture.nativeElement.querySelector(
+      '.result-score-row',
+    ) as HTMLElement;
+    const separator = fixture.nativeElement.querySelector(
+      '.result-score-separator',
+    ) as HTMLElement;
+
+    expect(scoreRow).toBeTruthy();
+    expect(scoreRow.querySelector('input[name="homeScore"]')).toBeTruthy();
+    expect(scoreRow.querySelector('input[name="awayScore"]')).toBeTruthy();
+    expect(separator.textContent?.trim()).toBe(':');
+    expect(scoreRow.textContent).toContain('Arsenal');
+    expect(scoreRow.textContent).toContain('Chelsea');
+    expect(scoreRow.querySelector('img[alt="Arsenal"]')).toBeTruthy();
+    expect(scoreRow.querySelector('img[alt="Chelsea"]')).toBeTruthy();
+  });
+
+  it('moves focus from home score to away score after one digit', () => {
+    fixture.componentRef.setInput('gameId', 'game-1');
+    fixture.detectChanges();
+
+    const homeInput = fixture.nativeElement.querySelector(
+      'input[name="homeScore"]',
+    ) as HTMLInputElement;
+    const awayInput = fixture.nativeElement.querySelector(
+      'input[name="awayScore"]',
+    ) as HTMLInputElement;
+    spyOn(awayInput, 'focus');
+    spyOn(awayInput, 'select');
+
+    homeInput.value = '2';
+    homeInput.dispatchEvent(new Event('input'));
+
+    expect(component.homeScore).toBe(2);
+    expect(awayInput.focus).toHaveBeenCalled();
+    expect(awayInput.select).toHaveBeenCalled();
+  });
+
+  it('moves focus back to home score on backspace from empty away score', () => {
+    fixture.componentRef.setInput('gameId', 'game-1');
+    fixture.detectChanges();
+
+    const homeInput = fixture.nativeElement.querySelector(
+      'input[name="homeScore"]',
+    ) as HTMLInputElement;
+    const awayInput = fixture.nativeElement.querySelector(
+      'input[name="awayScore"]',
+    ) as HTMLInputElement;
+    spyOn(homeInput, 'focus');
+    spyOn(homeInput, 'select');
+
+    awayInput.value = '';
+    awayInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
+
+    expect(homeInput.focus).toHaveBeenCalled();
+    expect(homeInput.select).toHaveBeenCalled();
+  });
+
   it('sanitizes non-digit characters in result score inputs', () => {
     fixture.componentRef.setInput('gameId', 'game-1');
     fixture.detectChanges();

@@ -135,6 +135,10 @@ export class StandingsComponent {
     return standing.bonusPointsByColumn[columnKey] ?? 0;
   }
 
+  getColumnDisplayLabel(label: string): string {
+    return label.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+  }
+
   backToChampionship(): void {
     this.router.navigate(['/championship', this.championshipId]);
   }

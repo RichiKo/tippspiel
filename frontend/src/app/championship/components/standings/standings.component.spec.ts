@@ -34,7 +34,12 @@ describe('StandingsComponent', () => {
       of({
         evaluatedBonusRules: [{ id: 'b-1', name: 'Meister' }],
         bonusColumns: [
-          { key: 'b-1:champion', ruleId: 'b-1', subrule: 'champion', label: 'Meister' },
+          {
+            key: 'b-1:champion',
+            ruleId: 'b-1',
+            subrule: 'champion',
+            label: 'Meister (Champion)',
+          },
         ],
         standings: [
           {
@@ -155,6 +160,38 @@ describe('StandingsComponent', () => {
       .map((cell) => (cell as HTMLElement).textContent ?? '')
       .join(' ');
     expect(headerText).toContain('Gesamt');
+  });
+
+  it('should render bonus standings inside a horizontal scroll region', () => {
+    const tableWrapper = fixture.nativeElement.querySelector(
+      '.standings-table-wrapper',
+    ) as HTMLElement;
+    const table = fixture.nativeElement.querySelector(
+      '.standings-table',
+    ) as HTMLTableElement;
+
+    expect(tableWrapper.classList).toContain(
+      'standings-table-wrapper--scrollable',
+    );
+    expect(tableWrapper.getAttribute('tabindex')).toBe('0');
+    expect(table.classList).toContain('standings-table--with-bonus');
+  });
+
+  it('should render bonus column labels without bracketed suffixes', () => {
+    const bonusHeader = fixture.nativeElement.querySelector(
+      'th.bonus-col',
+    ) as HTMLTableCellElement;
+
+    expect(bonusHeader.textContent?.trim()).toBe('Meister');
+    expect(bonusHeader.getAttribute('title')).toBe('Meister (Champion)');
+  });
+
+  it('should render the game points column label without bracketed suffixes', () => {
+    const pointsHeader = fixture.nativeElement.querySelector(
+      'th.points-col',
+    ) as HTMLTableCellElement;
+
+    expect(pointsHeader.textContent?.trim()).toBe('Punkte');
   });
 
   it('should navigate back when header back button is clicked', () => {
