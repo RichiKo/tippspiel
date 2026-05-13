@@ -1,8 +1,10 @@
 import { AuthGuard } from '@app/guards/auth.guard';
+import { AdminGuard } from '@app/guards/admin.guard';
 import { CreateUserDto } from '@app/user/dto/create-user.dto';
 import { LoginUserDto } from '@app/user/dto/login-user.dto';
 import { UpdateUserDto } from '@app/user/dto/update-user.dto';
 import { User } from '@app/user/decoratos/user.decorator';
+import { ArchiveUserOption } from '@app/user/types/archive-user-option.type';
 import { UserEntity } from '@app/user/user.entity';
 import { UserResponseInterface } from '@app/user/types/user-response';
 import { UserService } from '@app/user/user.service';
@@ -43,6 +45,12 @@ export class UserController {
   ): Promise<UserResponseInterface> {
     const loggedUser = await this.userService.login(loginUserDto);
     return this.userService.buildUserResponse(loggedUser);
+  }
+
+  @Get('users/archive-options')
+  @UseGuards(AuthGuard, AdminGuard)
+  findArchiveOptions(): Promise<ArchiveUserOption[]> {
+    return this.userService.findArchiveOptions();
   }
 
   @Put('user')

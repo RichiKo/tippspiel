@@ -1702,3 +1702,97 @@ Alle ausgewerteten Bonus-Regeln mit Ergebnissen.
 ---
 
 **Hinweis:** Bonus-Punkte werden in `rankings.bonusPoints` gespeichert und in `rankings.totalPoints` addiert.
+
+---
+
+## Archive API
+
+Archive-Einträge speichern Sieger vergangener Championships unabhängig von aktiven Championships.
+
+### **GET** `/archive`
+
+Liest alle Archive-Einträge für authentifizierte User.
+
+**Response (JSON):**
+```json
+[
+  {
+    "id": "archive-uuid",
+    "championshipName": "WM Tipps 2026",
+    "year": 2026,
+    "firstPlaceUserId": 1,
+    "firstPlaceManualName": null,
+    "firstPlaceDisplayName": "Anna",
+    "firstPlacePoints": 22541,
+    "secondPlaceUserId": null,
+    "secondPlaceManualName": "Gastspieler",
+    "secondPlaceDisplayName": "Gastspieler",
+    "secondPlacePoints": 18698,
+    "thirdPlaceUserId": 2,
+    "thirdPlaceManualName": null,
+    "thirdPlaceDisplayName": "Ben",
+    "thirdPlacePoints": 12256,
+    "createdAt": "2026-05-13T10:00:00.000Z",
+    "updatedAt": "2026-05-13T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### **GET** `/archive/:id`
+
+Liest einen einzelnen Archive-Eintrag für authentifizierte User.
+
+---
+
+### **POST** `/archive`
+
+Erstellt einen Archive-Eintrag. Nur Admins und Superadmins.
+
+**Request Body:**
+```json
+{
+  "championshipName": "WM Tipps 2026",
+  "year": 2026,
+  "firstPlace": { "userId": 1, "points": 22541 },
+  "secondPlace": { "manualName": "Gastspieler", "points": 18698 },
+  "thirdPlace": { "userId": 2, "points": 12256 }
+}
+```
+
+**Regeln:**
+- Pro Platz ist genau eine Quelle erlaubt: `userId` oder `manualName`.
+- Platz 1, 2 und 3 müssen eindeutig sein.
+- Manuelle Gewinner werden nicht als User angelegt.
+- `*DisplayName` wird als historischer Snapshot gespeichert.
+- `points` speichert die erreichte Punktzahl des jeweiligen Platzes und muss >= 0 sein.
+
+---
+
+### **PUT** `/archive/:id`
+
+Aktualisiert einen Archive-Eintrag vollständig. Nur Admins und Superadmins.
+
+---
+
+### **DELETE** `/archive/:id`
+
+Löscht einen Archive-Eintrag. Nur Admins und Superadmins.
+
+---
+
+### **GET** `/users/archive-options`
+
+Liefert registrierte User für die Archive-Siegerauswahl. Nur Admins und Superadmins.
+
+**Response (JSON):**
+```json
+[
+  {
+    "id": 1,
+    "username": "Anna",
+    "image": "anna.png"
+  }
+]
+```

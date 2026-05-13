@@ -1,0 +1,238 @@
+<div class="archive-page">
+  <ui-page-header
+    [kicker]="'archive.page.kicker' | translate"
+    [title]="'archive.page.title' | translate"
+    [subtitle]="'archive.page.subtitle' | translate"
+    [showBack]="true"
+    [backLabel]="'archive.page.back'"
+    (back)="navigateBack()"
+  />
+
+  <section class="archive-toolbar">
+    @if (isAdmin()) {
+      <button
+        type="button"
+        class="archive-primary-btn"
+        data-testid="archive-create-button"
+        (click)="openCreateForm()"
+      >
+        <lucide-icon [img]="icons.trophy" [size]="18" aria-hidden="true" />
+        {{ 'archive.actions.create' | translate }}
+      </button>
+    }
+  </section>
+
+  @if (loadError()) {
+    <section class="archive-state archive-state--error" aria-live="assertive">
+      <p>{{ loadError() }}</p>
+      <button type="button" class="archive-secondary-btn" (click)="loadEntries()">
+        {{ 'archive.states.retry' | translate }}
+      </button>
+    </section>
+  } @else if (isLoading()) {
+    <section class="archive-state" aria-live="polite">
+      <p>{{ 'archive.states.loading' | translate }}</p>
+    </section>
+  } @else if (entries().length === 0) {
+    <section class="archive-state" aria-live="polite">
+      <p>{{ 'archive.states.empty' | translate }}</p>
+    </section>
+  } @else {
+    <section class="archive-grid" aria-label="Archive">
+      @for (entry of entries(); track entry.id) {
+        <article class="archive-card">
+          <header class="archive-card__header">
+            <div>
+              <p class="archive-card__year">{{ entry.year }}</p>
+              <h2>{{ entry.championshipName }}</h2>
+            </div>
+          </header>
+
+          <div class="archive-winners">
+            <div class="archive-winner archive-winner--first">
+              <span class="archive-winner__rank">1</span>
+              <span
+                class="archive-winner__avatar"
+                data-testid="archive-firstPlace-avatar"
+                aria-hidden="true"
+              >
+                @if (shouldRenderWinnerAvatarImage(entry, 'firstPlace')) {
+                  <img
+                    [src]="getWinnerUser(entry, 'firstPlace')?.image ?? ''"
+                    [alt]="getWinnerDisplayName(entry, 'firstPlace')"
+                    (error)="onWinnerAvatarError(entry, 'firstPlace')"
+                  />
+                } @else {
+                  {{ getWinnerInitial(entry, 'firstPlace') }}
+                }
+              </span>
+              <strong class="archive-winner__name">{{ getWinnerDisplayName(entry, 'firstPlace') }}</strong>
+              <strong class="archive-winner__points">{{ getWinnerPoints(entry, 'firstPlace') }}</strong>
+              <span class="archive-winner__icon">
+                <lucide-icon [img]="icons.trophy" [size]="30" aria-hidden="true" />
+              </span>
+            </div>
+
+            <div class="archive-winner archive-winner--second">
+              <span class="archive-winner__rank">2</span>
+              <span
+                class="archive-winner__avatar"
+                data-testid="archive-secondPlace-avatar"
+                aria-hidden="true"
+              >
+                @if (shouldRenderWinnerAvatarImage(entry, 'secondPlace')) {
+                  <img
+                    [src]="getWinnerUser(entry, 'secondPlace')?.image ?? ''"
+                    [alt]="getWinnerDisplayName(entry, 'secondPlace')"
+                    (error)="onWinnerAvatarError(entry, 'secondPlace')"
+                  />
+                } @else {
+                  {{ getWinnerInitial(entry, 'secondPlace') }}
+                }
+              </span>
+              <strong class="archive-winner__name">{{ getWinnerDisplayName(entry, 'secondPlace') }}</strong>
+              <strong class="archive-winner__points">{{ getWinnerPoints(entry, 'secondPlace') }}</strong>
+              <span class="archive-winner__icon">
+                <lucide-icon [img]="icons.medal" [size]="22" aria-hidden="true" />
+              </span>
+            </div>
+
+            <div class="archive-winner archive-winner--third">
+              <span class="archive-winner__rank">3</span>
+              <span
+                class="archive-winner__avatar"
+                data-testid="archive-thirdPlace-avatar"
+                aria-hidden="true"
+              >
+                @if (shouldRenderWinnerAvatarImage(entry, 'thirdPlace')) {
+                  <img
+                    [src]="getWinnerUser(entry, 'thirdPlace')?.image ?? ''"
+                    [alt]="getWinnerDisplayName(entry, 'thirdPlace')"
+                    (error)="onWinnerAvatarError(entry, 'thirdPlace')"
+                  />
+                } @else {
+                  {{ getWinnerInitial(entry, 'thirdPlace') }}
+                }
+              </span>
+              <strong class="archive-winner__name">{{ getWinnerDisplayName(entry, 'thirdPlace') }}</strong>
+              <strong class="archive-winner__points">{{ getWinnerPoints(entry, 'thirdPlace') }}</strong>
+              <span class="archive-winner__icon">
+                <lucide-icon [img]="icons.award" [size]="22" aria-hidden="true" />
+              </span>
+            </div>
+          </div>
+
+          @if (isAdmin()) {
+            <div class="archive-card__actions">
+              <button type="button" class="archive-link-btn" (click)="openEditForm(entry)">
+                <lucide-icon [img]="icons.squarePen" [size]="16" aria-hidden="true" />
+                {{ 'archive.actions.edit' | translate }}
+              </button>
+              <button type="button" class="archive-link-btn archive-link-btn--danger" (click)="requestDelete(entry)">
+                <lucide-icon [img]="icons.trash2" [size]="16" aria-hidden="true" />
+                {{ 'archive.actions.delete' | translate }}
+              </button>
+            </div>
+          }
+        </article>
+      }
+    </section>
+  }
+
+  @if (isFormVisible()) {
+    <div class="archive-dialog-backdrop" (click)="closeForm()">
+      <section class="archive-dialog" (click)="$event.stopPropagation()">
+        <header class="archive-dialog__header">
+          <h2>{{ formTitleKey() | translate }}</h2>
+        </header>
+
+        @if (formError()) {
+          <div class="archive-form-error" aria-live="assertive">
+            {{ formError() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submitForm()" novalidate>
+          <div class="archive-form-grid">
+            <label class="archive-field">
+              <span>{{ 'archive.form.championshipName' | translate }}</span>
+              <input type="text" formControlName="championshipName" maxlength="120" />
+            </label>
+
+            <label class="archive-field">
+              <span>{{ 'archive.form.year' | translate }}</span>
+              <input type="number" formControlName="year" min="1900" [max]="currentYear" />
+            </label>
+          </div>
+
+          <div class="archive-winner-form-list">
+            <ng-container
+              *ngTemplateOutlet="winnerForm; context: { group: form.controls.firstPlace, label: 'archive.places.first' }"
+            />
+            <ng-container
+              *ngTemplateOutlet="winnerForm; context: { group: form.controls.secondPlace, label: 'archive.places.second' }"
+            />
+            <ng-container
+              *ngTemplateOutlet="winnerForm; context: { group: form.controls.thirdPlace, label: 'archive.places.third' }"
+            />
+          </div>
+
+          <div class="archive-dialog__actions">
+            <button type="button" class="archive-secondary-btn" (click)="closeForm()" [disabled]="isSaving()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="archive-primary-btn" [disabled]="isSaving()">
+              <lucide-icon [img]="icons.save" [size]="17" aria-hidden="true" />
+              {{ 'common.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+
+  <ng-template #winnerForm let-group="group" let-label="label">
+    <section class="archive-winner-form" [formGroup]="group">
+      <h3>{{ label | translate }}</h3>
+
+      <mat-form-field appearance="outline" class="archive-mat-field">
+        <mat-label>{{ 'archive.form.source' | translate }}</mat-label>
+        <mat-select formControlName="source">
+          <mat-option value="user">{{ 'archive.form.registeredUser' | translate }}</mat-option>
+          <mat-option value="manual">{{ 'archive.form.manualName' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      @if (group.controls.source.value === 'user') {
+        <mat-form-field appearance="outline" class="archive-mat-field">
+          <mat-label>{{ 'archive.form.user' | translate }}</mat-label>
+          <mat-select formControlName="userId">
+            @for (user of userOptions(); track user.id) {
+              <mat-option [value]="user.id">{{ user.username }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      } @else {
+        <label class="archive-field">
+          <span>{{ 'archive.form.manualName' | translate }}</span>
+          <input type="text" formControlName="manualName" maxlength="100" />
+        </label>
+      }
+
+      <label class="archive-field archive-field--points">
+        <span>{{ 'archive.form.points' | translate }}</span>
+        <input type="number" formControlName="points" min="0" />
+      </label>
+    </section>
+  </ng-template>
+
+  <app-confirmation-dialog
+    [visible]="!!deleteEntry()"
+    [title]="'archive.deleteDialog.title'"
+    [message]="'archive.deleteDialog.message' | translate : { name: deleteEntry()?.championshipName ?? '' }"
+    [confirmLabel]="'common.delete'"
+    [cancelLabel]="'common.cancel'"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  />
+</div>

@@ -104,6 +104,13 @@ export const routes: Routes = [
       import('./teams/teams.component').then((m) => m.TeamsComponent),
   },
   {
+    path: 'archive',
+    canActivate: [AuthGuard],
+    data: { seo: PRIVATE_SEO },
+    loadComponent: () =>
+      import('./archive/archive.component').then((m) => m.ArchiveComponent),
+  },
+  {
     path: 'settings',
     canActivate: [AuthGuard],
     data: { seo: PRIVATE_SEO },

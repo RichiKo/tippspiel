@@ -8,8 +8,16 @@
       </p>
     </div>
 
-    @if (isAdmin()) {
-      <div class="dashboard-actions">
+    <div class="dashboard-actions">
+      <a
+        routerLink="/archive"
+        class="action-btn action-btn--primary"
+        data-testid="dashboard-archive-link"
+      >
+        {{ "dashboard.actions.archive" | translate }}
+      </a>
+
+      @if (isAdmin()) {
         <a
           routerLink="/dashboard/create"
           class="action-btn action-btn--primary"
@@ -19,8 +27,8 @@
         <a routerLink="/teams" class="action-btn action-btn--secondary">
           {{ "dashboard.actions.manageTeams" | translate }}
         </a>
-      </div>
-    }
+      }
+    </div>
   </section>
 
   @if (isLoading()) {

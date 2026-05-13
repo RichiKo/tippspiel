@@ -26,3 +26,5 @@ Ausgeführte Migrationen:
 11. 1740700000000-AddTotalPointsToRankings.ts
 12. 1740700000001-RecalculateTotalPoints.ts (NEU - Berechnet totalPoints für existierende Daten)
 13. 1741100000000-AddEliminatedTeamsToChampionships.ts
+14. 1741400000000-CreateArchiveEntriesTable.ts
+15. 1741500000000-AddArchiveWinnerPoints.ts

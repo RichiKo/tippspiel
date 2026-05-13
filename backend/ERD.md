@@ -19,6 +19,7 @@ Das Datenmodell besteht aus 10 Kernentitäten, die die gesamte Geschäftslogik d
 9. **ChampionGuess** - Meister-Tipps der Benutzer
 10. **ChampionGuessEvaluation** - Auswertung der Meister-Tipps
 11. **Ranking** - Ranglisten pro Championship
+12. **ArchiveEntry** - Sieger vergangener Championships
 
 ---
 
@@ -310,6 +311,30 @@ Gesamtpunkte = (exactHits * 3) + (goalDiffHits * 2) + (tendencyHits * 1)
 
 ---
 
+### ArchiveEntry
+
+Speichert die Sieger vergangener Championships unabhängig von aktiven Championship-Datensätzen.
+
+**Felder:**
+- `id` (UUID) - Primärschlüssel
+- `championshipName` (string) - Historischer Championship-Name
+- `year` (number) - Jahr der Championship
+- `firstPlaceUserId`, `secondPlaceUserId`, `thirdPlaceUserId` (number, nullable) - Optionaler Foreign Key → User
+- `firstPlaceManualName`, `secondPlaceManualName`, `thirdPlaceManualName` (string, nullable) - Freier Name für Gewinner ohne Account
+- `firstPlaceDisplayName`, `secondPlaceDisplayName`, `thirdPlaceDisplayName` (string) - Gespeicherter Anzeige-Snapshot
+- `firstPlacePoints`, `secondPlacePoints`, `thirdPlacePoints` (number) - Historisch erreichte Punktzahl
+- `createdAt`, `updatedAt` (Date)
+
+**Beziehungen:**
+- Optionaler Bezug zu `User` pro Platz mit `onDelete: SET NULL`
+
+**Geschäftslogik:**
+- Pro Platz ist genau eine Quelle erlaubt: registrierter User oder manueller Name
+- Platz 1, 2 und 3 müssen eindeutig sein
+- Manuelle Gewinner werden nicht als User angelegt
+
+---
+
 ## Beziehungsdiagramm
 
 ```
@@ -323,6 +348,7 @@ User ↔ ChampionshipParticipant ↔ Championship
     ChampionGuessEvaluation → ChampionGuessRule
          
 User → Ranking ← Championship
+User → ArchiveEntry (optional pro Platz)
 ```
 
 ---
@@ -334,9 +360,11 @@ User → Ranking ← Championship
 - `User.username` - eindeutig
 - `Tip(userId, gameId)` - ein Tipp pro User und Spiel
 - `ChampionshipParticipant(userId, championshipId)` - Teilnahme nur einmal
+- `ArchiveEntry` erzwingt eindeutige Plätze in der Service-Logik
 
 ### Foreign Keys
 Alle `*Id` Felder sind Foreign Keys mit `onDelete: CASCADE` (außer dokumentiert).
+Archive-User-Foreign-Keys nutzen `onDelete: SET NULL`, damit historische Einträge erhalten bleiben.
 
 ### Validierung
 - `Game.kickoffTime` muss in der Zukunft liegen (bei Erstellung)

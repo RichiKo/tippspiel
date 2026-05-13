@@ -16,6 +16,7 @@ import { TipModule } from './tip/tip.module';
 import { RankingModule } from './ranking/ranking.module';
 import { MembershipModule } from './membership/membership.module';
 import { BonusModule } from './bonus/bonus.module';
+import { ArchiveModule } from './archive/archive.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { BonusModule } from './bonus/bonus.module';
     MembershipModule,
     UploadModule,
     BonusModule,
+    ArchiveModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

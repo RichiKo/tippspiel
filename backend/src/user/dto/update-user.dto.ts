@@ -5,7 +5,7 @@ import {
   MinLength,
   IsOptional,
 } from 'class-validator';
-import { UserRole } from '@app/user/user-rolle.enum';
+import { UserRole } from '../user-rolle.enum';
 
 export class UpdateUserDto {
   @IsOptional()

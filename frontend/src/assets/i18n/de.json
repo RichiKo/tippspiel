@@ -100,6 +100,7 @@
       "subtitle": "Verwalte Championships, Teams und alle aktiven Spieltage in einer klaren Admin-Oberflaeche."
     },
     "actions": {
+      "archive": "Archive",
       "addChampionship": "+ Championship hinzufuegen",
       "manageTeams": "Teams verwalten"
     },
@@ -110,6 +111,54 @@
     },
     "errors": {
       "loadFailed": "Championships konnten nicht geladen werden. Bitte erneut versuchen."
+    }
+  },
+  "archive": {
+    "page": {
+      "kicker": "Historie",
+      "title": "Archive",
+      "subtitle": "Sieger vergangener Championships dauerhaft im Blick.",
+      "back": "Zurueck zum Dashboard"
+    },
+    "actions": {
+      "create": "Archive-Eintrag erstellen",
+      "edit": "Bearbeiten",
+      "delete": "Loeschen"
+    },
+    "places": {
+      "first": "Platz 1",
+      "second": "Platz 2",
+      "third": "Platz 3"
+    },
+    "states": {
+      "loading": "Lade Archive...",
+      "empty": "Noch keine Archive-Eintraege vorhanden.",
+      "retry": "Erneut laden"
+    },
+    "form": {
+      "createTitle": "Archive-Eintrag erstellen",
+      "editTitle": "Archive-Eintrag bearbeiten",
+      "championshipName": "Championship-Name",
+      "year": "Jahr",
+      "source": "Sieger-Typ",
+      "registeredUser": "Registrierter User",
+      "manualName": "Manueller Name",
+      "user": "User",
+      "points": "Punkte"
+    },
+    "validation": {
+      "userRequired": "Bitte waehle fuer jeden registrierten Sieger einen User aus.",
+      "nameRequired": "Bitte gib fuer jeden manuellen Sieger einen Namen ein.",
+      "uniqueWinners": "Platz 1, 2 und 3 muessen unterschiedliche Sieger enthalten."
+    },
+    "errors": {
+      "loadFailed": "Archive konnte nicht geladen werden.",
+      "saveFailed": "Archive-Eintrag konnte nicht gespeichert werden.",
+      "deleteFailed": "Archive-Eintrag konnte nicht geloescht werden."
+    },
+    "deleteDialog": {
+      "title": "Archive-Eintrag loeschen",
+      "message": "Moechtest du den Archive-Eintrag «{{name}}» wirklich loeschen?"
     }
   },
   "championshipForm": {

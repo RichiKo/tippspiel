@@ -1,13 +1,14 @@
 import { compare } from 'bcrypt';
-import { CreateUserDto } from '@app/user/dto/create-user.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoginUserDto } from '@app/user/dto/login-user.dto';
 import { Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
-import { UpdateUserDto } from '@app/user/dto/update-user.dto';
-import { UserEntity } from '@app/user/user.entity';
-import { UserResponseInterface } from '@app/user/types/user-response';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ArchiveUserOption } from './types/archive-user-option.type';
+import { UserResponseInterface } from './types/user-response';
+import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserService {
@@ -100,6 +101,13 @@ export class UserService {
 
   findById(id: number): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { id } });
+  }
+
+  findArchiveOptions(): Promise<ArchiveUserOption[]> {
+    return this.userRepository.find({
+      select: ['id', 'username', 'image'],
+      order: { username: 'ASC' },
+    });
   }
 
   generateJwt(user: UserEntity): string {
