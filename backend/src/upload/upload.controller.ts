@@ -31,13 +31,18 @@ export class UploadController {
         fileSize: 2 * 1024 * 1024, // 2MB
       },
       fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const allowedMimeTypes = [
+          'image/jpeg',
+          'image/png',
+          'image/webp',
+          'image/svg+xml',
+        ];
         if (allowedMimeTypes.includes(file.mimetype)) {
           cb(null, true);
         } else {
           cb(
             new BadRequestException(
-              'Ungültiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP',
+              'Ungültiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP, SVG',
             ),
             false,
           );

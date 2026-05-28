@@ -268,8 +268,10 @@
     "selectButton": "Вибрати зображення",
     "uploading": "Завантаження...",
     "hint": "Макс. {{size}}MB (JPG, PNG, WebP)",
+    "hintWithSvg": "Макс. {{size}}MB (JPG, PNG, WebP, SVG)",
     "errors": {
       "fileType": "Неприпустимий тип файлу. Дозволено лише JPG, PNG, WebP.",
+      "fileTypeWithSvg": "Неприпустимий тип файлу. Дозволено лише JPG, PNG, WebP, SVG.",
       "fileSize": "Файл занадто великий. Максимум {{size}}MB.",
       "uploadFailed": "Не вдалося завантажити зображення."
     }

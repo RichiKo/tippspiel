@@ -268,8 +268,10 @@
     "selectButton": "Bild auswaehlen",
     "uploading": "Wird hochgeladen...",
     "hint": "Max. {{size}}MB (JPG, PNG, WebP)",
+    "hintWithSvg": "Max. {{size}}MB (JPG, PNG, WebP, SVG)",
     "errors": {
       "fileType": "Ungueltiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP",
+      "fileTypeWithSvg": "Ungueltiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP, SVG",
       "fileSize": "Datei ist zu gross. Maximal {{size}}MB sind erlaubt",
       "uploadFailed": "Fehler beim Hochladen des Bildes"
     }

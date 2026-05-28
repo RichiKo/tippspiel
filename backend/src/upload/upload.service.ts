@@ -11,13 +11,20 @@ export interface UploadedFile {
 
 @Injectable()
 export class UploadService {
-  private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  private readonly allowedMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/svg+xml',
+  ];
 
   private readonly maxSizeBytes = 2 * 1024 * 1024; // 2MB
 
   validateFile(file: UploadedFile): void {
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
-      throw new Error('Ungültiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP');
+      throw new Error(
+        'Ungültiger Dateityp. Erlaubt sind nur: JPG, PNG, WebP, SVG',
+      );
     }
 
     if (file.size > this.maxSizeBytes) {

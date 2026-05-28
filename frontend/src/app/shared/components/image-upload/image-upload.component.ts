@@ -31,6 +31,11 @@ import { UploadService } from '../../services/upload.service';
 export class ImageUploadComponent {
   private readonly uploadService = inject(UploadService);
   private readonly translate = inject(TranslateService);
+  private readonly imageMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  private readonly teamLogoMimeTypes = [
+    ...this.imageMimeTypes,
+    'image/svg+xml',
+  ];
 
   // Inputs
   uploadCategory = input.required<'teams' | 'users' | 'championships'>();
@@ -55,6 +60,12 @@ export class ImageUploadComponent {
   });
 
   hasImage = computed(() => !!this.displayImageUrl());
+  acceptedMimeTypes = computed(() => this.getAllowedMimeTypes().join(','));
+  uploadHintKey = computed(() =>
+    this.uploadCategory() === 'teams'
+      ? 'imageUpload.hintWithSvg'
+      : 'imageUpload.hint',
+  );
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -81,10 +92,9 @@ export class ImageUploadComponent {
   }
 
   private validateFile(file: File): string | null {
-    // Check file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowedTypes = this.getAllowedMimeTypes();
     if (!allowedTypes.includes(file.type)) {
-      return this.translate.instant('imageUpload.errors.fileType');
+      return this.translate.instant(this.getFileTypeErrorKey());
     }
 
     // Check file size
@@ -96,6 +106,18 @@ export class ImageUploadComponent {
     }
 
     return null;
+  }
+
+  private getAllowedMimeTypes(): readonly string[] {
+    return this.uploadCategory() === 'teams'
+      ? this.teamLogoMimeTypes
+      : this.imageMimeTypes;
+  }
+
+  private getFileTypeErrorKey(): string {
+    return this.uploadCategory() === 'teams'
+      ? 'imageUpload.errors.fileTypeWithSvg'
+      : 'imageUpload.errors.fileType';
   }
 
   private generatePreview(file: File): void {

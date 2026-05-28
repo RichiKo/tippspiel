@@ -26,7 +26,7 @@
     <div class="upload-box">
       <input
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        [attr.accept]="acceptedMimeTypes()"
         (change)="onFileSelected($event)"
         #fileInput
         class="file-input"
@@ -48,7 +48,7 @@
           {{ 'imageUpload.selectButton' | translate }}
         </button>
         <p class="upload-hint">
-          {{ 'imageUpload.hint' | translate : { size: maxSizeMB() } }}
+          {{ uploadHintKey() | translate : { size: maxSizeMB() } }}
         </p>
       }
     </div>
