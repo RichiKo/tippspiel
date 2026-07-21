@@ -169,7 +169,7 @@ describe('FinishedGamesMyViewComponent', () => {
     expect(points.textContent).toContain('3 P');
   });
 
-  it('replaces one match body with participant tips and toggles it back', () => {
+  it('keeps teams and final score visible while participant tips are open', () => {
     const entries: MyFinishedEntry[] = [
       createEntry({ gameId: 'g-1', kickoffTime: kickoffA }),
       createEntry({ gameId: 'g-2', kickoffTime: kickoffB }),
@@ -202,7 +202,18 @@ describe('FinishedGamesMyViewComponent', () => {
     firstToggle.click();
     fixture.detectChanges();
 
-    expect(firstMatch.querySelector('.my-game-row')).toBeNull();
+    const openGameRow = firstMatch.querySelector('.my-game-row') as HTMLElement;
+    const openTeamNames = Array.from(
+      openGameRow.querySelectorAll('.my-team-name'),
+    ).map((team) => team.textContent?.trim());
+
+    expect(openGameRow).toBeTruthy();
+    expect(openTeamNames).toEqual(['Galatasaray', 'Juventus']);
+    expect(openGameRow.querySelector('.my-final')?.textContent?.trim()).toBe(
+      '5 : 2',
+    );
+    expect(openGameRow.querySelector('.my-tip')).toBeNull();
+    expect(openGameRow.querySelector('.my-points')).toBeNull();
     expect(firstMatch.querySelector('app-tips-table')).toBeTruthy();
     expect(firstToggle.getAttribute('aria-pressed')).toBe('true');
     expect(firstToggle.getAttribute('aria-label')).toBe(
@@ -213,6 +224,8 @@ describe('FinishedGamesMyViewComponent', () => {
     fixture.detectChanges();
 
     expect(firstMatch.querySelector('.my-game-row')).toBeTruthy();
+    expect(firstMatch.querySelector('.my-tip')).toBeTruthy();
+    expect(firstMatch.querySelector('.my-points')).toBeTruthy();
     expect(firstMatch.querySelector('app-tips-table')).toBeNull();
     expect(firstToggle.getAttribute('aria-pressed')).toBe('false');
   });
@@ -246,7 +259,9 @@ describe('FinishedGamesMyViewComponent', () => {
 
     expect(firstMatch.querySelector('.my-game-row')).toBeTruthy();
     expect(firstMatch.querySelector('app-tips-table')).toBeNull();
-    expect(secondMatch.querySelector('.my-game-row')).toBeNull();
+    expect(secondMatch.querySelector('.my-game-row')).toBeTruthy();
+    expect(secondMatch.querySelector('.my-tip')).toBeNull();
+    expect(secondMatch.querySelector('.my-points')).toBeNull();
     expect(secondMatch.querySelector('app-tips-table')).toBeTruthy();
   });
 
