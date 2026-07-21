@@ -4,7 +4,30 @@
   gap: 12px;
 }
 
-.my-kickoff-group {
+.my-day-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.my-day-heading {
+  margin: 0;
+  padding: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0f5f4c;
+  border-bottom: 1px solid #dce5eb;
+}
+
+.my-day-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.my-item-row {
   border: 1px solid #dbe3ea;
   border-radius: 14px;
   background: #ffffff;
@@ -18,7 +41,7 @@
     transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.my-kickoff-group:hover {
+.my-item-row:hover {
   border-color: rgba(15, 118, 110, 0.36);
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.09);
   transform: translateY(-1px);
@@ -26,11 +49,15 @@
 
 .my-item-head {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   border-bottom: 1px solid #ebf0f4;
   padding-bottom: 0.72rem;
 }
 
-.my-kickoff {
+.my-kickoff-time {
   margin: 0;
   font-size: 0.86rem;
   font-weight: 700;
@@ -38,19 +65,49 @@
   color: #5a6572;
 }
 
-.my-list {
-  display: flex;
-  flex-direction: column;
+.my-tips-toggle {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(15, 118, 110, 0.38);
+  border-radius: 9px;
+  background: transparent;
+  color: #0f5f4c;
+  cursor: pointer;
+  transition:
+    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.my-item-row {
-  padding: 0.8rem 0;
-  border-bottom: 1px solid #edf2f7;
+.my-tips-toggle:hover:not(:disabled) {
+  background: rgba(15, 118, 110, 0.12);
 }
 
-.my-item-row:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
+.my-tips-toggle--active {
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.my-tips-toggle--active:hover:not(:disabled) {
+  background: #0f5f4c;
+}
+
+.my-tips-toggle:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
+}
+
+.my-tips-toggle:disabled {
+  border-color: #d5dde6;
+  background: #f4f7f9;
+  color: #94a3b8;
+  cursor: not-allowed;
 }
 
 .my-game-row {
@@ -162,12 +219,22 @@
 }
 
 @media (max-width: 767px) {
-  .my-kickoff-group {
+  .my-item-row {
     padding: 1rem;
   }
 
-  .my-kickoff {
+  .my-day-heading {
+    font-size: 0.68rem;
+  }
+
+  .my-kickoff-time {
     font-size: 0.9rem;
+  }
+
+  .my-tips-toggle {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
   }
 
   .my-game-row {
@@ -218,6 +285,13 @@
     width: auto;
     align-items: center;
     gap: 0.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-item-row,
+  .my-tips-toggle {
+    transition: none;
   }
 }
 

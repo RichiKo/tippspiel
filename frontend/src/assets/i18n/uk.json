@@ -632,6 +632,9 @@
       "tipPrefix": "Прогноз",
       "points": "Бали",
       "pointsShort": "б.",
+      "showParticipantTips": "Показати прогнози учасників",
+      "hideParticipantTips": "Сховати прогнози учасників",
+      "participantTipsUnavailable": "Прогнози учасників недоступні",
       "empty": "Оцінених матчів ще немає."
     },
     "spieltagTable": {

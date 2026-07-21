@@ -433,6 +433,8 @@
                   <app-finished-games-my-view
                     data-testid="view-my"
                     [entries]="myFinishedEntries()"
+                    [gameTipsMap]="gameTips()"
+                    [currentUserId]="currentUser()?.id ?? 0"
                   />
                 }
 

@@ -288,6 +288,15 @@ describe('ChampionshipDetailComponent', () => {
     ).toBeTruthy();
   });
 
+  it('should provide participant tips to the My Games match toggle', () => {
+    const toggle = fixture.nativeElement.querySelector(
+      '[data-testid="view-my"] .my-tips-toggle',
+    ) as HTMLButtonElement;
+
+    expect(toggle).toBeTruthy();
+    expect(toggle.disabled).toBeFalse();
+  });
+
   it('should style every tied third-place row as bronze in the Spieltag table', () => {
     component.games.set([closedGame]);
     component.rankingParticipants.set([

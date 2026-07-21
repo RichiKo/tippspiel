@@ -1,80 +1,123 @@
 <div class="my-finished-view">
   @if (groupedEntries().length > 0) {
-    @for (group of groupedEntries(); track group.kickoffTime.toISOString()) {
-      <section class="my-kickoff-group">
-        <div class="my-item-head">
-          <p class="my-kickoff">
-            {{ formatKickoff(group.kickoffTime) }}
-          </p>
-        </div>
+    @for (group of groupedEntries(); track group.dayKey) {
+      <section class="my-day-group">
+        <h3 class="my-day-heading">{{ formatDay(group.date) }}</h3>
 
-        <div class="my-list">
+        <div class="my-day-matches">
           @for (entry of group.entries; track entry.gameId) {
-            <article class="my-item-row">
-              <div class="my-game-row">
-                <div class="my-team my-team-home">
-                  <span class="my-team-name" [title]="entry.homeTeamName">{{
-                    entry.homeTeamName
-                  }}</span>
-                  @if (entry.homeTeamLogoUrl) {
-                    <img
-                      [src]="entry.homeTeamLogoUrl"
-                      [alt]="entry.homeTeamName"
-                      class="my-team-logo"
-                    />
-                  } @else {
-                    <span class="my-team-fallback">{{
-                      getTeamInitials(entry.homeTeamName)
-                    }}</span>
-                  }
-                </div>
+            <article class="my-item-row" [attr.data-game-id]="entry.gameId">
+              <header class="my-item-head">
+                <time
+                  class="my-kickoff-time"
+                  [attr.datetime]="entry.kickoffTime.toISOString()"
+                >
+                  {{ formatKickoffTime(entry.kickoffTime) }}
+                </time>
+                <button
+                  type="button"
+                  class="my-tips-toggle"
+                  [class.my-tips-toggle--active]="
+                    isParticipantTipsVisible(entry.gameId)
+                  "
+                  (click)="toggleParticipantTips(entry.gameId)"
+                  [disabled]="
+                    !hasParticipantTips(entry.gameId) || currentUserId() <= 0
+                  "
+                  [attr.aria-label]="
+                    getParticipantTipsLabelKey(entry.gameId) | translate
+                  "
+                  [attr.title]="
+                    getParticipantTipsLabelKey(entry.gameId) | translate
+                  "
+                  [attr.aria-pressed]="
+                    isParticipantTipsVisible(entry.gameId)
+                  "
+                >
+                  <lucide-icon
+                    [img]="icons.users"
+                    [size]="18"
+                    aria-hidden="true"
+                  ></lucide-icon>
+                </button>
+              </header>
 
-                <div class="my-center">
-                  <span
-                    class="my-final"
-                    [attr.title]="
-                      'championship.finishedMy.finalScore' | translate
-                    "
-                    >{{ entry.finalScore }}</span
-                  >
-                  <span
-                    class="my-tip"
-                    [attr.title]="'championship.finishedMy.yourTip' | translate"
-                    >{{ "championship.finishedMy.tipPrefix" | translate }}:
-                    {{ entry.userTip }}</span
-                  >
-                  <span
-                    class="my-points"
-                    [class.my-points--zero]="entry.points === 0"
-                    [class.my-points--mid]="
-                      entry.points > 0 && entry.points < 3
-                    "
-                    [class.my-points--high]="entry.points >= 3"
-                    [attr.title]="'championship.finishedMy.points' | translate"
-                    >{{ entry.points }}
-                    {{
-                      "championship.finishedMy.pointsShort" | translate
-                    }}</span
-                  >
-                </div>
-
-                <div class="my-team my-team-away">
-                  @if (entry.awayTeamLogoUrl) {
-                    <img
-                      [src]="entry.awayTeamLogoUrl"
-                      [alt]="entry.awayTeamName"
-                      class="my-team-logo"
-                    />
-                  } @else {
-                    <span class="my-team-fallback">{{
-                      getTeamInitials(entry.awayTeamName)
+              @if (isParticipantTipsVisible(entry.gameId)) {
+                <app-tips-table
+                  [tips]="getParticipantTips(entry.gameId)"
+                  [currentUserId]="currentUserId()"
+                  [isClosed]="true"
+                />
+              } @else {
+                <div class="my-game-row">
+                  <div class="my-team my-team-home">
+                    <span class="my-team-name" [title]="entry.homeTeamName">{{
+                      entry.homeTeamName
                     }}</span>
-                  }
-                  <span class="my-team-name" [title]="entry.awayTeamName">{{
-                    entry.awayTeamName
-                  }}</span>
+                    @if (entry.homeTeamLogoUrl) {
+                      <img
+                        [src]="entry.homeTeamLogoUrl"
+                        [alt]="entry.homeTeamName"
+                        class="my-team-logo"
+                      />
+                    } @else {
+                      <span class="my-team-fallback">{{
+                        getTeamInitials(entry.homeTeamName)
+                      }}</span>
+                    }
+                  </div>
+
+                  <div class="my-center">
+                    <span
+                      class="my-final"
+                      [attr.title]="
+                        'championship.finishedMy.finalScore' | translate
+                      "
+                      >{{ entry.finalScore }}</span
+                    >
+                    <span
+                      class="my-tip"
+                      [attr.title]="
+                        'championship.finishedMy.yourTip' | translate
+                      "
+                      >{{ "championship.finishedMy.tipPrefix" | translate }}:
+                      {{ entry.userTip }}</span
+                    >
+                    <span
+                      class="my-points"
+                      [class.my-points--zero]="entry.points === 0"
+                      [class.my-points--mid]="
+                        entry.points > 0 && entry.points < 3
+                      "
+                      [class.my-points--high]="entry.points >= 3"
+                      [attr.title]="
+                        'championship.finishedMy.points' | translate
+                      "
+                      >{{ entry.points }}
+                      {{
+                        "championship.finishedMy.pointsShort" | translate
+                      }}</span
+                    >
+                  </div>
+
+                  <div class="my-team my-team-away">
+                    @if (entry.awayTeamLogoUrl) {
+                      <img
+                        [src]="entry.awayTeamLogoUrl"
+                        [alt]="entry.awayTeamName"
+                        class="my-team-logo"
+                      />
+                    } @else {
+                      <span class="my-team-fallback">{{
+                        getTeamInitials(entry.awayTeamName)
+                      }}</span>
+                    }
+                    <span class="my-team-name" [title]="entry.awayTeamName">{{
+                      entry.awayTeamName
+                    }}</span>
+                  </div>
                 </div>
-              </div>
+              }
             </article>
           }
         </div>

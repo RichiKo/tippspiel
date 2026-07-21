@@ -632,6 +632,9 @@
       "tipPrefix": "Tipp",
       "points": "Punkte",
       "pointsShort": "P",
+      "showParticipantTips": "Tipps der Teilnehmer anzeigen",
+      "hideParticipantTips": "Tipps der Teilnehmer ausblenden",
+      "participantTipsUnavailable": "Keine Teilnehmer-Tipps verfügbar",
       "empty": "Noch keine gewerteten Spiele."
     },
     "spieltagTable": {
