@@ -288,6 +288,93 @@ describe('ChampionshipDetailComponent', () => {
     ).toBeTruthy();
   });
 
+  it('should style every tied third-place row as bronze in the Spieltag table', () => {
+    component.games.set([closedGame]);
+    component.rankingParticipants.set([
+      { userId: 1, username: 'Anna' },
+      { userId: 2, username: 'Ben' },
+      { userId: 3, username: 'Clara' },
+      { userId: 4, username: 'Dora' },
+      { userId: 5, username: 'Emil' },
+    ]);
+    component.gameTips.set(
+      new Map([
+        [
+          'g1',
+          [
+            {
+              gameId: 'g1',
+              championshipId: 'champ-1',
+              userId: 1,
+              homeTeamGoals: 2,
+              awayTeamGoals: 1,
+              points: 3,
+              outcomeType: 'exact',
+            },
+            {
+              gameId: 'g1',
+              championshipId: 'champ-1',
+              userId: 2,
+              homeTeamGoals: 2,
+              awayTeamGoals: 0,
+              points: 2,
+              outcomeType: 'goalDiff',
+            },
+            {
+              gameId: 'g1',
+              championshipId: 'champ-1',
+              userId: 3,
+              homeTeamGoals: 1,
+              awayTeamGoals: 0,
+              points: 1,
+              outcomeType: 'tendency',
+            },
+            {
+              gameId: 'g1',
+              championshipId: 'champ-1',
+              userId: 4,
+              homeTeamGoals: 1,
+              awayTeamGoals: 0,
+              points: 1,
+              outcomeType: 'tendency',
+            },
+            {
+              gameId: 'g1',
+              championshipId: 'champ-1',
+              userId: 5,
+              homeTeamGoals: 0,
+              awayTeamGoals: 2,
+              points: 0,
+              outcomeType: 'missed',
+            },
+          ],
+        ],
+      ]),
+    );
+    component.selectedView.set('table');
+    fixture.detectChanges();
+
+    const rows = fixture.nativeElement.querySelectorAll(
+      '.spieltags-table tbody tr',
+    ) as NodeListOf<HTMLElement>;
+    const rankPills = fixture.nativeElement.querySelectorAll(
+      '.spieltags-table .rank-pill',
+    ) as NodeListOf<HTMLElement>;
+
+    expect(Array.from(rankPills).map((pill) => pill.textContent?.trim())).toEqual([
+      '1',
+      '2',
+      '3',
+      '3',
+      '5',
+    ]);
+    expect(rankPills[2].classList).toContain('rank-pill--bronze');
+    expect(rankPills[3].classList).toContain('rank-pill--bronze');
+    expect(rows[2].classList).toContain('top-three');
+    expect(rows[3].classList).toContain('top-three');
+    expect(rows[4].classList).not.toContain('top-three');
+  });
+
   it('should set mobile view on resize when viewport is below 768px', () => {
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(390);
 

@@ -282,9 +282,16 @@ export class RankingService {
       return b.tendencyHits - a.tendencyHits;
     });
 
+    let currentRank = 0;
+    let previousTotalPoints: number | null = null;
+
     for (let i = 0; i < sortedUsers.length; i++) {
       const userData = sortedUsers[i];
-      const rank = i + 1;
+      if (userData.totalPoints !== previousTotalPoints) {
+        currentRank = i + 1;
+      }
+      previousTotalPoints = userData.totalPoints;
+      const rank = currentRank;
 
       const existingRanking = await this.rankingRepository.findOne({
         where: { userId: userData.userId, championshipId },
@@ -812,11 +819,20 @@ export class RankingService {
       return a.username.localeCompare(b.username);
     });
 
+    let currentPlace = 0;
+    let previousParticipantPoints: number | null = null;
     const rankedParticipants: ChampionshipParticipantStatisticsDto[] =
-      participantRows.map((participant, index) => ({
-        place: index + 1,
-        ...participant,
-      }));
+      participantRows.map((participant, index) => {
+        if (participant.totalPoints !== previousParticipantPoints) {
+          currentPlace = index + 1;
+        }
+        previousParticipantPoints = participant.totalPoints;
+
+        return {
+          place: currentPlace,
+          ...participant,
+        };
+      });
 
     const aggregateRatio = (count: number): number =>
       totalPlayedSlots === 0 ? 0 : count / totalPlayedSlots;

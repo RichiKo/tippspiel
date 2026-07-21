@@ -14,14 +14,17 @@
           </tr>
         </thead>
         <tbody>
-          @for (row of rows(); track row.userId; let i = $index) {
-            <tr [class.current-user]="isCurrentUser(row.userId)" [class.top-three]="i < 3">
+          @for (row of rows(); track row.userId) {
+            <tr
+              [class.current-user]="isCurrentUser(row.userId)"
+              [class.top-three]="row.place <= 3"
+            >
               <td class="rank-col">
                 <span
                   class="rank-pill"
-                  [class.rank-pill--gold]="i === 0"
-                  [class.rank-pill--silver]="i === 1"
-                  [class.rank-pill--bronze]="i === 2"
+                  [class.rank-pill--gold]="row.place === 1"
+                  [class.rank-pill--silver]="row.place === 2"
+                  [class.rank-pill--bronze]="row.place === 3"
                 >
                   {{ row.place }}
                 </span>

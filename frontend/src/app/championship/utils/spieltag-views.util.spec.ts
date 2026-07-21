@@ -141,6 +141,16 @@ describe('spieltag-views util', () => {
             outcomeType: 'tendency',
             user: { id: 2, username: 'Dima', email: '' },
           },
+          {
+            gameId: 'g1',
+            championshipId: 'c1',
+            userId: 5,
+            homeTeamGoals: 1,
+            awayTeamGoals: 1,
+            points: 1,
+            outcomeType: 'tendency',
+            user: { id: 5, username: 'Igor', email: '' },
+          },
         ],
       ],
       [
@@ -175,6 +185,7 @@ describe('spieltag-views util', () => {
       { userId: 2, username: 'Dima' },
       { userId: 3, username: 'Mischa' },
       { userId: 4, username: 'Ivan' },
+      { userId: 5, username: 'Igor' },
     ];
 
     const rows = buildSpieltagRankingRows(finishedGames, tipsByGame, participants);
@@ -183,9 +194,10 @@ describe('spieltag-views util', () => {
       'Richi',
       'Mischa',
       'Dima',
+      'Igor',
       'Ivan',
     ]);
-    expect(rows.map((row) => row.gamePoints)).toEqual([5, 3, 1, 0]);
-    expect(rows.map((row) => row.place)).toEqual([1, 2, 3, 4]);
+    expect(rows.map((row) => row.gamePoints)).toEqual([5, 3, 1, 1, 0]);
+    expect(rows.map((row) => row.place)).toEqual([1, 2, 3, 3, 5]);
   });
 });

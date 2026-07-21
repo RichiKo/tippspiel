@@ -87,16 +87,19 @@
               </tr>
             </thead>
             <tbody>
-              @for (standing of sortedStandings(); track standing.id; let i = $index) {
-                <tr [class.current-user]="isCurrentUser(standing.userId)" [class.top-three]="i < 3">
+              @for (standing of sortedStandings(); track standing.id) {
+                <tr
+                  [class.current-user]="isCurrentUser(standing.userId)"
+                  [class.top-three]="standing.rank <= 3"
+                >
                   <td class="rank">
                     <span
                       class="rank-pill"
-                      [class.rank-pill--gold]="i === 0"
-                      [class.rank-pill--silver]="i === 1"
-                      [class.rank-pill--bronze]="i === 2"
+                      [class.rank-pill--gold]="standing.rank === 1"
+                      [class.rank-pill--silver]="standing.rank === 2"
+                      [class.rank-pill--bronze]="standing.rank === 3"
                     >
-                      {{ i + 1 }}
+                      {{ standing.rank }}
                     </span>
                   </td>
                   <td class="username">

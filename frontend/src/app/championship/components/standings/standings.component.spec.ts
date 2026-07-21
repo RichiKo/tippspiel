@@ -221,6 +221,71 @@ describe('StandingsComponent', () => {
     expect(pointsHeader.textContent?.trim()).toBe('Punkte');
   });
 
+  it('should render tied competition ranks with the same medal styling', () => {
+    const template = component.standings()[0];
+    component.standings.set([
+      {
+        ...template,
+        id: 's-1',
+        userId: 1,
+        rank: 1,
+        totalPoints: 120,
+        user: { id: 1, username: 'Anna', email: 'anna@test.com' },
+      },
+      {
+        ...template,
+        id: 's-2',
+        userId: 2,
+        rank: 2,
+        totalPoints: 115,
+        user: { id: 2, username: 'Ben', email: 'ben@test.com' },
+      },
+      {
+        ...template,
+        id: 's-3',
+        userId: 3,
+        rank: 3,
+        totalPoints: 110,
+        user: { id: 3, username: 'Clara', email: 'clara@test.com' },
+      },
+      {
+        ...template,
+        id: 's-4',
+        userId: 4,
+        rank: 3,
+        totalPoints: 110,
+        user: { id: 4, username: 'Dora', email: 'dora@test.com' },
+      },
+      {
+        ...template,
+        id: 's-5',
+        userId: 5,
+        rank: 5,
+        totalPoints: 100,
+        user: { id: 5, username: 'Emil', email: 'emil@test.com' },
+      },
+    ]);
+    fixture.detectChanges();
+
+    const rows = fixture.nativeElement.querySelectorAll('tbody tr') as NodeListOf<HTMLElement>;
+    const rankPills = fixture.nativeElement.querySelectorAll(
+      '.rank-pill',
+    ) as NodeListOf<HTMLElement>;
+
+    expect(Array.from(rankPills).map((pill) => pill.textContent?.trim())).toEqual([
+      '1',
+      '2',
+      '3',
+      '3',
+      '5',
+    ]);
+    expect(rankPills[2].classList).toContain('rank-pill--bronze');
+    expect(rankPills[3].classList).toContain('rank-pill--bronze');
+    expect(rows[2].classList).toContain('top-three');
+    expect(rows[3].classList).toContain('top-three');
+    expect(rows[4].classList).not.toContain('top-three');
+  });
+
   it('should navigate back when header back button is clicked', () => {
     const backButton = fixture.nativeElement.querySelector(
       '.ui-page-header__back button',

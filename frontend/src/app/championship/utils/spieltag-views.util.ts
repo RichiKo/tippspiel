@@ -179,8 +179,18 @@ export function buildSpieltagRankingRows(
     return a.username.localeCompare(b.username);
   });
 
-  return rows.map((row, index) => ({
-    ...row,
-    place: index + 1,
-  }));
+  let currentPlace = 0;
+  let previousTotal: number | null = null;
+
+  return rows.map((row, index) => {
+    if (row.total !== previousTotal) {
+      currentPlace = index + 1;
+    }
+    previousTotal = row.total;
+
+    return {
+      ...row,
+      place: currentPlace,
+    };
+  });
 }

@@ -43,7 +43,9 @@ describe('RankingService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    rankingRepository.create.mockImplementation((value) => value);
+    rankingRepository.create.mockImplementation(
+      (value: unknown): unknown => value,
+    );
     rankingRepository.save.mockResolvedValue(undefined);
     rankingRepository.findOne.mockResolvedValue(null);
 
@@ -145,6 +147,56 @@ describe('RankingService', () => {
     expect(tipRepository.createQueryBuilder).toHaveBeenCalled();
     expect(rankingRepository.delete).toHaveBeenCalled();
     expect(rankingRepository.save).toHaveBeenCalledTimes(2);
+  });
+
+  it('recalculateForChampionship should assign competition ranks to tied total points', async () => {
+    championshipRepository.findOne.mockResolvedValue({ id: 'champ-1' });
+    membershipRepository.find.mockResolvedValue([
+      { userId: 1, status: MembershipStatus.ACTIVE },
+      { userId: 2, status: MembershipStatus.ACTIVE },
+      { userId: 3, status: MembershipStatus.ACTIVE },
+      { userId: 4, status: MembershipStatus.ACTIVE },
+      { userId: 5, status: MembershipStatus.ACTIVE },
+    ]);
+    tipRepository.find
+      .mockResolvedValueOnce([
+        { userId: 1 },
+        { userId: 2 },
+        { userId: 3 },
+        { userId: 4 },
+        { userId: 5 },
+      ])
+      .mockResolvedValueOnce([
+        { userId: 1, gameId: 'game-1', outcomeType: TipOutcome.EXACT },
+        { userId: 2, gameId: 'game-1', outcomeType: TipOutcome.GOAL_DIFF },
+        { userId: 3, gameId: 'game-1', outcomeType: TipOutcome.TENDENCY },
+        { userId: 4, gameId: 'game-1', outcomeType: TipOutcome.TENDENCY },
+        { userId: 5, gameId: 'game-1', outcomeType: TipOutcome.MISSED },
+      ]);
+    rankingRepository.find.mockResolvedValue([]);
+
+    await service.recalculateForChampionship('champ-1');
+
+    expect(rankingRepository.save).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ userId: 1, rank: 1 }),
+    );
+    expect(rankingRepository.save).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ userId: 2, rank: 2 }),
+    );
+    expect(rankingRepository.save).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ userId: 3, rank: 3 }),
+    );
+    expect(rankingRepository.save).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({ userId: 4, rank: 3 }),
+    );
+    expect(rankingRepository.save).toHaveBeenNthCalledWith(
+      5,
+      expect.objectContaining({ userId: 5, rank: 5 }),
+    );
   });
 
   it('findUserStatisticsByChampionship should aggregate closed games and round points', async () => {
@@ -499,6 +551,91 @@ describe('RankingService', () => {
       participatedMatches: 2,
       missedMatches: 1,
     });
+  });
+
+  it('findChampionshipStatisticsByChampionship should assign competition places to tied participants', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+
+    const championshipGamesBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([
+        {
+          id: 'g1',
+          isClosed: true,
+          roundId: 'r1',
+          round: { id: 'r1', name: 'Round 1' },
+          homeScore: 2,
+          awayScore: 1,
+        },
+      ]),
+    };
+    gameRepository.createQueryBuilder.mockReturnValue(championshipGamesBuilder);
+    rankingRepository.find.mockResolvedValue(
+      [1, 2, 3, 4, 5].map((userId) => ({
+        id: `rk-${userId}`,
+        userId,
+        rank: userId,
+        user: { id: userId, username: `User ${userId}`, email: '' },
+      })),
+    );
+    tipRepository.find
+      .mockResolvedValueOnce([1, 2, 3, 4, 5].map((userId) => ({ userId })))
+      .mockResolvedValueOnce([
+        {
+          userId: 1,
+          gameId: 'g1',
+          homeTeamGoals: 2,
+          awayTeamGoals: 1,
+          points: 3,
+          outcomeType: TipOutcome.EXACT,
+        },
+        {
+          userId: 2,
+          gameId: 'g1',
+          homeTeamGoals: 2,
+          awayTeamGoals: 0,
+          points: 2,
+          outcomeType: TipOutcome.GOAL_DIFF,
+        },
+        {
+          userId: 3,
+          gameId: 'g1',
+          homeTeamGoals: 1,
+          awayTeamGoals: 0,
+          points: 1,
+          outcomeType: TipOutcome.TENDENCY,
+        },
+        {
+          userId: 4,
+          gameId: 'g1',
+          homeTeamGoals: 1,
+          awayTeamGoals: 0,
+          points: 1,
+          outcomeType: TipOutcome.TENDENCY,
+        },
+        {
+          userId: 5,
+          gameId: 'g1',
+          homeTeamGoals: 0,
+          awayTeamGoals: 2,
+          points: 0,
+          outcomeType: TipOutcome.MISSED,
+        },
+      ]);
+
+    const result = await service.findChampionshipStatisticsByChampionship(
+      'champ-1',
+      1,
+    );
+
+    expect(result.participants.map((participant) => participant.place)).toEqual(
+      [1, 2, 3, 3, 5],
+    );
   });
 
   it('findChampionshipStatisticsByChampionship should throw when user is not an active member', async () => {
