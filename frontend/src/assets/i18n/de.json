@@ -740,6 +740,14 @@
         "pointsLabel": "{{points}} Punkte",
         "notAvailable": "Noch keine ausgewerteten Spiele vorhanden."
       },
+      "mostResultativeGame": {
+        "title": "Meist resultatives Spiel",
+        "totalPoints": "Gesamtpunkte aller Teilnehmer",
+        "exactHits": "Exakt",
+        "goalDiffHits": "Differenz",
+        "tendencyHits": "Tendenz",
+        "empty": "Noch kein beendetes Spiel vorhanden."
+      },
       "roundMode": {
         "tableTitle": "Teilnehmer in der Championship",
         "summary": {

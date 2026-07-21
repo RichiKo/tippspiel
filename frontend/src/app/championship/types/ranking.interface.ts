@@ -80,6 +80,28 @@ export interface ChampionshipParticipantExtremum {
   points: number;
 }
 
+export interface MostResultativeGame {
+  gameId: string;
+  roundName: string;
+  kickoffTime: string;
+  homeTeam: {
+    id: string;
+    name: string;
+    logoUrl: string;
+  };
+  awayTeam: {
+    id: string;
+    name: string;
+    logoUrl: string;
+  };
+  homeScore: number | null;
+  awayScore: number | null;
+  totalPoints: number;
+  exactHits: number;
+  goalDiffHits: number;
+  tendencyHits: number;
+}
+
 export interface ChampionshipStatisticsParticipant {
   place: number;
   userId: number;
@@ -116,5 +138,6 @@ export interface ChampionshipAggregateStatistics {
   worstRound: RoundPoints | null;
   bestParticipant: ChampionshipParticipantExtremum | null;
   worstParticipant: ChampionshipParticipantExtremum | null;
+  mostResultativeGame: MostResultativeGame | null;
   participants: ChampionshipStatisticsParticipant[];
 }

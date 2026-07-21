@@ -376,32 +376,44 @@ describe('RankingService', () => {
         {
           id: 'g1',
           isClosed: true,
+          kickoffTime: new Date('2026-02-17T18:00:00.000Z'),
           roundId: 'r1',
           round: { id: 'r1', name: 'Round 1' },
+          homeTeam: { id: 'team-1', name: 'Juventus', logoUrl: 'juve.svg' },
+          awayTeam: { id: 'team-2', name: 'Inter', logoUrl: 'inter.svg' },
           homeScore: 2,
           awayScore: 1,
         },
         {
           id: 'g2',
           isClosed: true,
+          kickoffTime: new Date('2026-02-17T20:00:00.000Z'),
           roundId: 'r1',
           round: { id: 'r1', name: 'Round 1' },
+          homeTeam: { id: 'team-3', name: 'Milan', logoUrl: 'milan.svg' },
+          awayTeam: { id: 'team-4', name: 'Roma', logoUrl: 'roma.svg' },
           homeScore: 1,
           awayScore: 1,
         },
         {
           id: 'g3',
           isClosed: false,
+          kickoffTime: new Date('2026-02-18T18:00:00.000Z'),
           roundId: 'r1',
           round: { id: 'r1', name: 'Round 1' },
+          homeTeam: { id: 'team-5', name: 'PSG', logoUrl: 'psg.svg' },
+          awayTeam: { id: 'team-6', name: 'Bayern', logoUrl: 'bayern.svg' },
           homeScore: null,
           awayScore: null,
         },
         {
           id: 'g4',
           isClosed: true,
+          kickoffTime: new Date('2026-02-18T20:00:00.000Z'),
           roundId: 'r2',
           round: { id: 'r2', name: 'Round 2' },
+          homeTeam: { id: 'team-7', name: 'Arsenal', logoUrl: 'arsenal.svg' },
+          awayTeam: { id: 'team-8', name: 'Chelsea', logoUrl: 'chelsea.svg' },
           homeScore: 0,
           awayScore: 0,
         },
@@ -535,6 +547,27 @@ describe('RankingService', () => {
     expect(result.pointsDistribution.zeroPoints.count).toBe(3);
     expect(result.pointsDistribution.threePoints.ratio).toBeCloseTo(0.5, 5);
     expect(result.pointsDistribution.zeroPoints.ratio).toBeCloseTo(0.5, 5);
+    expect(result.mostResultativeGame).toEqual({
+      gameId: 'g1',
+      roundName: 'Round 1',
+      kickoffTime: new Date('2026-02-17T18:00:00.000Z'),
+      homeTeam: { id: 'team-1', name: 'Juventus', logoUrl: 'juve.svg' },
+      awayTeam: { id: 'team-2', name: 'Inter', logoUrl: 'inter.svg' },
+      homeScore: 2,
+      awayScore: 1,
+      totalPoints: 3,
+      exactHits: 1,
+      goalDiffHits: 0,
+      tendencyHits: 0,
+    });
+    expect(championshipGamesBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+      'game.homeTeam',
+      'homeTeam',
+    );
+    expect(championshipGamesBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+      'game.awayTeam',
+      'awayTeam',
+    );
     expect(result.participants[0]).toMatchObject({
       place: 1,
       userId: 1,
@@ -553,6 +586,303 @@ describe('RankingService', () => {
     });
   });
 
+  it('findChampionshipStatisticsByChampionship should prefer exact and goal difference hits for tied game points', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+
+    const games = [
+      {
+        id: 'g-tendency',
+        isClosed: true,
+        kickoffTime: new Date('2026-02-17T17:00:00.000Z'),
+        roundId: 'r1',
+        round: { id: 'r1', name: 'Round 1' },
+        homeTeam: { id: 'h1', name: 'Home 1', logoUrl: '' },
+        awayTeam: { id: 'a1', name: 'Away 1', logoUrl: '' },
+        homeScore: 2,
+        awayScore: 1,
+      },
+      {
+        id: 'g-difference',
+        isClosed: true,
+        kickoffTime: new Date('2026-02-17T19:00:00.000Z'),
+        roundId: 'r1',
+        round: { id: 'r1', name: 'Round 1' },
+        homeTeam: { id: 'h2', name: 'Home 2', logoUrl: '' },
+        awayTeam: { id: 'a2', name: 'Away 2', logoUrl: '' },
+        homeScore: 2,
+        awayScore: 1,
+      },
+      {
+        id: 'g-no-exact',
+        isClosed: true,
+        kickoffTime: new Date('2026-02-17T16:00:00.000Z'),
+        roundId: 'r1',
+        round: { id: 'r1', name: 'Round 1' },
+        homeTeam: { id: 'h3', name: 'Home 3', logoUrl: '' },
+        awayTeam: { id: 'a3', name: 'Away 3', logoUrl: '' },
+        homeScore: 2,
+        awayScore: 1,
+      },
+    ];
+    const championshipGamesBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(games),
+    };
+    gameRepository.createQueryBuilder.mockReturnValue(championshipGamesBuilder);
+    rankingRepository.find.mockResolvedValue(
+      [1, 2, 3].map((userId) => ({
+        userId,
+        rank: userId,
+        user: { id: userId, username: `User ${userId}` },
+      })),
+    );
+    tipRepository.find.mockResolvedValue([
+      {
+        userId: 1,
+        gameId: 'g-tendency',
+        homeTeamGoals: 2,
+        awayTeamGoals: 1,
+        points: 3,
+        outcomeType: TipOutcome.EXACT,
+      },
+      {
+        userId: 2,
+        gameId: 'g-tendency',
+        homeTeamGoals: 1,
+        awayTeamGoals: 0,
+        points: 1,
+        outcomeType: TipOutcome.TENDENCY,
+      },
+      {
+        userId: 3,
+        gameId: 'g-tendency',
+        homeTeamGoals: 1,
+        awayTeamGoals: 0,
+        points: 1,
+        outcomeType: TipOutcome.TENDENCY,
+      },
+      {
+        userId: 1,
+        gameId: 'g-difference',
+        homeTeamGoals: 2,
+        awayTeamGoals: 1,
+        points: 3,
+        outcomeType: TipOutcome.EXACT,
+      },
+      {
+        userId: 2,
+        gameId: 'g-difference',
+        homeTeamGoals: 3,
+        awayTeamGoals: 2,
+        points: 2,
+        outcomeType: TipOutcome.GOAL_DIFF,
+      },
+      {
+        userId: 3,
+        gameId: 'g-difference',
+        homeTeamGoals: 0,
+        awayTeamGoals: 2,
+        points: 0,
+        outcomeType: TipOutcome.MISSED,
+      },
+      {
+        userId: 1,
+        gameId: 'g-no-exact',
+        homeTeamGoals: 3,
+        awayTeamGoals: 2,
+        points: 2,
+        outcomeType: TipOutcome.GOAL_DIFF,
+      },
+      {
+        userId: 2,
+        gameId: 'g-no-exact',
+        homeTeamGoals: 4,
+        awayTeamGoals: 3,
+        points: 2,
+        outcomeType: TipOutcome.GOAL_DIFF,
+      },
+      {
+        userId: 3,
+        gameId: 'g-no-exact',
+        homeTeamGoals: 1,
+        awayTeamGoals: 0,
+        points: 1,
+        outcomeType: TipOutcome.TENDENCY,
+      },
+    ]);
+
+    const result = await service.findChampionshipStatisticsByChampionship(
+      'champ-1',
+      1,
+    );
+
+    expect(result.mostResultativeGame).toMatchObject({
+      gameId: 'g-difference',
+      totalPoints: 5,
+      exactHits: 1,
+      goalDiffHits: 1,
+      tendencyHits: 0,
+    });
+  });
+
+  it('findChampionshipStatisticsByChampionship should prioritize points before kickoff and game id', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+
+    const games = [
+      {
+        id: 'z-later',
+        isClosed: true,
+        kickoffTime: new Date('2026-02-17T20:00:00.000Z'),
+        roundId: 'r1',
+        round: { id: 'r1', name: 'Round 1' },
+        homeTeam: { id: 'h1', name: 'Home 1', logoUrl: '' },
+        awayTeam: { id: 'a1', name: 'Away 1', logoUrl: '' },
+        homeScore: 1,
+        awayScore: 0,
+      },
+      {
+        id: 'z-early',
+        isClosed: true,
+        kickoffTime: new Date('2026-02-17T18:00:00.000Z'),
+        roundId: 'r1',
+        round: { id: 'r1', name: 'Round 1' },
+        homeTeam: { id: 'h2', name: 'Home 2', logoUrl: '' },
+        awayTeam: { id: 'a2', name: 'Away 2', logoUrl: '' },
+        homeScore: 1,
+        awayScore: 0,
+      },
+      {
+        id: 'a-early',
+        isClosed: true,
+        kickoffTime: new Date('2026-02-17T18:00:00.000Z'),
+        roundId: 'r1',
+        round: { id: 'r1', name: 'Round 1' },
+        homeTeam: { id: 'h3', name: 'Home 3', logoUrl: '' },
+        awayTeam: { id: 'a3', name: 'Away 3', logoUrl: '' },
+        homeScore: 1,
+        awayScore: 0,
+      },
+    ];
+    const championshipGamesBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(games),
+    };
+    gameRepository.createQueryBuilder.mockReturnValue(championshipGamesBuilder);
+    rankingRepository.find.mockResolvedValue([
+      { userId: 1, rank: 1, user: { id: 1, username: 'User 1' } },
+    ]);
+    tipRepository.find.mockResolvedValue(
+      games.map((game) => ({
+        userId: 1,
+        gameId: game.id,
+        homeTeamGoals: game.id === 'z-later' ? 1 : 2,
+        awayTeamGoals: game.id === 'z-later' ? 0 : 1,
+        points: 3,
+        outcomeType: TipOutcome.EXACT,
+      })),
+    );
+
+    const tiedResult = await service.findChampionshipStatisticsByChampionship(
+      'champ-1',
+      1,
+    );
+
+    expect(tiedResult.mostResultativeGame).toMatchObject({
+      gameId: 'a-early',
+    });
+
+    tipRepository.find.mockResolvedValue(
+      games.map((game) => ({
+        userId: 1,
+        gameId: game.id,
+        homeTeamGoals: 1,
+        awayTeamGoals: 0,
+        points: game.id === 'z-later' ? 3 : 2,
+        outcomeType:
+          game.id === 'z-later' ? TipOutcome.EXACT : TipOutcome.GOAL_DIFF,
+      })),
+    );
+
+    const higherPointsResult =
+      await service.findChampionshipStatisticsByChampionship('champ-1', 1);
+
+    expect(higherPointsResult.mostResultativeGame).toMatchObject({
+      gameId: 'z-later',
+      totalPoints: 3,
+    });
+  });
+
+  it('findChampionshipStatisticsByChampionship should return a zero-point closed game', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+    const game = {
+      id: 'g-zero',
+      isClosed: true,
+      kickoffTime: new Date('2026-02-17T18:00:00.000Z'),
+      roundId: 'r1',
+      round: { id: 'r1', name: 'Round 1' },
+      homeTeam: { id: 'h1', name: 'Home', logoUrl: '' },
+      awayTeam: { id: 'a1', name: 'Away', logoUrl: '' },
+      homeScore: 0,
+      awayScore: 0,
+    };
+    gameRepository.createQueryBuilder.mockReturnValue({
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([game]),
+    });
+    rankingRepository.find.mockResolvedValue([]);
+    tipRepository.find.mockResolvedValue([]);
+
+    const result = await service.findChampionshipStatisticsByChampionship(
+      'champ-1',
+      1,
+    );
+
+    expect(result.mostResultativeGame).toMatchObject({
+      gameId: 'g-zero',
+      totalPoints: 0,
+      exactHits: 0,
+      goalDiffHits: 0,
+      tendencyHits: 0,
+    });
+  });
+
+  it('findChampionshipStatisticsByChampionship should return no resultative game without closed games', async () => {
+    jest
+      .spyOn(service, 'recalculateForChampionship')
+      .mockResolvedValue(undefined);
+    membershipRepository.findOne.mockResolvedValue({ id: 'membership-1' });
+    gameRepository.createQueryBuilder.mockReturnValue({
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
+    });
+    rankingRepository.find.mockResolvedValue([]);
+    tipRepository.find.mockResolvedValue([]);
+
+    const result = await service.findChampionshipStatisticsByChampionship(
+      'champ-1',
+      1,
+    );
+
+    expect(result.mostResultativeGame).toBeNull();
+  });
+
   it('findChampionshipStatisticsByChampionship should assign competition places to tied participants', async () => {
     jest
       .spyOn(service, 'recalculateForChampionship')
@@ -567,8 +897,11 @@ describe('RankingService', () => {
         {
           id: 'g1',
           isClosed: true,
+          kickoffTime: new Date('2026-02-17T18:00:00.000Z'),
           roundId: 'r1',
           round: { id: 'r1', name: 'Round 1' },
+          homeTeam: { id: 'team-1', name: 'Home', logoUrl: '' },
+          awayTeam: { id: 'team-2', name: 'Away', logoUrl: '' },
           homeScore: 2,
           awayScore: 1,
         },

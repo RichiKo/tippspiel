@@ -108,6 +108,28 @@ export interface ChampionshipParticipantExtremumDto {
   points: number;
 }
 
+export interface MostResultativeGameDto {
+  gameId: string;
+  roundName: string;
+  kickoffTime: Date;
+  homeTeam: {
+    id: string;
+    name: string;
+    logoUrl: string;
+  };
+  awayTeam: {
+    id: string;
+    name: string;
+    logoUrl: string;
+  };
+  homeScore: number | null;
+  awayScore: number | null;
+  totalPoints: number;
+  exactHits: number;
+  goalDiffHits: number;
+  tendencyHits: number;
+}
+
 export interface ChampionshipAggregateStatisticsDto {
   championshipId: string;
   totalMatches: number;
@@ -129,6 +151,7 @@ export interface ChampionshipAggregateStatisticsDto {
   worstRound: RoundPointsDto | null;
   bestParticipant: ChampionshipParticipantExtremumDto | null;
   worstParticipant: ChampionshipParticipantExtremumDto | null;
+  mostResultativeGame: MostResultativeGameDto | null;
   participants: ChampionshipParticipantStatisticsDto[];
 }
 
@@ -659,6 +682,8 @@ export class RankingService {
     const games = await this.gameRepository
       .createQueryBuilder('game')
       .leftJoinAndSelect('game.round', 'round')
+      .leftJoinAndSelect('game.homeTeam', 'homeTeam')
+      .leftJoinAndSelect('game.awayTeam', 'awayTeam')
       .where('round.championshipId = :championshipId', { championshipId })
       .orderBy('game.kickoffTime', 'ASC')
       .getMany();
@@ -715,6 +740,17 @@ export class RankingService {
     let missedMatchesTotal = 0;
 
     const roundTotals = new Map<string, RoundPointsDto>();
+    const gameTotals = new Map(
+      closedGames.map((game) => [
+        game.id,
+        {
+          totalPoints: 0,
+          exactHits: 0,
+          goalDiffHits: 0,
+          tendencyHits: 0,
+        },
+      ]),
+    );
 
     const participantRows = participants.map((participant) => {
       let participatedMatches = 0;
@@ -737,6 +773,18 @@ export class RankingService {
 
         const gamePoints = this.resolvePointsForClosedGame(tip, game);
         totalPoints += gamePoints;
+
+        const gameTotal = gameTotals.get(game.id);
+        if (gameTotal) {
+          gameTotal.totalPoints += gamePoints;
+          if (gamePoints === 3) {
+            gameTotal.exactHits++;
+          } else if (gamePoints === 2) {
+            gameTotal.goalDiffHits++;
+          } else if (gamePoints === 1) {
+            gameTotal.tendencyHits++;
+          }
+        }
 
         const roundId = game.round?.id ?? game.roundId;
         const roundName = game.round?.name ?? roundId;
@@ -883,6 +931,59 @@ export class RankingService {
             points: rankedParticipants[rankedParticipants.length - 1].totalPoints,
           };
 
+    const mostResultativeGame =
+      closedGames
+        .map((game): MostResultativeGameDto => {
+          const totals = gameTotals.get(game.id) ?? {
+            totalPoints: 0,
+            exactHits: 0,
+            goalDiffHits: 0,
+            tendencyHits: 0,
+          };
+
+          return {
+            gameId: game.id,
+            roundName: game.round?.name ?? game.roundId,
+            kickoffTime: game.kickoffTime,
+            homeTeam: {
+              id: game.homeTeam.id,
+              name: game.homeTeam.name,
+              logoUrl: game.homeTeam.logoUrl,
+            },
+            awayTeam: {
+              id: game.awayTeam.id,
+              name: game.awayTeam.name,
+              logoUrl: game.awayTeam.logoUrl,
+            },
+            homeScore: game.homeScore,
+            awayScore: game.awayScore,
+            ...totals,
+          };
+        })
+        .sort((a, b) => {
+          if (b.totalPoints !== a.totalPoints) {
+            return b.totalPoints - a.totalPoints;
+          }
+          if (b.exactHits !== a.exactHits) {
+            return b.exactHits - a.exactHits;
+          }
+          if (b.goalDiffHits !== a.goalDiffHits) {
+            return b.goalDiffHits - a.goalDiffHits;
+          }
+          if (b.tendencyHits !== a.tendencyHits) {
+            return b.tendencyHits - a.tendencyHits;
+          }
+
+          const kickoffDifference =
+            new Date(a.kickoffTime).getTime() -
+            new Date(b.kickoffTime).getTime();
+          if (kickoffDifference !== 0) {
+            return kickoffDifference;
+          }
+
+          return a.gameId.localeCompare(b.gameId);
+        })[0] ?? null;
+
     return {
       championshipId,
       totalMatches: games.length,
@@ -916,6 +1017,7 @@ export class RankingService {
       worstRound,
       bestParticipant,
       worstParticipant,
+      mostResultativeGame,
       participants: rankedParticipants,
     };
   }

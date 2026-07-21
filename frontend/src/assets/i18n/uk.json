@@ -740,6 +740,14 @@
         "pointsLabel": "{{points}} балів",
         "notAvailable": "Ще немає оцінених матчів."
       },
+      "mostResultativeGame": {
+        "title": "Найрезультативніший матч",
+        "totalPoints": "Загальна сума балів учасників",
+        "exactHits": "Точні",
+        "goalDiffHits": "Різниці",
+        "tendencyHits": "Тенденції",
+        "empty": "Завершених матчів ще немає."
+      },
       "roundMode": {
         "tableTitle": "Учасники чемпіонату",
         "summary": {

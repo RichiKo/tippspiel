@@ -378,6 +378,32 @@ export class StatisticsComponent implements OnDestroy {
     return `${(ratio * 100).toFixed(1)}%`;
   }
 
+  formatMatchKickoff(kickoffTime: string): string {
+    const date = new Date(kickoffTime);
+    const locale = this.translate.currentLang === 'de' ? 'de-DE' : 'uk-UA';
+    const dateLabel = new Intl.DateTimeFormat(locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+    const timeLabel = new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
+
+    return `${dateLabel} · ${timeLabel}`;
+  }
+
+  getTeamInitials(name: string): string {
+    return name
+      .split(/\s+/)
+      .filter((part) => part.length > 0)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('');
+  }
+
   backToChampionship(): void {
     this.router.navigate(['/championship', this.championshipId]);
   }

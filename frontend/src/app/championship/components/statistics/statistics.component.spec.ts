@@ -81,6 +81,27 @@ describe('StatisticsComponent', () => {
       username: 'No Luck',
       points: 0,
     },
+    mostResultativeGame: {
+      gameId: 'game-top',
+      roundName: 'Viertelfinale',
+      kickoffTime: '2026-02-17T18:15:00.000Z',
+      homeTeam: {
+        id: 'team-1',
+        name: 'Juventus',
+        logoUrl: 'https://example.com/juventus.svg',
+      },
+      awayTeam: {
+        id: 'team-2',
+        name: 'Inter Milan',
+        logoUrl: '',
+      },
+      homeScore: 1,
+      awayScore: 2,
+      totalPoints: 17,
+      exactHits: 3,
+      goalDiffHits: 2,
+      tendencyHits: 4,
+    },
     participants: [
       {
         place: 1,
@@ -161,6 +182,14 @@ describe('StatisticsComponent', () => {
             rounds: {
               notAvailable: 'Keine Daten',
             },
+            mostResultativeGame: {
+              title: 'Meist resultatives Spiel',
+              totalPoints: 'Gesamtpunkte',
+              exactHits: 'Exakt',
+              goalDiffHits: 'Differenz',
+              tendencyHits: 'Tendenz',
+              empty: 'Noch kein beendetes Spiel vorhanden.',
+            },
           },
         },
       },
@@ -240,5 +269,70 @@ describe('StatisticsComponent', () => {
     expect(text).toContain('62');
     expect(text).toContain('Round 1');
     expect(text).toContain('Round 2');
+  });
+
+  it('should render the most resultative game only in championship mode', () => {
+    expect(
+      fixture.nativeElement.querySelector('.most-resultative-game-card'),
+    ).toBeNull();
+
+    const championshipModeButton = fixture.nativeElement.querySelectorAll(
+      '.statistics-mode-toggle button',
+    )[1] as HTMLButtonElement;
+    championshipModeButton.click();
+    fixture.detectChanges();
+
+    const card = fixture.nativeElement.querySelector(
+      '.most-resultative-game-card',
+    ) as HTMLElement;
+    const text = card.textContent ?? '';
+
+    expect(card).toBeTruthy();
+    expect(text).toContain('Meist resultatives Spiel');
+    expect(text).toContain('Viertelfinale');
+    expect(text).toContain('17.02.2026');
+    expect(text).toContain('19:15');
+    expect(text).toContain('Juventus');
+    expect(text).toContain('Inter Milan');
+    expect(text).toContain('1 : 2');
+    expect(text).toContain('Gesamtpunkte');
+    expect(text).toContain('17');
+    expect(text).toContain('Exakt');
+    expect(text).toContain('3');
+    expect(text).toContain('Differenz');
+    expect(text).toContain('2');
+    expect(text).toContain('Tendenz');
+    expect(text).toContain('4');
+    expect(card.querySelectorAll('img').length).toBe(1);
+    expect(
+      card.querySelector('.resultative-team-fallback')?.textContent,
+    ).toContain('IM');
+    expect(card.querySelector('.my-tip')).toBeNull();
+    expect(card.querySelector('button')).toBeNull();
+  });
+
+  it('should render an empty state when no championship game is closed', () => {
+    mockRankingService.getChampionshipStatistics.and.returnValue(
+      of({
+        ...defaultRoundStatistics,
+        mostResultativeGame: null,
+      }),
+    );
+    const emptyFixture = TestBed.createComponent(StatisticsComponent);
+    emptyFixture.detectChanges();
+
+    const championshipModeButton = emptyFixture.nativeElement.querySelectorAll(
+      '.statistics-mode-toggle button',
+    )[1] as HTMLButtonElement;
+    championshipModeButton.click();
+    emptyFixture.detectChanges();
+
+    const card = emptyFixture.nativeElement.querySelector(
+      '.most-resultative-game-card',
+    ) as HTMLElement;
+
+    expect(card).toBeTruthy();
+    expect(card.textContent).toContain('Noch kein beendetes Spiel vorhanden.');
+    expect(card.querySelector('.resultative-match')).toBeNull();
   });
 });

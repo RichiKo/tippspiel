@@ -409,6 +409,112 @@
               </dl>
             </ui-card>
 
+            <ui-card
+              variant="default"
+              padding="md"
+              class="most-resultative-game-card"
+            >
+              <h3>
+                {{
+                  "championship.statistics.mostResultativeGame.title"
+                    | translate
+                }}
+              </h3>
+
+              @if (roundStats.mostResultativeGame; as game) {
+                <article class="resultative-match">
+                  <header class="resultative-match-header">
+                    <span>{{ game.roundName }}</span>
+                    <time [attr.datetime]="game.kickoffTime">
+                      {{ formatMatchKickoff(game.kickoffTime) }}
+                    </time>
+                  </header>
+
+                  <div class="resultative-game-row">
+                    <div class="resultative-team resultative-team--home">
+                      <span class="resultative-team-name">{{
+                        game.homeTeam.name
+                      }}</span>
+                      @if (game.homeTeam.logoUrl) {
+                        <img
+                          class="resultative-team-logo"
+                          [src]="game.homeTeam.logoUrl"
+                          [alt]="game.homeTeam.name"
+                        />
+                      } @else {
+                        <span class="resultative-team-fallback">{{
+                          getTeamInitials(game.homeTeam.name)
+                        }}</span>
+                      }
+                    </div>
+
+                    <p class="resultative-final-score">
+                      {{ game.homeScore ?? "–" }} :
+                      {{ game.awayScore ?? "–" }}
+                    </p>
+
+                    <div class="resultative-team resultative-team--away">
+                      @if (game.awayTeam.logoUrl) {
+                        <img
+                          class="resultative-team-logo"
+                          [src]="game.awayTeam.logoUrl"
+                          [alt]="game.awayTeam.name"
+                        />
+                      } @else {
+                        <span class="resultative-team-fallback">{{
+                          getTeamInitials(game.awayTeam.name)
+                        }}</span>
+                      }
+                      <span class="resultative-team-name">{{
+                        game.awayTeam.name
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div class="resultative-points-summary">
+                    <div class="resultative-total-points">
+                      <span>{{
+                        "championship.statistics.mostResultativeGame.totalPoints"
+                          | translate
+                      }}</span>
+                      <strong>{{ game.totalPoints }}</strong>
+                    </div>
+
+                    <dl class="resultative-breakdown">
+                      <div class="resultative-breakdown-item resultative-breakdown-item--exact">
+                        <dt>{{
+                          "championship.statistics.mostResultativeGame.exactHits"
+                            | translate
+                        }}</dt>
+                        <dd>{{ game.exactHits }}</dd>
+                      </div>
+                      <div class="resultative-breakdown-item resultative-breakdown-item--difference">
+                        <dt>{{
+                          "championship.statistics.mostResultativeGame.goalDiffHits"
+                            | translate
+                        }}</dt>
+                        <dd>{{ game.goalDiffHits }}</dd>
+                      </div>
+                      <div class="resultative-breakdown-item resultative-breakdown-item--tendency">
+                        <dt>{{
+                          "championship.statistics.mostResultativeGame.tendencyHits"
+                            | translate
+                        }}</dt>
+                        <dd>{{ game.tendencyHits }}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </article>
+              } @else {
+                <p class="resultative-empty">
+                  {{
+                    "championship.statistics.mostResultativeGame.empty"
+                      | translate
+                  }}
+                </p>
+              }
+            </ui-card>
+
             <ui-card variant="default" padding="md" class="distribution-card">
               <h3>
                 {{ "championship.statistics.distribution.title" | translate }}
