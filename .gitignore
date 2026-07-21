@@ -7,3 +7,4 @@ dist/
 !.env.example
 !**/.env.example
 postgres_data/
+.worktrees/
