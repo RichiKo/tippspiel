@@ -13,12 +13,15 @@
 .my-day-heading {
   margin: 0;
   padding: 0 0 8px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #0f5f4c;
   border-bottom: 1px solid #dce5eb;
+}
+
+.my-day-heading,
+.my-kickoff-time {
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #5a6572;
 }
 
 .my-day-matches {
@@ -59,10 +62,6 @@
 
 .my-kickoff-time {
   margin: 0;
-  font-size: 0.86rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #5a6572;
 }
 
 .my-tips-toggle {
@@ -152,8 +151,6 @@
 
 .my-team-logo {
   object-fit: contain;
-  border: 1px solid #e8edf2;
-  background: #f8fbfd;
 }
 
 .my-team-fallback {
@@ -223,10 +220,7 @@
     padding: 1rem;
   }
 
-  .my-day-heading {
-    font-size: 0.68rem;
-  }
-
+  .my-day-heading,
   .my-kickoff-time {
     font-size: 0.9rem;
   }

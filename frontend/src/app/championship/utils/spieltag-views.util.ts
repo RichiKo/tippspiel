@@ -8,11 +8,6 @@ export interface GameGroup {
   games: Game[];
 }
 
-export interface KickoffGroup {
-  kickoffTime: Date;
-  games: Game[];
-}
-
 export interface RankingParticipant {
   userId: number;
   username: string;
@@ -64,31 +59,6 @@ export function groupGamesByDate(games: Game[]): GameGroup[] {
         (a, b) =>
           new Date(a.kickoffTime).getTime() - new Date(b.kickoffTime).getTime(),
       ),
-    }));
-}
-
-export function groupGamesByKickoff(games: Game[]): KickoffGroup[] {
-  const grouped = new Map<string, KickoffGroup>();
-
-  for (const game of games) {
-    const kickoffTime = new Date(game.kickoffTime);
-    kickoffTime.setSeconds(0, 0);
-    const key = kickoffTime.toISOString();
-
-    if (!grouped.has(key)) {
-      grouped.set(key, { kickoffTime, games: [] });
-    }
-
-    grouped.get(key)?.games.push(game);
-  }
-
-  return Array.from(grouped.values())
-    .sort((a, b) => a.kickoffTime.getTime() - b.kickoffTime.getTime())
-    .map((group) => ({
-      kickoffTime: group.kickoffTime,
-      games: group.games
-        .slice()
-        .sort((a, b) => a.id.localeCompare(b.id)),
     }));
 }
 

@@ -147,6 +147,26 @@ describe('FinishedGamesMyViewComponent', () => {
     expect(toggleButtons.at(0)?.getAttribute('aria-pressed')).toBe('false');
   });
 
+  it('uses the kickoff time typography for the date heading', () => {
+    fixture.componentRef.setInput('entries', [createEntry({ gameId: 'g-1' })]);
+    fixture.detectChanges();
+
+    const dateHeading = fixture.nativeElement.querySelector(
+      '.my-day-heading',
+    ) as HTMLElement;
+    const kickoffTime = fixture.nativeElement.querySelector(
+      '.my-kickoff-time',
+    ) as HTMLElement;
+    const dateStyles = getComputedStyle(dateHeading);
+    const timeStyles = getComputedStyle(kickoffTime);
+
+    expect(dateStyles.fontSize).toBe(timeStyles.fontSize);
+    expect(dateStyles.fontWeight).toBe(timeStyles.fontWeight);
+    expect(dateStyles.letterSpacing).toBe(timeStyles.letterSpacing);
+    expect(dateStyles.color).toBe(timeStyles.color);
+    expect(dateStyles.textTransform).toBe(timeStyles.textTransform);
+  });
+
   it('renders final score, tip and points for each row', () => {
     const entries: MyFinishedEntry[] = [
       createEntry({
@@ -167,6 +187,22 @@ describe('FinishedGamesMyViewComponent', () => {
     expect(finalScore.textContent?.trim()).toBe('2 : 0');
     expect(tip.textContent).toContain('Tipp: 1 : 0');
     expect(points.textContent).toContain('3 P');
+  });
+
+  it('renders team logos without a border or background', () => {
+    fixture.componentRef.setInput('entries', [createEntry({ gameId: 'g-1' })]);
+    fixture.detectChanges();
+
+    const logos = Array.from(
+      fixture.nativeElement.querySelectorAll('.my-team-logo'),
+    ) as HTMLImageElement[];
+
+    expect(logos.length).toBe(2);
+    for (const logo of logos) {
+      const styles = getComputedStyle(logo);
+      expect(styles.borderTopStyle).toBe('none');
+      expect(styles.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    }
   });
 
   it('keeps teams and final score visible while participant tips are open', () => {

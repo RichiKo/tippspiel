@@ -441,7 +441,7 @@
                 @if (selectedView() === "allGames") {
                   <app-finished-games-all-view
                     data-testid="view-all"
-                    [groupedGames]="finishedGamesGroupedByKickoff()"
+                    [groupedGames]="finishedGamesGroupedByDate()"
                     [userTipsMap]="userTips()"
                     [gameTipsMap]="gameTips()"
                     [currentUserId]="currentUser()?.id || 0"
@@ -471,12 +471,12 @@
             }
           </section>
 
-          <section class="open-games-section">
-            <div class="section-title-row">
-              <h3 class="finished-games-title">
-                {{ "championship.detail.sections.openGames" | translate }}
-              </h3>
-              @if (openGames().length > 0) {
+          @if (openGames().length > 0 && selectedView() !== "table") {
+            <section class="open-games-section">
+              <div class="section-title-row">
+                <h3 class="finished-games-title">
+                  {{ "championship.detail.sections.openGames" | translate }}
+                </h3>
                 <ui-badge
                   class="open-games-progress"
                   tone="info"
@@ -495,9 +495,7 @@
                   <lucide-icon [img]="icons.table" [size]="13" aria-hidden="true"></lucide-icon>
                   {{ tippedOpenGamesCount() }}/{{ openGames().length }}
                 </ui-badge>
-              }
-            </div>
-            @if (openGamesGroupedByDate().length > 0) {
+              </div>
               <div class="games-list">
                 @for (group of openGamesGroupedByDate(); track group.date) {
                   <div class="game-group">
@@ -520,12 +518,8 @@
                   </div>
                 }
               </div>
-            } @else {
-              <p class="section-inline-info section-inline-info--subtle">
-                {{ "championship.detail.sections.noOpenGames" | translate }}
-              </p>
-            }
-          </section>
+            </section>
+          }
         } @else {
           <p class="no-selection">
             {{ "championship.detail.selectRound" | translate }}

@@ -288,6 +288,20 @@ describe('ChampionshipDetailComponent', () => {
     ).toBeTruthy();
   });
 
+  it('should hide the open games section in table view', () => {
+    expect(component.openGames().length).toBe(1);
+    expect(
+      fixture.nativeElement.querySelector('.open-games-section'),
+    ).toBeTruthy();
+
+    component.selectedView.set('table');
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.open-games-section'),
+    ).toBeNull();
+  });
+
   it('should provide participant tips to the My Games match toggle', () => {
     const toggle = fixture.nativeElement.querySelector(
       '[data-testid="view-my"] .my-tips-toggle',
@@ -295,6 +309,59 @@ describe('ChampionshipDetailComponent', () => {
 
     expect(toggle).toBeTruthy();
     expect(toggle.disabled).toBeFalse();
+  });
+
+  it('should group all predictions by calendar day and show the time only in each game card', () => {
+    component.games.set([
+      closedGame,
+      {
+        ...closedGame,
+        id: 'g3',
+        kickoffTime: new Date('2026-02-01T15:30:00.000Z'),
+      },
+    ]);
+    component.selectedView.set('allGames');
+    fixture.detectChanges();
+
+    const dateHeadings = fixture.nativeElement.querySelectorAll(
+      '[data-testid="view-all"] .game-date-header',
+    ) as NodeListOf<HTMLElement>;
+    const kickoffTimes = fixture.nativeElement.querySelectorAll(
+      '[data-testid="view-all"] .kickoff-time',
+    ) as NodeListOf<HTMLElement>;
+
+    expect(dateHeadings.length).toBe(1);
+    expect(dateHeadings[0].textContent).not.toContain(':');
+    expect(kickoffTimes.length).toBe(2);
+  });
+
+  it('should use the game kickoff time typography for the all predictions date heading', () => {
+    component.selectedView.set('allGames');
+    fixture.detectChanges();
+
+    const dateHeading = fixture.nativeElement.querySelector(
+      '[data-testid="view-all"] .game-date-header',
+    ) as HTMLElement;
+    const kickoffTime = fixture.nativeElement.querySelector(
+      '[data-testid="view-all"] .kickoff-time',
+    ) as HTMLElement;
+    const dateStyles = getComputedStyle(dateHeading);
+    const timeStyles = getComputedStyle(kickoffTime);
+
+    expect(dateStyles.fontSize).toBe(timeStyles.fontSize);
+    expect(dateStyles.fontWeight).toBe(timeStyles.fontWeight);
+    expect(dateStyles.letterSpacing).toBe(timeStyles.letterSpacing);
+    expect(dateStyles.color).toBe(timeStyles.color);
+    expect(dateStyles.textTransform).toBe(timeStyles.textTransform);
+  });
+
+  it('should hide the open games section when there are no open games', () => {
+    component.games.set([closedGame]);
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.open-games-section'),
+    ).toBeNull();
   });
 
   it('should style every tied third-place row as bronze in the Spieltag table', () => {

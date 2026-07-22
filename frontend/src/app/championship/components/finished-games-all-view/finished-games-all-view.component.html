@@ -1,8 +1,8 @@
 <div class="finished-all-view">
   @if (groupedGames().length > 0) {
-    @for (group of groupedGames(); track group.kickoffTime.toISOString()) {
+    @for (group of groupedGames(); track group.date.toISOString()) {
       <div class="game-group">
-        <h3 class="game-date-header">{{ formatKickoffHeader(group.kickoffTime) }}</h3>
+        <h3 class="game-date-header">{{ formatDateHeader(group.date) }}</h3>
         @for (game of group.games; track game.id) {
           <app-game-card
             [game]="game"
