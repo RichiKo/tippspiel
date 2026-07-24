@@ -6,7 +6,9 @@
   } @else {
     <div
       class="detail-back-row"
-      [class.detail-back-row--mobile-offset]="isMobileView() && rounds().length > 0"
+      [class.detail-back-row--mobile-offset]="
+        isMobileView() && rounds().length > 0
+      "
     >
       <button
         type="button"
@@ -14,7 +16,11 @@
         (click)="onBackClick()"
         [attr.aria-label]="'common.back' | translate"
       >
-        <lucide-icon [img]="icons.arrowLeft" [size]="16" aria-hidden="true"></lucide-icon>
+        <lucide-icon
+          [img]="icons.arrowLeft"
+          [size]="16"
+          aria-hidden="true"
+        ></lucide-icon>
         <span>{{ "common.back" | translate }}</span>
       </button>
     </div>
@@ -30,9 +36,9 @@
           <h1 class="championship-title">{{ champ.name }}</h1>
         </div>
         <div class="championship-info">
-          @if (champ.description) {
+          <!-- @if (champ.description) {
             <p>{{ champ.description }}</p>
-          }
+          } -->
 
           <div class="action-links action-links-scroll">
             <a
@@ -173,10 +179,13 @@
               </p>
               @if (
                 showSelectedRoundPredictionProgress() &&
-                selectedRoundPredictionProgress();
+                  selectedRoundPredictionProgress();
                 as progress
               ) {
-                <div class="active-tour-progress" data-testid="active-tour-progress">
+                <div
+                  class="active-tour-progress"
+                  data-testid="active-tour-progress"
+                >
                   <div class="active-tour-progress__header">
                     <span>{{
                       "championship.detail.sections.activeTourPredictionProgressTitle"
@@ -310,11 +319,14 @@
           </div>
           @if (
             !isMobileView() &&
-            showSelectedRoundPredictionProgress() &&
-            selectedRoundPredictionProgress();
+              showSelectedRoundPredictionProgress() &&
+              selectedRoundPredictionProgress();
             as progress
           ) {
-            <div class="active-tour-progress" data-testid="active-tour-progress">
+            <div
+              class="active-tour-progress"
+              data-testid="active-tour-progress"
+            >
               <div class="active-tour-progress__header">
                 <span>{{
                   "championship.detail.sections.activeTourPredictionProgressTitle"
@@ -371,12 +383,18 @@
                   [attr.aria-label]="
                     'championship.detail.sections.finishedGamesProgress'
                       | translate
-                        : { evaluated: finishedGames().length, total: games().length }
+                        : {
+                            evaluated: finishedGames().length,
+                            total: games().length,
+                          }
                   "
                   [attr.title]="
                     'championship.detail.sections.finishedGamesProgress'
                       | translate
-                        : { evaluated: finishedGames().length, total: games().length }
+                        : {
+                            evaluated: finishedGames().length,
+                            total: games().length,
+                          }
                   "
                 >
                   <lucide-icon
@@ -484,15 +502,25 @@
                   [attr.aria-label]="
                     'championship.detail.sections.openGamesTipsProgress'
                       | translate
-                        : { filled: tippedOpenGamesCount(), total: openGames().length }
+                        : {
+                            filled: tippedOpenGamesCount(),
+                            total: openGames().length,
+                          }
                   "
                   [attr.title]="
                     'championship.detail.sections.openGamesTipsProgress'
                       | translate
-                        : { filled: tippedOpenGamesCount(), total: openGames().length }
+                        : {
+                            filled: tippedOpenGamesCount(),
+                            total: openGames().length,
+                          }
                   "
                 >
-                  <lucide-icon [img]="icons.table" [size]="13" aria-hidden="true"></lucide-icon>
+                  <lucide-icon
+                    [img]="icons.table"
+                    [size]="13"
+                    aria-hidden="true"
+                  ></lucide-icon>
                   {{ tippedOpenGamesCount() }}/{{ openGames().length }}
                 </ui-badge>
               </div>

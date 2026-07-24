@@ -1,3 +1,8 @@
+import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import {
   TranslateFakeLoader,
@@ -6,6 +11,7 @@ import {
   TranslateService,
 } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+import { appConfig } from '../../app.config';
 import { I18nService } from './i18n.service';
 
 describe('I18nService', () => {
@@ -41,5 +47,46 @@ describe('I18nService', () => {
     await firstValueFrom(service.setLanguage('de'));
 
     expect(service.currentLanguage()).toBe('de');
+  });
+});
+
+describe('App translation loader', () => {
+  let loader: TranslateLoader;
+  let httpTesting: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ...appConfig.providers,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    });
+
+    loader = TestBed.inject(TranslateLoader);
+    httpTesting = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTesting.verify();
+  });
+
+  it('adds a cache-busting version to translation asset requests', () => {
+    loader.getTranslation('uk').subscribe();
+
+    const requests = httpTesting.match(() => true);
+    const ukrainianRequests = requests.filter((request) =>
+      request.request.url.includes('/uk.json'),
+    );
+
+    expect(ukrainianRequests.length).toBeGreaterThan(0);
+    expect(
+      ukrainianRequests.every(
+        (request) =>
+          request.request.urlWithParams ===
+          './assets/i18n/uk.json?v=20260724',
+      ),
+    ).toBeTrue();
+    requests.forEach((request) => request.flush({}));
   });
 });

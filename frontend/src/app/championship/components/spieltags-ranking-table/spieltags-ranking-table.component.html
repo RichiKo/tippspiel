@@ -17,7 +17,6 @@
           @for (row of rows(); track row.userId) {
             <tr
               [class.current-user]="isCurrentUser(row.userId)"
-              [class.top-three]="row.place <= 3"
             >
               <td class="rank-col">
                 <span

@@ -364,7 +364,7 @@ describe('ChampionshipDetailComponent', () => {
     ).toBeNull();
   });
 
-  it('should style every tied third-place row as bronze in the Spieltag table', () => {
+  it('should keep medal badges without highlighting top-three Spieltag rows', () => {
     component.games.set([closedGame]);
     component.rankingParticipants.set([
       { userId: 1, username: 'Anna' },
@@ -446,9 +446,11 @@ describe('ChampionshipDetailComponent', () => {
     ]);
     expect(rankPills[2].classList).toContain('rank-pill--bronze');
     expect(rankPills[3].classList).toContain('rank-pill--bronze');
-    expect(rows[2].classList).toContain('top-three');
-    expect(rows[3].classList).toContain('top-three');
-    expect(rows[4].classList).not.toContain('top-three');
+    expect(
+      Array.from(rows).every(
+        (row) => !row.classList.contains('top-three'),
+      ),
+    ).toBeTrue();
   });
 
   it('should set mobile view on resize when viewport is below 768px', () => {

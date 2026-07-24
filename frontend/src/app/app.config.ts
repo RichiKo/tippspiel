@@ -20,11 +20,16 @@ import {
 } from '@ngx-translate/core';
 import { MondayFirstNativeDateAdapter } from './shared/adapters/monday-first-native-date-adapter';
 
+const TRANSLATION_ASSET_VERSION = '20260724';
+
 class AppTranslateLoader implements TranslateLoader {
   constructor(private readonly http: HttpClient) {}
 
   getTranslation(language: string): Observable<Record<string, unknown>> {
-    return this.http.get<Record<string, unknown>>(`./assets/i18n/${language}.json`);
+    const encodedLanguage = encodeURIComponent(language);
+    return this.http.get<Record<string, unknown>>(
+      `./assets/i18n/${encodedLanguage}.json?v=${TRANSLATION_ASSET_VERSION}`,
+    );
   }
 }
 

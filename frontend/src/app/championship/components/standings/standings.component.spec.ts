@@ -221,7 +221,7 @@ describe('StandingsComponent', () => {
     expect(pointsHeader.textContent?.trim()).toBe('Punkte');
   });
 
-  it('should render tied competition ranks with the same medal styling', () => {
+  it('should use distinct row colors per medal rank and the same color for ties', () => {
     const template = component.standings()[0];
     component.standings.set([
       {
@@ -281,9 +281,50 @@ describe('StandingsComponent', () => {
     ]);
     expect(rankPills[2].classList).toContain('rank-pill--bronze');
     expect(rankPills[3].classList).toContain('rank-pill--bronze');
-    expect(rows[2].classList).toContain('top-three');
-    expect(rows[3].classList).toContain('top-three');
-    expect(rows[4].classList).not.toContain('top-three');
+    expect(rows[0].classList).toContain('place-first');
+    expect(rows[1].classList).toContain('place-second');
+    expect(rows[2].classList).toContain('place-third');
+    expect(rows[3].classList).toContain('place-third');
+    expect(rows[4].classList).not.toContain('place-first');
+    expect(rows[4].classList).not.toContain('place-second');
+    expect(rows[4].classList).not.toContain('place-third');
+
+    const rowColors = Array.from(rows).map(
+      (row) => getComputedStyle(row).backgroundColor,
+    );
+    const firstPlaceUsername = rows[0].querySelector('.username-text') as HTMLElement;
+    const firstPlacePoints = rows[0].querySelector('td.points') as HTMLElement;
+    const firstPlaceTotalPoints = rows[0].querySelector(
+      'td.total-points',
+    ) as HTMLElement;
+
+    expect(rowColors[0]).toBe('rgba(16, 185, 129, 0.2)');
+    expect(rowColors[1]).toBe('rgba(16, 185, 129, 0.1)');
+    expect(rowColors[2]).toBe('rgba(16, 185, 129, 0.05)');
+    expect(rowColors[2]).toBe(rowColors[3]);
+    expect(getComputedStyle(firstPlaceUsername).color).toBe('rgb(15, 23, 42)');
+    expect(getComputedStyle(firstPlacePoints).color).toBe('rgb(51, 65, 85)');
+    expect(getComputedStyle(firstPlaceTotalPoints).color).toBe('rgb(15, 95, 76)');
+    expect(getComputedStyle(rankPills[0]).color).toBe('rgb(146, 64, 14)');
+  });
+
+  it('should provide darker hover feedback for each medal rank', () => {
+    const styleRules = Array.from(document.styleSheets).flatMap((styleSheet) =>
+      Array.from(styleSheet.cssRules),
+    );
+    const hoverBackground = (placeClass: string): string | undefined =>
+      styleRules
+        .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule)
+        .find(
+          (rule) =>
+            rule.selectorText.includes(`tr.${placeClass}`) &&
+            rule.selectorText.includes(':hover'),
+        )
+        ?.style.getPropertyValue('background');
+
+    expect(hoverBackground('place-first')).toBe('rgba(16, 185, 129, 0.28)');
+    expect(hoverBackground('place-second')).toBe('rgba(16, 185, 129, 0.18)');
+    expect(hoverBackground('place-third')).toBe('rgba(16, 185, 129, 0.1)');
   });
 
   it('should navigate back when header back button is clicked', () => {

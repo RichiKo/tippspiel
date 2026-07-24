@@ -90,7 +90,9 @@
               @for (standing of sortedStandings(); track standing.id) {
                 <tr
                   [class.current-user]="isCurrentUser(standing.userId)"
-                  [class.top-three]="standing.rank <= 3"
+                  [class.place-first]="standing.rank === 1"
+                  [class.place-second]="standing.rank === 2"
+                  [class.place-third]="standing.rank === 3"
                 >
                   <td class="rank">
                     <span
