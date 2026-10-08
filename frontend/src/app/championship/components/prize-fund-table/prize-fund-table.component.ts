@@ -253,8 +253,10 @@ import {
       }
       .user-avatar,
       .user-avatar-placeholder {
-        width: 32px;
-        height: 32px;
+        display: none;
+      }
+      .money {
+        font-size: 0.75rem;
       }
     }
     @media (max-width: 430px) {
@@ -270,12 +272,6 @@ import {
       }
       .user-info {
         gap: var(--ts-space-2);
-      }
-      .user-avatar,
-      .user-avatar-placeholder {
-        width: 24px;
-        height: 24px;
-        font-size: 0.68rem;
       }
       .rank-pill {
         min-width: 28px;
