@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { getMetadataArgsStorage, Repository } from 'typeorm';
 import { ChampionshipService } from './championship.service';
 import { ChampionshipEntity } from './championship.entity';
 import { TeamEntity } from '../team/team.entity';
@@ -96,13 +96,189 @@ describe('ChampionshipService', () => {
     );
   });
 
+  describe('prize fund configuration', () => {
+    const config = {
+      entryFeeMinorUnits: '10000',
+      prizeFundRule: {
+        tieMode: 'tie_breakers' as const,
+        prizeAmountsMinorUnits: ['150000', '100000', '50000', '0'],
+      },
+    };
+
+    it('creates championships with zero entry fee and three shared prize places', async () => {
+      const dto = {
+        name: 'Private',
+        image: '',
+        isPublic: false,
+        isActive: true,
+      };
+      (championshipRepository.create as jest.Mock).mockImplementation(
+        (data) => data,
+      );
+      (championshipRepository.save as jest.Mock).mockImplementation(
+        async (data) => ({ id: 'champ-1', ...data }),
+      );
+      const result = await service.create(dto, 1);
+      expect(result).toMatchObject({
+        entryFeeMinorUnits: '0',
+        prizeFundRule: {
+          tieMode: 'share_equal_points',
+          prizeAmountsMinorUnits: ['0', '0', '0'],
+        },
+      });
+      expect(membershipService.joinChampionship).toHaveBeenCalledWith(
+        1,
+        'champ-1',
+      );
+    });
+
+    it('reads only configuration from a private championship', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue({
+        ...createChampionship('champ-1'),
+        isPublic: false,
+        ...config,
+      });
+      expect(await service.getPrizeFund('champ-1')).toEqual(config);
+      expect(championshipRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'champ-1' },
+        select: ['id', 'isPublic', 'entryFeeMinorUnits', 'prizeFundRule'],
+      });
+    });
+
+    it('does not expose prize configuration through default entity reads or initialize hidden defaults', () => {
+      const columns = getMetadataArgsStorage().columns.filter(
+        (column) => column.target === ChampionshipEntity,
+      );
+      for (const propertyName of ['entryFeeMinorUnits', 'prizeFundRule']) {
+        expect(
+          columns.find((column) => column.propertyName === propertyName)
+            ?.options.select,
+        ).toBe(false);
+      }
+      expect(new ChampionshipEntity().entryFeeMinorUnits).toBeUndefined();
+      expect(new ChampionshipEntity().prizeFundRule).toBeUndefined();
+    });
+
+    it('saves both configuration values together and returns the saved values', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue({
+        ...createChampionship('champ-1'),
+        isPublic: false,
+      });
+      (championshipRepository.update as jest.Mock).mockResolvedValue({
+        affected: 1,
+      });
+      expect(await service.updatePrizeFund('champ-1', config)).toEqual(config);
+      expect(championshipRepository.update).toHaveBeenCalledWith(
+        { id: 'champ-1', isPublic: false },
+        config,
+      );
+      expect(championshipRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('rejects saving when the championship becomes public during configuration editing', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue({
+        isPublic: false,
+      });
+      (championshipRepository.update as jest.Mock).mockResolvedValue({
+        affected: 0,
+      });
+      await expect(service.updatePrizeFund('champ-1', config)).rejects.toThrow(
+        'private',
+      );
+    });
+
+    it('persists agreed prize amounts without limiting them to the fund or bigint entry-fee range', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue({
+        isPublic: false,
+      });
+      (championshipRepository.update as jest.Mock).mockResolvedValue({
+        affected: 1,
+      });
+      const configuration = {
+        entryFeeMinorUnits: '0',
+        prizeFundRule: {
+          tieMode: 'tie_breakers' as const,
+          prizeAmountsMinorUnits: ['18446744073709551614', '50000'],
+        },
+      };
+      expect(await service.updatePrizeFund('champ-1', configuration)).toEqual(
+        configuration,
+      );
+      expect(championshipRepository.update).toHaveBeenCalledWith(
+        { id: 'champ-1', isPublic: false },
+        configuration,
+      );
+    });
+
+    it('rejects private-only configuration for public championships', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue(
+        createChampionship('champ-1'),
+      );
+      await expect(service.getPrizeFund('champ-1')).rejects.toThrow('private');
+      await expect(service.updatePrizeFund('champ-1', config)).rejects.toThrow(
+        'private',
+      );
+      expect(championshipRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('rejects fees outside the PostgreSQL bigint range', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue({
+        isPublic: false,
+      });
+      await expect(
+        service.updatePrizeFund('champ-1', {
+          ...config,
+          entryFeeMinorUnits: '9223372036854775808',
+        }),
+      ).rejects.toThrow();
+      expect(championshipRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('does not allow prize configuration through the general update route', async () => {
+      (championshipRepository.findOne as jest.Mock).mockResolvedValue(
+        createChampionship('champ-1'),
+      );
+      await service.update('champ-1', { name: 'Renamed', ...config });
+      expect(championshipRepository.update).toHaveBeenCalledWith('champ-1', {
+        name: 'Renamed',
+      });
+    });
+
+    it('does not allow prize configuration through the creation route', async () => {
+      (championshipRepository.create as jest.Mock).mockImplementation(
+        (data) => data,
+      );
+      (championshipRepository.save as jest.Mock).mockImplementation(
+        async (data) => ({ id: 'champ-1', ...data }),
+      );
+      const result = await service.create(
+        {
+          name: 'Private',
+          image: '',
+          isPublic: false,
+          isActive: true,
+          ...config,
+        },
+        1,
+      );
+      expect(result.entryFeeMinorUnits).toBe('0');
+      expect(result.prizeFundRule.prizeAmountsMinorUnits).toEqual([
+        '0',
+        '0',
+        '0',
+      ]);
+    });
+  });
+
   it('should clear team relations before deleting championship', async () => {
     const championship = {
       id: 'champ-1',
       teams: [{ id: 'team-1' }, { id: 'team-2' }],
     } as unknown as ChampionshipEntity;
 
-    (championshipRepository.findOne as jest.Mock).mockResolvedValue(championship);
+    (championshipRepository.findOne as jest.Mock).mockResolvedValue(
+      championship,
+    );
     (championshipRepository.save as jest.Mock).mockResolvedValue({
       ...championship,
       teams: [],
@@ -125,7 +301,9 @@ describe('ChampionshipService', () => {
       teams: [],
     } as unknown as ChampionshipEntity;
 
-    (championshipRepository.findOne as jest.Mock).mockResolvedValue(championship);
+    (championshipRepository.findOne as jest.Mock).mockResolvedValue(
+      championship,
+    );
     (championshipRepository.delete as jest.Mock).mockResolvedValue(undefined);
 
     await service.remove('champ-2');
@@ -288,8 +466,12 @@ describe('ChampionshipService', () => {
     const result = await service.findAll(7);
 
     expect(result).toHaveLength(1);
-    expect(result[0]?.currentRoundTipLabel?.currentRoundId).toBe('round-closer');
-    expect(result[0]?.currentRoundTipLabel?.currentRoundName).toBe('Spieltag Nah');
+    expect(result[0]?.currentRoundTipLabel?.currentRoundId).toBe(
+      'round-closer',
+    );
+    expect(result[0]?.currentRoundTipLabel?.currentRoundName).toBe(
+      'Spieltag Nah',
+    );
   });
 
   it('should return round prediction progress for championship detail', async () => {
@@ -297,12 +479,17 @@ describe('ChampionshipService', () => {
     const activeRound = createRound('champ-1', 'round-1', 'Spieltag 1');
     const pastRound = createRound('champ-1', 'round-2', 'Spieltag 2');
 
-    (championshipRepository.findOne as jest.Mock).mockResolvedValue(championship);
+    (championshipRepository.findOne as jest.Mock).mockResolvedValue(
+      championship,
+    );
     (membershipRepository.find as jest.Mock).mockResolvedValue([
       { userId: 1 },
       { userId: 2 },
     ]);
-    (roundRepository.find as jest.Mock).mockResolvedValue([activeRound, pastRound]);
+    (roundRepository.find as jest.Mock).mockResolvedValue([
+      activeRound,
+      pastRound,
+    ]);
     mockActiveRounds([activeRound]);
     (gameRepository.find as jest.Mock).mockResolvedValue([
       { id: 'game-1', roundId: 'round-1' },
@@ -346,7 +533,9 @@ describe('ChampionshipService', () => {
     const championship = createChampionship('champ-1');
     const activeRound = createRound('champ-1', 'round-1', 'Spieltag 1');
 
-    (championshipRepository.findOne as jest.Mock).mockResolvedValue(championship);
+    (championshipRepository.findOne as jest.Mock).mockResolvedValue(
+      championship,
+    );
     (membershipRepository.find as jest.Mock).mockResolvedValue([]);
     (roundRepository.find as jest.Mock).mockResolvedValue([activeRound]);
     mockActiveRounds([activeRound]);

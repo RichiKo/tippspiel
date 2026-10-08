@@ -1,6 +1,7 @@
 import { RankingService } from './ranking.service';
 import { MembershipStatus } from '../membership/membership-status.enum';
 import { TipOutcome } from '../tip/tip-outcome.enum';
+import { BonusRuleType } from '../bonus/bonus-rule-type.enum';
 
 describe('RankingService', () => {
   const rankingRepository = {
@@ -99,6 +100,45 @@ describe('RankingService', () => {
     expect(recalculateSpy).toHaveBeenCalledWith('champ-1');
     expect(rankingRepository.find).toHaveBeenCalled();
   });
+
+  it.each([false, true])(
+    'includes user avatars in standings with evaluated bonus rules: %s',
+    async (hasBonusRules) => {
+      jest.spyOn(service, 'recalculateForChampionship').mockResolvedValue();
+      rankingRepository.find.mockResolvedValue([
+        {
+          userId: 1,
+          totalPoints: 10,
+          bonusPoints: 0,
+          user: {
+            id: 1,
+            username: 'Anna',
+            email: '',
+            image: '/uploads/anna.png',
+          },
+        },
+        {
+          userId: 2,
+          totalPoints: 5,
+          bonusPoints: 0,
+          user: { id: 2, username: 'Ben', email: '', image: null },
+        },
+      ]);
+      bonusRuleRepository.find.mockResolvedValue(
+        hasBonusRules
+          ? [{ id: 'bonus-1', name: 'Champion', type: BonusRuleType.CHAMPION }]
+          : [],
+      );
+      bonusEvaluationRepository.find.mockResolvedValue([]);
+
+      const result = await service.findStandingsByChampionship('champ-1');
+
+      expect(result.standings.map((row) => row.user)).toEqual([
+        { id: 1, username: 'Anna', email: '', image: '/uploads/anna.png' },
+        { id: 2, username: 'Ben', email: '', image: null },
+      ]);
+    },
+  );
 
   it('findStandingsByChampionship should trigger recalculation before loading standings', async () => {
     const recalculateSpy = jest

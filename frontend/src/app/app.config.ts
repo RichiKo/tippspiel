@@ -20,7 +20,7 @@ import {
 } from '@ngx-translate/core';
 import { MondayFirstNativeDateAdapter } from './shared/adapters/monday-first-native-date-adapter';
 
-const TRANSLATION_ASSET_VERSION = '20260724';
+const TRANSLATION_ASSET_VERSION = '20261008-prize-amounts';
 
 class AppTranslateLoader implements TranslateLoader {
   constructor(private readonly http: HttpClient) {}

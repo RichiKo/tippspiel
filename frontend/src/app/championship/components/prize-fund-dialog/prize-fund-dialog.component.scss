@@ -1,0 +1,80 @@
+:host {
+  display: block;
+  color: var(--ts-text-primary);
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-2);
+  margin-bottom: var(--ts-space-4);
+}
+label {
+  font-weight: 700;
+}
+input,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--ts-border);
+  border-radius: 8px;
+  background: var(--ts-surface);
+  color: var(--ts-text-primary);
+  font: inherit;
+}
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
+}
+.hint {
+  color: var(--ts-text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+}
+.error {
+  color: var(--ts-error);
+  font-size: 0.9rem;
+  margin: 0;
+}
+.preview {
+  border-top: 1px solid var(--ts-border);
+  padding-top: var(--ts-space-3);
+}
+.preview h3 {
+  margin-top: 0;
+}
+.total {
+  font-weight: 700;
+}
+mat-dialog-actions {
+  gap: var(--ts-space-2);
+}
+
+.prize-places {
+  border: 0;
+  margin: 0 0 var(--ts-space-4);
+  padding: 0;
+  min-width: 0;
+}
+.prize-places legend {
+  font-weight: 700;
+  margin-bottom: var(--ts-space-3);
+}
+.prize-place-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ts-space-3);
+  align-items: center;
+}
+@media (max-width: 480px) {
+  .prize-place-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-bottom: var(--ts-space-4);
+  }
+  .prize-place-row .form-field {
+    margin-bottom: var(--ts-space-2);
+  }
+}

@@ -24,9 +24,8 @@ erDiagram
     UUID createdByUserId
     Date createdAt
     Date updatedAt
-    number entryFee
-    number prizePool
-    string prizeDistribution
+    bigint entryFeeMinorUnits
+    jsonb prizeFundRule
   }
   Round {
     UUID id
@@ -114,4 +113,4 @@ erDiagram
   ChampionGuess ||--o{ ChampionGuessEvaluation : evaluated
   ChampionGuessRule ||--o{ ChampionGuessEvaluation : rule
   User ||--o{ Ranking : has
-  Championship ||--o{ Ranking : for 
+  Championship ||--o{ Ranking : for

@@ -23,6 +23,8 @@ import { MembershipStatus } from '../membership/membership-status.enum';
 import { RoundEntity } from '../round/round.entity';
 import { GameEntity } from '../game/game.entity';
 import { TipEntity } from '../tip/tip.entity';
+import { UpdatePrizeFundDto } from './dto/update-prize-fund.dto';
+import { PrizeFundConfiguration } from './types/prize-fund';
 
 @Injectable()
 export class ChampionshipService {
@@ -56,7 +58,9 @@ export class ChampionshipService {
       }));
     }
 
-    const championshipIds = championships.map((championship) => championship.id);
+    const championshipIds = championships.map(
+      (championship) => championship.id,
+    );
     const activeMemberships = await this.membershipRepository.find({
       where: {
         userId,
@@ -90,7 +94,9 @@ export class ChampionshipService {
 
     const activeRoundByChampionshipId = new Map<string, RoundEntity>();
     for (const round of activeRounds) {
-      const existingRound = activeRoundByChampionshipId.get(round.championshipId);
+      const existingRound = activeRoundByChampionshipId.get(
+        round.championshipId,
+      );
       if (
         !existingRound ||
         this.compareRoundsByClosestDeadline(round, existingRound) < 0
@@ -190,7 +196,9 @@ export class ChampionshipService {
       },
       select: ['userId'],
     });
-    const activeUserIds = activeMemberships.map((membership) => membership.userId);
+    const activeUserIds = activeMemberships.map(
+      (membership) => membership.userId,
+    );
     const totalUsers = activeUserIds.length;
 
     const rounds = await this.roundRepository.find({
@@ -281,6 +289,11 @@ export class ChampionshipService {
     const championship = this.championshipRepository.create({
       ...createDto,
       createdByUserId: userId.toString(),
+      entryFeeMinorUnits: '0',
+      prizeFundRule: {
+        tieMode: 'share_equal_points',
+        prizeAmountsMinorUnits: ['0', '0', '0'],
+      },
     });
     const saved = await this.championshipRepository.save(championship);
 
@@ -294,8 +307,80 @@ export class ChampionshipService {
     id: string,
     updateDto: UpdateChampionshipDto,
   ): Promise<ChampionshipEntity> {
-    await this.championshipRepository.update(id, updateDto);
+    const allowedFields = [
+      'name',
+      'description',
+      'image',
+      'isPublic',
+      'isActive',
+      'createdByUserId',
+    ];
+    const fields = Object.fromEntries(
+      Object.entries(updateDto).filter(([key]) => allowedFields.includes(key)),
+    );
+    if (Object.keys(fields).length > 0) {
+      await this.championshipRepository.update(id, fields);
+    }
     return this.findOne(id);
+  }
+
+  async getPrizeFund(id: string): Promise<PrizeFundConfiguration> {
+    const championship = await this.findPrivateChampionship(id);
+    return this.toPrizeFundConfiguration(championship);
+  }
+
+  async updatePrizeFund(
+    id: string,
+    dto: UpdatePrizeFundDto,
+  ): Promise<PrizeFundConfiguration> {
+    await this.findPrivateChampionship(id);
+    if (BigInt(dto.entryFeeMinorUnits) > 9223372036854775807n) {
+      throw new BadRequestException('Amount exceeds the supported money range');
+    }
+    const configuration: PrizeFundConfiguration = {
+      entryFeeMinorUnits: dto.entryFeeMinorUnits,
+      prizeFundRule: {
+        tieMode: dto.prizeFundRule.tieMode,
+        prizeAmountsMinorUnits: [...dto.prizeFundRule.prizeAmountsMinorUnits],
+      },
+    };
+    const updated = await this.championshipRepository.update(
+      { id, isPublic: false },
+      configuration,
+    );
+    if (!updated.affected) {
+      throw new BadRequestException(
+        'Prize funds are only available for private championships',
+      );
+    }
+    return configuration;
+  }
+
+  private async findPrivateChampionship(
+    id: string,
+  ): Promise<ChampionshipEntity> {
+    const championship = await this.championshipRepository.findOne({
+      where: { id },
+      select: ['id', 'isPublic', 'entryFeeMinorUnits', 'prizeFundRule'],
+    });
+    if (!championship) {
+      throw new NotFoundException('Championship not found');
+    }
+    if (championship.isPublic) {
+      throw new BadRequestException(
+        'Prize funds are only available for private championships',
+      );
+    }
+    return championship;
+  }
+
+  private toPrizeFundConfiguration(
+    championship: ChampionshipEntity,
+  ): PrizeFundConfiguration {
+    return {
+      entryFeeMinorUnits: championship.entryFeeMinorUnits,
+      prizeFundRule: championship.prizeFundRule,
+    };
   }
 
   async remove(id: string): Promise<void> {
@@ -464,7 +549,8 @@ export class ChampionshipService {
       return null;
     }
 
-    const tippedGamesCount = tippedGamesCountByRoundId.get(currentRound.id) ?? 0;
+    const tippedGamesCount =
+      tippedGamesCountByRoundId.get(currentRound.id) ?? 0;
     const missingGamesCount = totalGamesCount - tippedGamesCount;
 
     if (tippedGamesCount === 0) {
@@ -522,7 +608,8 @@ export class ChampionshipService {
     roundIdsOpenForTips: Set<string>,
   ): RoundPredictionProgressDto {
     const totalMatchesInRound = totalMatchesByRoundId.get(round.id) ?? 0;
-    const submittedPredictions = submittedPredictionsByRoundId.get(round.id) ?? 0;
+    const submittedPredictions =
+      submittedPredictionsByRoundId.get(round.id) ?? 0;
     const totalPossiblePredictions = totalUsers * totalMatchesInRound;
     const rawProgressPercent =
       totalPossiblePredictions === 0

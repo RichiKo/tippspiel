@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Championship } from '../types/championship.interface';
 import { Team } from '../../teams/types/team.interface';
+import { PrizeFundConfiguration } from '../../championship/types/prize-fund.interface';
 
 export interface UpdateEliminatedTeamsDto {
   teamIds: string[];
@@ -22,6 +23,14 @@ export interface EliminatedTeamsResponse {
 export class ChampionshipService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/championships';
+
+  getPrizeFund(id: string): Observable<PrizeFundConfiguration> {
+    return this.http.get<PrizeFundConfiguration>(`${this.apiUrl}/${encodeURIComponent(id)}/prize-fund`);
+  }
+
+  updatePrizeFund(id: string, configuration: PrizeFundConfiguration): Observable<PrizeFundConfiguration> {
+    return this.http.put<PrizeFundConfiguration>(`${this.apiUrl}/${encodeURIComponent(id)}/prize-fund`, configuration);
+  }
 
   getAllChampionships(): Observable<Championship[]> {
     return this.http.get<Championship[]>(this.apiUrl);

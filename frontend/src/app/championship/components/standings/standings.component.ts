@@ -1,11 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatDialog } from '@angular/material/dialog';
+import { forkJoin, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
@@ -24,7 +28,18 @@ import {
   UiBadgeComponent,
   UiCardComponent,
   UiPageHeaderComponent,
+  UiButtonComponent,
 } from '../../../ui-lib/public-api';
+import { PrizeFundConfiguration } from '../../types/prize-fund.interface';
+import {
+  calculatePrizeFund,
+  formatMinorUnits,
+} from '../../utils/prize-fund.util';
+import { PrizeFundTableComponent } from '../prize-fund-table/prize-fund-table.component';
+import {
+  PrizeFundDialogComponent,
+  PrizeFundDialogData,
+} from '../prize-fund-dialog/prize-fund-dialog.component';
 
 @Component({
   selector: 'app-standings',
@@ -36,6 +51,8 @@ import {
     UiBadgeComponent,
     UiCardComponent,
     UiPageHeaderComponent,
+    UiButtonComponent,
+    PrizeFundTableComponent,
   ],
   templateUrl: './standings.component.html',
   styleUrl: './standings.component.scss',
@@ -48,12 +65,37 @@ export class StandingsComponent {
   private readonly rankingService = inject(RankingService);
   private readonly persistingService = inject(PersistingService);
   private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly destroyRef = inject(DestroyRef);
+  private prizeRequest: Subscription | null = null;
 
   championship = signal<Championship | null>(null);
   bonusColumns = signal<BonusColumn[]>([]);
   standings = signal<StandingRow[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  readonly selectedView = signal<'standings' | 'winners'>('standings');
+  readonly prizeConfiguration = signal<PrizeFundConfiguration | null>(null);
+  readonly isPrizeLoading = signal(false);
+  readonly prizeError = signal<string | null>(null);
+  readonly prizeFund = computed(() => {
+    const configuration = this.prizeConfiguration();
+    return configuration
+      ? calculatePrizeFund(this.standings(), configuration)
+      : null;
+  });
+  readonly canManagePrizeFund = computed(() => {
+    const user = this.currentUser();
+    const championship = this.championship();
+    return (
+      !!user &&
+      !!championship &&
+      !championship.isPublic &&
+      (user.role === 'admin' ||
+        user.role === 'super_admin' ||
+        championship.createdByUserId === user.id.toString())
+    );
+  });
 
   readonly currentUser = this.persistingService.currentUser;
   readonly icons = UI_ICONS;
@@ -78,6 +120,72 @@ export class StandingsComponent {
 
   championshipId = '';
 
+  setView(view: 'standings' | 'winners'): void {
+    if (
+      view === this.selectedView() ||
+      (view === 'winners' && this.championship()?.isPublic !== false)
+    )
+      return;
+    this.prizeRequest?.unsubscribe();
+    this.isPrizeLoading.set(false);
+    this.selectedView.set(view);
+    if (view === 'winners') this.loadPrizeFund();
+  }
+
+  loadPrizeFund(): void {
+    this.prizeRequest?.unsubscribe();
+    this.isPrizeLoading.set(true);
+    this.prizeError.set(null);
+    this.prizeRequest = forkJoin({
+      configuration: this.championshipService.getPrizeFund(this.championshipId),
+      standings: this.rankingService.getStandings(this.championshipId),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ configuration, standings }) => {
+          this.prizeConfiguration.set(configuration);
+          this.standings.set(standings.standings);
+          this.bonusColumns.set(standings.bonusColumns ?? []);
+          this.isPrizeLoading.set(false);
+        },
+        error: () => {
+          this.isPrizeLoading.set(false);
+          this.prizeError.set(
+            this.translate.instant('championship.prizeFund.errors.load'),
+          );
+        },
+      });
+  }
+
+  editPrizeFund(): void {
+    const configuration = this.prizeConfiguration();
+    if (!configuration || !this.canManagePrizeFund() || this.isPrizeLoading())
+      return;
+    this.dialog
+      .open<
+        PrizeFundDialogComponent,
+        PrizeFundDialogData,
+        PrizeFundConfiguration
+      >(PrizeFundDialogComponent, {
+        width: '720px',
+        maxWidth: 'calc(100vw - 24px)',
+        data: {
+          championshipId: this.championshipId,
+          configuration,
+          participants: this.standings(),
+        },
+      })
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((saved) => {
+        if (saved) this.loadPrizeFund();
+      });
+  }
+
+  money(amount: bigint | string): string {
+    return formatMinorUnits(BigInt(amount), this.translate.currentLang);
+  }
+
   constructor() {
     effect(() => {
       const id = this.route.snapshot.paramMap.get('id');
@@ -99,16 +207,20 @@ export class StandingsComponent {
   }
 
   loadChampionship(): void {
-    this.championshipService.getChampionshipById(this.championshipId).subscribe({
-      next: (championship) => {
-        this.championship.set(championship);
-      },
-      error: () => {
-        this.error.set(
-          this.translate.instant('championship.standings.errors.loadChampionship'),
-        );
-      },
-    });
+    this.championshipService
+      .getChampionshipById(this.championshipId)
+      .subscribe({
+        next: (championship) => {
+          this.championship.set(championship);
+        },
+        error: () => {
+          this.error.set(
+            this.translate.instant(
+              'championship.standings.errors.loadChampionship',
+            ),
+          );
+        },
+      });
   }
 
   loadStandings(): void {

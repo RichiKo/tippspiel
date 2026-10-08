@@ -20,7 +20,6 @@ import { UI_ICONS } from '../../icons/ui-icons';
 export class UiPageHeaderComponent {
   title = input.required<string>();
   subtitle = input<string | null>(null);
-  kicker = input<string | null>(null);
   showBack = input(false);
   backLabel = input('common.back');
 

@@ -63,9 +63,8 @@ Repräsentiert einen Wettbewerb (z. B. "WM 2026", "EM 2024").
 - `createdByUserId` (UUID) - Ersteller (Foreign Key → User)
 - `createdAt` (Date) - Erstellungsdatum
 - `updatedAt` (Date) - Letzte Änderung
-- `entryFee` (number) - Teilnahmegebühr
-- `prizePool` (number) - Gesamtpreisgeld
-- `prizeDistribution` (string) - Preisgeldverteilung (z. B. "1st: 60%, 2nd: 30%")
+- `entryFeeMinorUnits` (bigint, NOT NULL, Default 0) - Einsatz in Kopeken; API überträgt einen Dezimalstring
+- `prizeFundRule` (jsonb, NOT NULL) - Default `{ tieMode: "share_equal_points", prizeAmountsMinorUnits: ["0", "0", "0"] }`; alternativ `tie_breakers`. Geordnetes, nicht leeres Array fester Kopekenbeträge (Dezimalstrings), ein Betrag pro Platz.
 
 **Beziehungen:**
 - Hat viele `ChampionshipParticipant` (Teilnehmer)
@@ -79,7 +78,9 @@ Repräsentiert einen Wettbewerb (z. B. "WM 2026", "EM 2024").
 **Geschäftslogik:**
 - Nur der Ersteller oder Admins können die Championship bearbeiten
 - `isActive` steuert, ob neue Tipps abgegeben werden können
-- `prizePool` wird automatisch aus Teilnahmegebühren berechnet
+- Preisgeldkonfiguration ist ausschließlich für private Championships verfügbar; Owner, Admin und Super-Admin dürfen sie ändern.
+- Fonds, Gewinner und Prozentwerte werden nicht persistiert. Das Frontend berechnet den Fonds aus Einsatz × aktiven Teilnehmern der Standings-API. Die vereinbarten Platzbeträge werden unabhängig vom Fonds gespeichert; ihre Summe wird nicht gegen den Fonds geprüft und die Beträge werden nicht automatisch angepasst.
+- Gemeinsame Plätze teilen den festen Platzbetrag bei gleichen Gesamtpunkten (dichte Rangfolge); alternativ entscheiden Trefferzahlen über genau einen Gewinner je Platz. Nicht belegte Preise werden nicht umverteilt. Prozentanzeigen sind ausschließlich informativ.
 
 ---
 
@@ -101,7 +102,7 @@ Verknüpft User mit Championships (Teilnahme-Relation).
 
 **Geschäftslogik:**
 - User kann nur an einer Championship teilnehmen, wenn `isApproved = true`
-- `isPaid` relevant für Championships mit `entryFee > 0`
+- Der Fonds verwendet aktive Mitgliedschaften; Zahlungsstatus wird bei der Preisgeldberechnung nicht zusätzlich ausgewertet.
 
 ---
 

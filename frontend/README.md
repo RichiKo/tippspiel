@@ -1,5 +1,15 @@
 # Frontend
 
+## Gewinner- und Preisgeldübersicht
+
+Private Championships bieten in „Таблиця результатів“ einen Toggle zwischen Ergebnistabelle und Gewinnern. Öffentliche Championships behalten ausschließlich die Ergebnistabelle. Owner, Admin und Super-Admin konfigurieren im Dialog den Einsatz und den festen Gewinnbetrag für jeden Platz (UAH, maximal zwei Nachkommastellen). Standardmäßig gibt es drei Betragszeilen; Plätze können hinzugefügt oder entfernt werden (mindestens einer). Die Gleichstandsregel und Live-Vorschau bleiben verfügbar. Prozentwerte erscheinen ausschließlich als Information.
+
+Die Konfiguration wird über `GET/PUT /championships/:id/prize-fund` geladen/gespeichert. Beim Öffnen der Gewinneransicht und nach dem Speichern werden Konfiguration und Standings frisch geladen; es gibt keine Hintergrundabfragen. Die normale Ranglogik der Ergebnistabelle bleibt unverändert.
+
+`championship/utils/prize-fund.util.ts` berechnet exakt mit `BigInt`-Kopeken: Fonds = Einsatz × aktive Teilnehmer; die vereinbarten Platzbeträge werden unverändert verwendet. Es gibt keine Summenprüfung, automatische Skalierung oder Warnung bei Über-/Unterzuweisung. Gleiche Punkte teilen ausschließlich den festen Betrag eines dichten Platzes (`1, 2, 2, 3`), Restkopeken gehen an zuerst gelieferte Benutzer. Alternativ entscheiden Gesamtpunkte, exakte Treffer, Differenz- und Tendenztreffer mit stabiler Backend-Reihenfolge bei vollständiger Gleichheit. Unbelegte Preise werden nicht umverteilt. Prozentanzeigen beziehen sich auf den tatsächlichen Benutzerbetrag relativ zum Fonds und werden auf zwei Nachkommastellen gerundet (bei Fonds 0: 0 %; feste Preise bleiben bestehen).
+
+---
+
 frontend/
 │── src/
 │ ├── app/

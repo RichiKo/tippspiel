@@ -87,6 +87,13 @@ describe('DashboardComponent', () => {
     fixture.detectChanges();
   });
 
+  it('renders the dashboard title without a decorative subheader', () => {
+    expect(fixture.nativeElement.querySelector('.hero-badge')).toBeNull();
+    expect(fixture.nativeElement.querySelector('h1').textContent).toContain(
+      'Dashboard',
+    );
+  });
+
   it('renders the archive button inside the dashboard card', () => {
     const hero = fixture.nativeElement.querySelector(
       '.dashboard-hero',

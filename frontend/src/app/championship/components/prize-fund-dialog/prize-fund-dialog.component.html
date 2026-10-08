@@ -1,0 +1,120 @@
+<h2 mat-dialog-title>{{ 'championship.prizeFund.edit' | translate }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    <div class="form-field">
+      <label for="prize-entry-fee"
+        >{{ 'championship.prizeFund.entryFee' | translate }} (UAH)</label
+      >
+      <input
+        id="prize-entry-fee"
+        type="text"
+        inputmode="decimal"
+        formControlName="entryFee"
+        aria-describedby="prize-fee-hint"
+      />
+      <p id="prize-fee-hint" class="hint">
+        {{ 'championship.prizeFund.feeHint' | translate }}
+      </p>
+      @if (form.controls.entryFee.touched && form.controls.entryFee.invalid) {
+        <p class="error">
+          {{ 'championship.prizeFund.validation.fee' | translate }}
+        </p>
+      }
+    </div>
+    <fieldset class="prize-places" formArrayName="prizeAmounts">
+      <legend>{{ 'championship.prizeFund.places' | translate }}</legend>
+      @for (
+        control of form.controls.prizeAmounts.controls;
+        track control;
+        let index = $index
+      ) {
+        <div class="prize-place-row">
+          <div class="form-field">
+            <label [for]="'prize-amount-' + index"
+              >{{
+                'championship.prizeFund.placeAmount'
+                  | translate: { place: index + 1 }
+              }}
+              (UAH)</label
+            >
+            <input
+              class="prize-amount-input"
+              [id]="'prize-amount-' + index"
+              type="text"
+              inputmode="decimal"
+              [formControlName]="index"
+              [attr.aria-describedby]="'prize-share-' + index"
+            />
+            <p class="hint" [id]="'prize-share-' + index">
+              {{ 'championship.prizeFund.share' | translate }}:
+              {{ placeShare(index) }}
+            </p>
+            @if (control.touched && control.invalid) {
+              <p class="error">
+                {{ 'championship.prizeFund.validation.amount' | translate }}
+              </p>
+            }
+          </div>
+          <ui-button
+            variant="ghost"
+            class="prize-remove-button"
+            [disabled]="isSaving() || form.controls.prizeAmounts.length === 1"
+            (click)="removePlace(index)"
+            >{{
+              'championship.prizeFund.removePlace'
+                | translate: { place: index + 1 }
+            }}</ui-button
+          >
+        </div>
+      }
+      <ui-button
+        variant="secondary"
+        class="prize-add-button"
+        [disabled]="isSaving()"
+        (click)="addPlace()"
+        >{{ 'championship.prizeFund.addPlace' | translate }}</ui-button
+      >
+    </fieldset>
+    <div class="form-field">
+      <label for="prize-tie-mode">{{
+        'championship.prizeFund.rule' | translate
+      }}</label>
+      <select id="prize-tie-mode" formControlName="tieMode">
+        <option value="share_equal_points">
+          {{ 'championship.prizeFund.rules.share_equal_points' | translate }}
+        </option>
+        <option value="tie_breakers">
+          {{ 'championship.prizeFund.rules.tie_breakers' | translate }}
+        </option>
+      </select>
+    </div>
+    @if (preview(); as result) {
+      <section class="preview">
+        <h3>{{ 'championship.prizeFund.preview' | translate }}</h3>
+        <p>
+          {{ 'championship.prizeFund.participants' | translate }}:
+          {{ data.participants.length }}
+        </p>
+        <p class="total">
+          {{ 'championship.prizeFund.total' | translate }}:
+          {{ money(result.totalMinorUnits) }}
+        </p>
+        <app-prize-fund-table [result]="result" />
+      </section>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <ui-button variant="secondary" [disabled]="isSaving()" (click)="cancel()">{{
+      'common.cancel' | translate
+    }}</ui-button>
+    <ui-button
+      type="submit"
+      [disabled]="form.invalid || !configuration() || isSaving()"
+      [loading]="isSaving()"
+      >{{ 'common.save' | translate }}</ui-button
+    >
+  </mat-dialog-actions>
+</form>

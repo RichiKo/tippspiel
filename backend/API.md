@@ -530,6 +530,34 @@ Authorization: Bearer <token>
 
 ## Championship API
 
+### **GET / PUT** `/championships/:id/prize-fund`
+
+Preisgeldkonfiguration ausschließlich für private Championships. Beide Endpunkte benötigen `Authorization: Bearer <token>`. Lesen ist für authentifizierte Benutzer möglich; Schreiben nur für den Owner sowie `admin` und `super_admin`.
+
+PUT speichert Einsatz und Regel zusammen. Request und GET-/PUT-Response haben dieselbe Form:
+
+```json
+{
+  "entryFeeMinorUnits": "10000",
+  "prizeFundRule": {
+    "tieMode": "share_equal_points",
+    "prizeAmountsMinorUnits": ["150000", "100000", "50000"]
+  }
+}
+```
+
+- `entryFeeMinorUnits`: kanonischer ganzzahliger Dezimalstring in Kopeken (10000 = 100 UAH), Bereich `0` bis `9223372036854775807`, Default `"0"`.
+- `tieMode`: `share_equal_points` (Default) oder `tie_breakers`.
+- `prizeAmountsMinorUnits`: nicht leeres Array kanonischer nichtnegativer Kopeken-Dezimalstrings; Position 0 = Platz 1 usw. Default `["0", "0", "0"]`. JSONB-Platzbeträge unterliegen nicht dem PostgreSQL-bigint-Bereich des Einsatzes. Die Anzahl der Preisplätze ergibt sich aus der Arraylänge.
+- Einsatz, Gleichstandsregel und Platzbeträge sind beim PUT erforderlich; zusätzliche Felder, auch innerhalb der Regel, werden abgewiesen. `prizePlaceCount` gehört nicht mehr zum Vertrag.
+- Die Summe der Platzbeträge wird nicht gegen den Fonds geprüft. Über- oder Unterzuweisung ist erlaubt; es gibt keine automatische Anpassung.
+- Allgemeine Championship-Erstellung/-Aktualisierung konfiguriert diese Werte nicht. Neue Championships erhalten die Defaults.
+- `200`: Konfiguration gelesen/gespeichert; `400`: öffentliches Championship oder ungültige Konfiguration; `401`: nicht authentifiziert; `403`: keine Schreibberechtigung; `404`: Championship fehlt.
+
+Die vereinbarten Platzbeträge werden gespeichert, Fonds, Gewinner und Prozentwerte nicht. Das Frontend verwendet aktive Teilnehmer und Trefferzahlen aus der Standings-API: Fonds = Einsatz × Teilnehmerzahl. Prozent = tatsächlicher Benutzergewinn / Fonds × 100, auf zwei Nachkommastellen gerundet (bei Fonds 0: 0 %). Gemeinsame Punkte ergeben dichte Plätze (`1, 2, 2, 3`) und teilen ausschließlich den festgelegten Platzbetrag. `tie_breakers` entscheidet nach Gesamtpunkten, exakten Treffern, Differenz- und Tendenztreffern (absteigend); bei vollständiger Gleichheit bleibt die Backend-Reihenfolge erhalten. Restkopeken geteilter Preise gehen an zuerst gelieferte Benutzer; unbesetzte Preise werden nicht auf andere Plätze umverteilt. Platzbeträge ändern sich nicht mit Einsatz oder Teilnehmerzahl.
+
+---
+
 ### **POST** `/championships`
 
 Erstellt eine neue Championship (authentifiziert, nur für Admins).
@@ -546,8 +574,8 @@ Authorization: Bearer <token>
   "name": "WM 2026",
   "description": "Fußball-Weltmeisterschaft 2026",
   "isPublic": true,
-  "entryFee": 10,
-  "prizeDistribution": "1st: 60%, 2nd: 30%, 3rd: 10%"
+  "image": "",
+  "isActive": true
 }
 ```
 
@@ -560,9 +588,8 @@ Authorization: Bearer <token>
   "description": "Fußball-Weltmeisterschaft 2026",
   "isPublic": true,
   "isActive": true,
-  "entryFee": 10,
-  "prizePool": 0,
-  "prizeDistribution": "1st: 60%, 2nd: 30%, 3rd: 10%",
+  "entryFeeMinorUnits": "0",
+  "prizeFundRule": { "tieMode": "share_equal_points", "prizeAmountsMinorUnits": ["0", "0", "0"] },
   "createdByUserId": "user-uuid",
   "createdAt": "2026-01-25T10:00:00.000Z",
   "updatedAt": "2026-01-25T10:00:00.000Z"
@@ -596,8 +623,6 @@ Ruft alle Championships ab (öffentliche oder eigene).
       "description": "Fußball-Weltmeisterschaft 2026",
       "isPublic": true,
       "isActive": true,
-      "entryFee": 10,
-      "prizePool": 100,
       "createdAt": "2026-01-25T10:00:00.000Z"
     }
   ]
@@ -623,9 +648,6 @@ Ruft Championship-Details ab.
   "isPublic": true,
   "isActive": true,
   "eliminatedTeamIds": ["team-uuid-1", "team-uuid-2"],
-  "entryFee": 10,
-  "prizePool": 100,
-  "prizeDistribution": "1st: 60%, 2nd: 30%, 3rd: 10%",
   "createdByUserId": "user-uuid",
   "createdAt": "2026-01-25T10:00:00.000Z",
   "updatedAt": "2026-01-25T10:00:00.000Z"
@@ -666,9 +688,6 @@ Authorization: Bearer <token>
   "description": "Neue Beschreibung",
   "isPublic": true,
   "isActive": false,
-  "entryFee": 10,
-  "prizePool": 100,
-  "prizeDistribution": "1st: 60%, 2nd: 30%, 3rd: 10%",
   "createdByUserId": "user-uuid",
   "createdAt": "2026-01-25T10:00:00.000Z",
   "updatedAt": "2026-01-25T11:00:00.000Z"
@@ -1231,7 +1250,8 @@ Für `champion` wird eine Spalte geliefert, für `champion_finalist` zwei Spalte
       "user": {
         "id": 1,
         "username": "testuser",
-        "email": "testuser@example.com"
+        "email": "testuser@example.com",
+        "image": "/uploads/profile/testuser.png"
       }
     }
   ]
@@ -1241,6 +1261,7 @@ Für `champion` wird eine Spalte geliefert, für `champion_finalist` zwei Spalte
 - `evaluatedBonusRules`: Liste der ausgewerteten Bonus-Regeln (Reihenfolge = Spaltenreihenfolge).
 - `bonusColumns`: Dynamische Bonus-Spalten (inkl. `single|finalist|champion`).
 - `standings`: Pro Zeile `gamePoints` = Punkte aus Spielen, `bonusPointsByRule` = Summe je Regel-ID, `bonusPointsByColumn` = Punkte je Spalte, `totalPoints` = Spielpunkte + alle Bonus-Punkte.
+- `standings[].user.image`: Profilbild-URL oder `null`, unabhängig davon, ob Bonus-Spalten vorhanden sind.
 
 #### **Status Codes**
 - `200 OK` - Erfolgreiche Abfrage
@@ -1553,8 +1574,7 @@ Authorization: Bearer <token>
 - `name`: String, erforderlich
 - `description`: String, optional
 - `isPublic`: Boolean, default `true`
-- `entryFee`: Number, optional
-- `prizeDistribution`: String, optional
+- `entryFeeMinorUnits` und `prizeFundRule`: nur über `/championships/:id/prize-fund` konfigurierbar (siehe oben)
 
 ### Game
 - `homeTeamId`: UUID, erforderlich

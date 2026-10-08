@@ -84,7 +84,7 @@ describe('App translation loader', () => {
       ukrainianRequests.every(
         (request) =>
           request.request.urlWithParams ===
-          './assets/i18n/uk.json?v=20260724',
+          './assets/i18n/uk.json?v=20261008-prize-amounts',
       ),
     ).toBeTrue();
     requests.forEach((request) => request.flush({}));

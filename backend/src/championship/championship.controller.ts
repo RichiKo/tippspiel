@@ -21,6 +21,8 @@ import { User } from '../user/decoratos/user.decorator';
 import { ChampionshipOwnerGuard } from '../membership/guards/championship-owner.guard';
 import { UpdateEliminatedTeamsDto } from './dto/update-eliminated-teams.dto';
 import { UpdateSingleEliminatedTeamDto } from './dto/update-single-eliminated-team.dto';
+import { UpdatePrizeFundDto } from './dto/update-prize-fund.dto';
+import { PrizeFundConfiguration } from './types/prize-fund';
 import {
   ChampionshipCardResponseDto,
   ChampionshipDetailResponseDto,
@@ -30,6 +32,28 @@ import {
 export class ChampionshipController {
   constructor(private readonly championshipService: ChampionshipService) {}
 
+  @Get(':id/prize-fund')
+  @UseGuards(AuthGuard)
+  async getPrizeFund(@Param('id') id: string): Promise<PrizeFundConfiguration> {
+    return this.championshipService.getPrizeFund(id);
+  }
+
+  @Put(':id/prize-fund')
+  @UseGuards(AuthGuard, ChampionshipOwnerGuard)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  async updatePrizeFund(
+    @Param('id') id: string,
+    @Body() dto: UpdatePrizeFundDto,
+  ): Promise<PrizeFundConfiguration> {
+    return this.championshipService.updatePrizeFund(id, dto);
+  }
+
   @Get()
   async findAll(
     @User('id') userId: number | null,
@@ -38,7 +62,9 @@ export class ChampionshipController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ChampionshipDetailResponseDto> {
+  async findOne(
+    @Param('id') id: string,
+  ): Promise<ChampionshipDetailResponseDto> {
     return this.championshipService.findOneDetail(id);
   }
 

@@ -1,129 +1,262 @@
 <section class="standings-view">
   @if (isLoading()) {
     <ui-card variant="default" padding="lg">
-      <p class="standings-feedback">{{ 'championship.standings.loading' | translate }}</p>
+      <p class="standings-feedback">
+        {{ 'championship.standings.loading' | translate }}
+      </p>
     </ui-card>
   } @else if (error()) {
     <ui-card variant="default" padding="lg">
       <p class="standings-feedback standings-feedback--error">{{ error() }}</p>
     </ui-card>
   } @else {
-    <ui-card variant="elevated" padding="lg" class="standings-shell">
-      <ui-page-header
-        [kicker]="'championship.standings.page.kicker' | translate"
-        [title]="'championship.standings.page.title' | translate"
-        [subtitle]="championship()?.name ?? null"
-        [showBack]="true"
-        [backLabel]="'championship.standings.page.backLabel' | translate"
-        (back)="backToChampionship()"
-      >
-        <div uiPageHeaderActions class="standings-actions">
-          <ui-badge tone="info" appearance="soft">
-            <lucide-icon [img]="icons.users" [size]="14" aria-hidden="true"></lucide-icon>
-            {{
-              'championship.standings.badges.participants'
-                | translate: { count: sortedStandings().length }
-            }}
-          </ui-badge>
-          <ui-badge tone="success" appearance="soft">
-            <lucide-icon [img]="icons.table" [size]="14" aria-hidden="true"></lucide-icon>
-            {{
-              'championship.standings.badges.bonusColumns'
-                | translate: { count: bonusColumns().length }
-            }}
-          </ui-badge>
-        </div>
-      </ui-page-header>
-
-      <ui-card variant="default" padding="none" class="standings-table-shell">
-        <div
-          class="standings-table-wrapper"
-          [class.standings-table-wrapper--scrollable]="showTotalColumn()"
-          [attr.tabindex]="showTotalColumn() ? 0 : null"
+    <ui-card variant="elevated" padding="lg">
+      <div class="standings-shell">
+        <ui-page-header
+          [title]="
+            (selectedView() === 'winners'
+              ? 'championship.prizeFund.title'
+              : 'championship.standings.page.title'
+            ) | translate
+          "
+          [subtitle]="championship()?.name ?? null"
+          [showBack]="true"
+          [backLabel]="'championship.standings.page.backLabel' | translate"
+          (back)="backToChampionship()"
         >
-          <table
-            class="standings-table"
-            [class.standings-table--base]="!showTotalColumn()"
-            [class.standings-table--with-bonus]="showTotalColumn()"
-          >
-            @if (!showTotalColumn()) {
-              <colgroup>
-                <col class="col-rank" />
-                <col class="col-participant" />
-                <col class="col-points" />
-              </colgroup>
+          <div uiPageHeaderActions class="standings-actions">
+            @if (selectedView() === 'winners' && canManagePrizeFund()) {
+              <ui-button
+                class="prize-edit-button"
+                variant="secondary"
+                [disabled]="isPrizeLoading() || !!prizeError()"
+                (click)="editPrizeFund()"
+              >
+                {{ 'championship.prizeFund.edit' | translate }}
+              </ui-button>
             }
-            <thead>
-              <tr>
-                <th class="rank-col">{{ 'championship.standings.headers.rank' | translate }}</th>
-                <th class="participant-col">{{ 'championship.standings.headers.participant' | translate }}</th>
-                <th
-                  class="points-col"
-                  [attr.title]="'championship.standings.headers.gamePoints' | translate"
-                >
-                  {{
-                    getColumnDisplayLabel(
-                      'championship.standings.headers.gamePoints' | translate
-                    )
-                  }}
-                </th>
-                @for (column of bonusColumns(); track column.key) {
-                  <th class="bonus-col" [attr.title]="column.label">
-                    <span class="standings-header-label">
-                      <span class="standings-header-label__text">
-                        {{ getColumnDisplayLabel(column.label) }}
-                      </span>
-                      @if (getBonusColumnSubruleSuffix(column)) {
-                        <span class="standings-header-label__suffix">
-                          {{ getBonusColumnSubruleSuffix(column) }}
-                        </span>
-                      }
-                    </span>
-                  </th>
+            <ui-badge tone="info" appearance="soft">
+              <lucide-icon
+                [img]="icons.users"
+                [size]="14"
+                aria-hidden="true"
+              ></lucide-icon>
+              {{
+                'championship.standings.badges.participants'
+                  | translate: { count: sortedStandings().length }
+              }}
+            </ui-badge>
+            <ui-badge tone="success" appearance="soft">
+              <lucide-icon
+                [img]="icons.table"
+                [size]="14"
+                aria-hidden="true"
+              ></lucide-icon>
+              {{
+                'championship.standings.badges.bonusColumns'
+                  | translate: { count: bonusColumns().length }
+              }}
+            </ui-badge>
+          </div>
+        </ui-page-header>
+
+        @if (championship()?.isPublic === false) {
+          <div
+            class="standings-mode-toggle"
+            role="tablist"
+            [attr.aria-label]="'championship.prizeFund.views.label' | translate"
+          >
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="selectedView() === 'standings'"
+              [class.is-active]="selectedView() === 'standings'"
+              (click)="setView('standings')"
+            >
+              {{ 'championship.prizeFund.views.standings' | translate }}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="selectedView() === 'winners'"
+              [class.is-active]="selectedView() === 'winners'"
+              (click)="setView('winners')"
+            >
+              {{ 'championship.prizeFund.views.winners' | translate }}
+            </button>
+          </div>
+        }
+
+        @if (selectedView() === 'standings') {
+          <ui-card
+            variant="default"
+            padding="none"
+            class="standings-table-shell"
+          >
+            <div
+              class="standings-table-wrapper"
+              [class.standings-table-wrapper--scrollable]="showTotalColumn()"
+              [attr.tabindex]="showTotalColumn() ? 0 : null"
+            >
+              <table
+                class="standings-table"
+                [class.standings-table--base]="!showTotalColumn()"
+                [class.standings-table--with-bonus]="showTotalColumn()"
+              >
+                @if (!showTotalColumn()) {
+                  <colgroup>
+                    <col class="col-rank" />
+                    <col class="col-participant" />
+                    <col class="col-points" />
+                  </colgroup>
                 }
-                @if (showTotalColumn()) {
-                  <th class="total-col">{{ 'championship.standings.headers.total' | translate }}</th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (standing of sortedStandings(); track standing.id) {
-                <tr
-                  [class.current-user]="isCurrentUser(standing.userId)"
-                  [class.place-first]="standing.rank === 1"
-                  [class.place-second]="standing.rank === 2"
-                  [class.place-third]="standing.rank === 3"
-                >
-                  <td class="rank">
-                    <span
-                      class="rank-pill"
-                      [class.rank-pill--gold]="standing.rank === 1"
-                      [class.rank-pill--silver]="standing.rank === 2"
-                      [class.rank-pill--bronze]="standing.rank === 3"
+                <thead>
+                  <tr>
+                    <th class="rank-col">
+                      {{ 'championship.standings.headers.rank' | translate }}
+                    </th>
+                    <th class="participant-col">
+                      {{
+                        'championship.standings.headers.participant' | translate
+                      }}
+                    </th>
+                    <th
+                      class="points-col"
+                      [attr.title]="
+                        'championship.standings.headers.gamePoints' | translate
+                      "
                     >
-                      {{ standing.rank }}
-                    </span>
-                  </td>
-                  <td class="username">
-                    <div class="username-cell">
-                      <span class="username-text">{{ standing.user.username }}</span>
+                      {{
+                        getColumnDisplayLabel(
+                          'championship.standings.headers.gamePoints'
+                            | translate
+                        )
+                      }}
+                    </th>
+                    @for (column of bonusColumns(); track column.key) {
+                      <th class="bonus-col" [attr.title]="column.label">
+                        <span class="standings-header-label">
+                          <span class="standings-header-label__text">
+                            {{ getColumnDisplayLabel(column.label) }}
+                          </span>
+                          @if (getBonusColumnSubruleSuffix(column)) {
+                            <span class="standings-header-label__suffix">
+                              {{ getBonusColumnSubruleSuffix(column) }}
+                            </span>
+                          }
+                        </span>
+                      </th>
+                    }
+                    @if (showTotalColumn()) {
+                      <th class="total-col">
+                        {{ 'championship.standings.headers.total' | translate }}
+                      </th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (standing of sortedStandings(); track standing.id) {
+                    <tr
+                      [class.current-user]="isCurrentUser(standing.userId)"
+                      [class.place-first]="standing.rank === 1"
+                      [class.place-second]="standing.rank === 2"
+                      [class.place-third]="standing.rank === 3"
+                    >
+                      <td class="rank">
+                        <span
+                          class="rank-pill"
+                          [class.rank-pill--gold]="standing.rank === 1"
+                          [class.rank-pill--silver]="standing.rank === 2"
+                          [class.rank-pill--bronze]="standing.rank === 3"
+                        >
+                          {{ standing.rank }}
+                        </span>
+                      </td>
+                      <td class="username">
+                        <div class="username-cell">
+                          <span class="username-text">{{
+                            standing.user.username
+                          }}</span>
+                        </div>
+                      </td>
+                      <td class="points">{{ standing.gamePoints }}</td>
+                      @for (column of bonusColumns(); track column.key) {
+                        <td class="bonus-points">
+                          {{ getBonusPointsForColumn(standing, column.key) }}
+                        </td>
+                      }
+                      @if (showTotalColumn()) {
+                        <td class="total-points">{{ standing.totalPoints }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </ui-card>
+        } @else {
+          @if (isPrizeLoading()) {
+            <p class="standings-feedback" role="status">
+              {{ 'championship.prizeFund.loading' | translate }}
+            </p>
+          } @else if (prizeError()) {
+            <div class="prize-fund-error" role="alert">
+              <p>{{ prizeError() }}</p>
+              <ui-button variant="secondary" (click)="loadPrizeFund()">{{
+                'championship.prizeFund.retry' | translate
+              }}</ui-button>
+            </div>
+          } @else {
+            @if (prizeConfiguration(); as config) {
+              @if (prizeFund(); as fund) {
+                <ui-card variant="default" padding="md">
+                  <dl class="prize-summary">
+                    <div>
+                      <dt>
+                        {{ 'championship.prizeFund.entryFee' | translate }}
+                      </dt>
+                      <dd>{{ money(config.entryFeeMinorUnits) }}</dd>
                     </div>
-                  </td>
-                  <td class="points">{{ standing.gamePoints }}</td>
-                  @for (column of bonusColumns(); track column.key) {
-                    <td class="bonus-points">
-                      {{ getBonusPointsForColumn(standing, column.key) }}
-                    </td>
-                  }
-                  @if (showTotalColumn()) {
-                    <td class="total-points">{{ standing.totalPoints }}</td>
-                  }
-                </tr>
+                    <div>
+                      <dt>
+                        {{ 'championship.prizeFund.participants' | translate }}
+                      </dt>
+                      <dd>{{ standings().length }}</dd>
+                    </div>
+                    <div class="prize-summary-total">
+                      <dt>{{ 'championship.prizeFund.total' | translate }}</dt>
+                      <dd>{{ money(fund.totalMinorUnits) }}</dd>
+                    </div>
+                    <div>
+                      <dt>
+                        {{ 'championship.prizeFund.placeCount' | translate }}
+                      </dt>
+                      <dd>
+                        {{ config.prizeFundRule.prizeAmountsMinorUnits.length }}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>{{ 'championship.prizeFund.rule' | translate }}</dt>
+                      <dd>
+                        {{
+                          'championship.prizeFund.rules.' +
+                            config.prizeFundRule.tieMode | translate
+                        }}
+                      </dd>
+                    </div>
+                  </dl>
+                </ui-card>
+                <ui-card variant="default" padding="none">
+                  <app-prize-fund-table [result]="fund" />
+                </ui-card>
+                <p class="prize-fund-note">
+                  {{ 'championship.prizeFund.provisional' | translate }}
+                </p>
               }
-            </tbody>
-          </table>
-        </div>
-      </ui-card>
+            }
+          }
+        }
+      </div>
     </ui-card>
   }
 </section>

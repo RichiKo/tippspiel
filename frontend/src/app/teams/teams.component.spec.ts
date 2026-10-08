@@ -112,6 +112,15 @@ describe('TeamsComponent', () => {
     expect(fixture.nativeElement.querySelector('.teams-table')).toBeTruthy();
   });
 
+  it('renders the page title without a decorative subheader', () => {
+    expect(
+      fixture.nativeElement.querySelector('.ui-page-header__kicker'),
+    ).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('.ui-page-header__title').textContent,
+    ).toContain('Команди');
+  });
+
   it('should navigate back to dashboard when header back button is clicked', () => {
     const backButton = fixture.nativeElement.querySelector(
       '.ui-page-header__back button',

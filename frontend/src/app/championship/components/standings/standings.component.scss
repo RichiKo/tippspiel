@@ -2,6 +2,78 @@
   display: block;
 }
 
+.standings-mode-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 460px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--ts-surface-muted);
+}
+
+.standings-mode-toggle button {
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ts-text-secondary);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.standings-mode-toggle button.is-active {
+  border-color: rgba(16, 185, 129, 0.52);
+  background: #fff;
+  color: #0f5f4c;
+  box-shadow: 0 5px 12px rgba(16, 24, 39, 0.08);
+}
+
+.standings-mode-toggle button:focus-visible {
+  outline: 2px solid var(--ts-focus-ring);
+  outline-offset: 2px;
+}
+
+.prize-summary {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-3);
+}
+.prize-summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ts-space-3);
+  flex-wrap: wrap;
+}
+.prize-summary dt,
+.prize-fund-note {
+  color: var(--ts-text-secondary);
+}
+.prize-summary dd {
+  margin: 0;
+  font-weight: 700;
+}
+.prize-summary-total {
+  padding-block: var(--ts-space-3);
+  border-block: 1px solid var(--ts-border);
+}
+.prize-summary-total dd {
+  color: var(--ts-text-primary);
+  font-size: 1.2rem;
+}
+.prize-fund-note {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.prize-fund-error {
+  color: var(--ts-error);
+}
+
 .standings-view {
   max-width: 1360px;
   margin: 0 auto;
@@ -11,12 +83,12 @@
 .standings-shell {
   display: flex;
   flex-direction: column;
-  gap: var(--ts-space-4);
+  gap: var(--ts-space-5);
 }
 
 .standings-actions {
   display: inline-flex;
-  gap: var(--ts-space-2);
+  gap: var(--ts-space-3);
   flex-wrap: wrap;
 }
 

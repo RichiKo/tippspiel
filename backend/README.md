@@ -1,5 +1,13 @@
 # User API
 
+## Private Championship-Preisgeldkonfiguration
+
+`GET/PUT /championships/:id/prize-fund` persistiert `entryFeeMinorUnits` (Dezimalstring in Kopeken) und `prizeFundRule` (JSONB: Gleichstandsregel und geordnetes Array `prizeAmountsMinorUnits` mit einem festen Betrag je Platz). Defaults: Einsatz 0, gemeinsame Plätze und drei Platzbeträge von 0. Die Summe wird nicht mit dem Fonds abgeglichen; Prozentwerte dienen nur als Information. Authentifizierte Benutzer können lesen; Owner, Admin und Super-Admin können schreiben. Öffentliche Championships und ungültige Konfigurationen werden abgewiesen.
+
+Fonds und Gewinner werden aus aktiven Standings im Frontend berechnet und nicht persistiert. API-Vertrag und Regeln stehen in [API.md](API.md); Datenmodell in [ERD.md](ERD.md). Vor Einsatz des Backends die neue Migration ausführen, siehe [migrations.txt](migrations.txt).
+
+Die Standings-API liefert in `user.image` die Profilbild-URL oder `null`, auch ohne ausgewertete Bonus-Regeln. Die Gewinnerübersicht verwendet sie für die Benutzeravatare.
+
 ## Endpoint: Create User
 
 ### **POST** `/users/register`

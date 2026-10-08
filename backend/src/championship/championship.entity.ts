@@ -10,6 +10,7 @@ import {
 import { TeamEntity } from '../team/team.entity';
 import { RoundEntity } from '../round/round.entity';
 import { MembershipEntity } from '../membership/membership.entity';
+import { PrizeFundRule } from './types/prize-fund';
 
 @Entity({ name: 'championships' })
 export class ChampionshipEntity {
@@ -30,6 +31,17 @@ export class ChampionshipEntity {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ type: 'bigint', default: '0', select: false })
+  entryFeeMinorUnits: string;
+
+  @Column({
+    type: 'jsonb',
+    select: false,
+    default: () =>
+      `'${JSON.stringify({ tieMode: 'share_equal_points', prizeAmountsMinorUnits: ['0', '0', '0'] })}'::jsonb`,
+  })
+  prizeFundRule: PrizeFundRule;
 
   @Column('simple-array', { default: '' })
   eliminatedTeamIds: string[];

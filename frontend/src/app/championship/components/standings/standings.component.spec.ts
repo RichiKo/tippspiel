@@ -2,7 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { firstValueFrom, of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { firstValueFrom, of, Subject, throwError } from 'rxjs';
 import { StandingsComponent } from './standings.component';
 import { ChampionshipService } from '../../../dashboard/services/championship.service';
 import { RankingService } from '../../services/ranking.service';
@@ -13,20 +14,31 @@ describe('StandingsComponent', () => {
   let fixture: ComponentFixture<StandingsComponent>;
 
   const mockChampionshipService = {
-    getChampionshipById: jasmine.createSpy('getChampionshipById').and.returnValue(
+    getPrizeFund: jasmine.createSpy('getPrizeFund').and.returnValue(
       of({
-        id: 'champ-1',
-        name: 'CL 2026',
-        description: '',
-        image: '',
-        isPublic: true,
-        isActive: true,
-        createdAt: new Date('2026-01-01T00:00:00.000Z'),
-        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-        teamIds: [],
-        eliminatedTeamIds: [],
+        entryFeeMinorUnits: '10000',
+        prizeFundRule: {
+          tieMode: 'share_equal_points',
+          prizeAmountsMinorUnits: ['0', '0', '0'],
+        },
       }),
     ),
+    getChampionshipById: jasmine
+      .createSpy('getChampionshipById')
+      .and.returnValue(
+        of({
+          id: 'champ-1',
+          name: 'CL 2026',
+          description: '',
+          image: '',
+          isPublic: true,
+          isActive: true,
+          createdAt: new Date('2026-01-01T00:00:00.000Z'),
+          updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+          teamIds: [],
+          eliminatedTeamIds: [],
+        }),
+      ),
   };
 
   const mockRankingService = {
@@ -88,6 +100,7 @@ describe('StandingsComponent', () => {
   };
 
   const navigateSpy = jasmine.createSpy('navigate');
+  const mockDialog = { open: jasmine.createSpy('open') };
 
   const mockPersistingService = {
     currentUser: signal({
@@ -121,6 +134,7 @@ describe('StandingsComponent', () => {
         { provide: ChampionshipService, useValue: mockChampionshipService },
         { provide: RankingService, useValue: mockRankingService },
         { provide: PersistingService, useValue: mockPersistingService },
+        { provide: MatDialog, useValue: mockDialog },
       ],
     }).compileComponents();
 
@@ -150,7 +164,243 @@ describe('StandingsComponent', () => {
   it('should render migrated standings header and table', () => {
     expect(component).toBeTruthy();
     expect(fixture.nativeElement.querySelector('ui-page-header')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.standings-table')).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('.standings-table'),
+    ).toBeTruthy();
+  });
+
+  it('does not expose the prize toggle for public championships', () => {
+    expect(
+      fixture.nativeElement.querySelector('.standings-mode-toggle'),
+    ).toBeNull();
+  });
+
+  it('does not render a kicker above either standings title', () => {
+    expect(
+      fixture.nativeElement.querySelector('.ui-page-header__kicker'),
+    ).toBeNull();
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+    });
+    component.setView('winners');
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('.ui-page-header__kicker'),
+    ).toBeNull();
+  });
+
+  it('places the informational note after the winners table', () => {
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+    });
+    component.setView('winners');
+    fixture.detectChanges();
+    const table = fixture.nativeElement.querySelector(
+      'app-prize-fund-table',
+    ) as HTMLElement;
+    const note = fixture.nativeElement.querySelector(
+      '.prize-fund-note',
+    ) as HTMLElement;
+    expect(table.compareDocumentPosition(note)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('spaces the projected content blocks inside the card', () => {
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+    });
+    component.setView('winners');
+    fixture.detectChanges();
+    const toggle = fixture.nativeElement.querySelector(
+      '.standings-mode-toggle',
+    ) as HTMLElement;
+    const layout = getComputedStyle(toggle.parentElement!);
+    expect(layout.display).toBe('flex');
+    expect(layout.flexDirection).toBe('column');
+    expect(parseFloat(layout.rowGap)).toBeGreaterThanOrEqual(16);
+  });
+
+  it('loads current standings and configuration when toggling to private winners', () => {
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+      createdByUserId: '99',
+    });
+    fixture.detectChanges();
+    const calls = mockRankingService.getStandings.calls.count();
+    const toggle = fixture.nativeElement.querySelectorAll(
+      '.standings-mode-toggle button',
+    )[1] as HTMLButtonElement;
+    toggle.click();
+    fixture.detectChanges();
+    expect(mockRankingService.getStandings.calls.count()).toBe(calls + 1);
+    expect(mockChampionshipService.getPrizeFund).toHaveBeenCalledWith(
+      'champ-1',
+    );
+    expect(
+      fixture.nativeElement.querySelectorAll('.prize-winners-table tbody tr')
+        .length,
+    ).toBe(2);
+    expect(
+      fixture.nativeElement.querySelector('.prize-edit-button'),
+    ).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('.prize-winners-table')?.textContent,
+    ).toContain('Richi');
+    component.setView('standings');
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('.standings-table'),
+    ).toBeTruthy();
+  });
+
+  it('allows owner, admin and super-admin to edit the private configuration', () => {
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+      createdByUserId: '1',
+    });
+    expect(component.canManagePrizeFund()).toBeTrue();
+    component.championship.set({
+      ...component.championship()!,
+      createdByUserId: '99',
+    });
+    for (const role of ['admin', 'super_admin']) {
+      mockPersistingService.currentUser.set({
+        ...mockPersistingService.currentUser(),
+        role,
+      });
+      expect(component.canManagePrizeFund()).toBeTrue();
+    }
+    mockPersistingService.currentUser.set({
+      ...mockPersistingService.currentUser(),
+      role: 'user',
+    });
+  });
+
+  it('shows an error for failed configuration loads and keeps the toggle usable', () => {
+    mockChampionshipService.getPrizeFund.and.returnValue(
+      throwError(() => new Error('failed')),
+    );
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+    });
+    component.setView('winners');
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('.prize-fund-error'),
+    ).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('.standings-mode-toggle'),
+    ).toBeTruthy();
+    mockChampionshipService.getPrizeFund.and.returnValue(
+      of({
+        entryFeeMinorUnits: '10000',
+        prizeFundRule: {
+          tieMode: 'share_equal_points',
+          prizeAmountsMinorUnits: ['0', '0', '0'],
+        },
+      }),
+    );
+  });
+
+  it('reloads configuration and changed participants after saving but not after canceling', () => {
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+      createdByUserId: '1',
+    });
+    component.setView('winners');
+    const originalStandings = component.standings();
+    let closed = new Subject<unknown>();
+    mockDialog.open.and.returnValue({ afterClosed: () => closed });
+    const calls = mockChampionshipService.getPrizeFund.calls.count();
+    component.editPrizeFund();
+    closed.next(undefined);
+    closed.complete();
+    expect(mockChampionshipService.getPrizeFund.calls.count()).toBe(calls);
+
+    closed = new Subject<unknown>();
+    const configuration = {
+      entryFeeMinorUnits: '20000',
+      prizeFundRule: {
+        tieMode: 'tie_breakers',
+        prizeAmountsMinorUnits: ['10000', '5000'],
+      },
+    };
+    mockChampionshipService.getPrizeFund.and.returnValue(of(configuration));
+    mockRankingService.getStandings.and.returnValue(
+      of({ bonusColumns: [], standings: [originalStandings[0]] }),
+    );
+    component.editPrizeFund();
+    closed.next(configuration);
+    fixture.detectChanges();
+    expect(mockChampionshipService.getPrizeFund.calls.count()).toBe(calls + 1);
+    expect(component.prizeConfiguration()?.entryFeeMinorUnits).toBe('20000');
+    expect(component.prizeConfiguration()?.prizeFundRule.tieMode).toBe(
+      'tie_breakers',
+    );
+    expect(component.prizeFund()?.totalMinorUnits).toBe(20000n);
+    expect(component.prizeFund()?.winners[0].username).toBe('Alice');
+    closed.complete();
+    mockChampionshipService.getPrizeFund.and.returnValue(
+      of({
+        entryFeeMinorUnits: '10000',
+        prizeFundRule: {
+          tieMode: 'share_equal_points',
+          prizeAmountsMinorUnits: ['0', '0', '0'],
+        },
+      }),
+    );
+    mockRankingService.getStandings.and.returnValue(
+      of({
+        bonusColumns: [
+          {
+            key: 'b-1:finalist',
+            ruleId: 'b-1',
+            subrule: 'finalist',
+            label: 'Meister (Finalist)',
+          },
+          {
+            key: 'b-1:champion',
+            ruleId: 'b-1',
+            subrule: 'champion',
+            label: 'Meister (Champion)',
+          },
+        ],
+        standings: originalStandings,
+      }),
+    );
+  });
+
+  it('shows a loading state and cancels outstanding requests when returning to standings', () => {
+    const pending = new Subject<never>();
+    mockChampionshipService.getPrizeFund.and.returnValue(pending);
+    component.championship.set({
+      ...component.championship()!,
+      isPublic: false,
+    });
+    component.setView('winners');
+    fixture.detectChanges();
+    expect(component.isPrizeLoading()).toBeTrue();
+    expect(fixture.nativeElement.querySelector('[role="status"]')).toBeTruthy();
+    component.setView('standings');
+    expect(pending.observed).toBeFalse();
+    expect(component.isPrizeLoading()).toBeFalse();
+    mockChampionshipService.getPrizeFund.and.returnValue(
+      of({
+        entryFeeMinorUnits: '10000',
+        prizeFundRule: {
+          tieMode: 'share_equal_points',
+          prizeAmountsMinorUnits: ['0', '0', '0'],
+        },
+      }),
+    );
   });
 
   it('should keep current user highlighted and show total column', () => {
@@ -204,11 +454,13 @@ describe('StandingsComponent', () => {
     ) as NodeListOf<HTMLTableCellElement>;
 
     expect(
-      bonusHeaders[0].querySelector('.standings-header-label__suffix')
+      bonusHeaders[0]
+        .querySelector('.standings-header-label__suffix')
         ?.textContent?.trim(),
     ).toBe('(FN)');
     expect(
-      bonusHeaders[1].querySelector('.standings-header-label__suffix')
+      bonusHeaders[1]
+        .querySelector('.standings-header-label__suffix')
         ?.textContent?.trim(),
     ).toBe('(CH)');
   });
@@ -267,18 +519,16 @@ describe('StandingsComponent', () => {
     ]);
     fixture.detectChanges();
 
-    const rows = fixture.nativeElement.querySelectorAll('tbody tr') as NodeListOf<HTMLElement>;
+    const rows = fixture.nativeElement.querySelectorAll(
+      'tbody tr',
+    ) as NodeListOf<HTMLElement>;
     const rankPills = fixture.nativeElement.querySelectorAll(
       '.rank-pill',
     ) as NodeListOf<HTMLElement>;
 
-    expect(Array.from(rankPills).map((pill) => pill.textContent?.trim())).toEqual([
-      '1',
-      '2',
-      '3',
-      '3',
-      '5',
-    ]);
+    expect(
+      Array.from(rankPills).map((pill) => pill.textContent?.trim()),
+    ).toEqual(['1', '2', '3', '3', '5']);
     expect(rankPills[2].classList).toContain('rank-pill--bronze');
     expect(rankPills[3].classList).toContain('rank-pill--bronze');
     expect(rows[0].classList).toContain('place-first');
@@ -292,7 +542,9 @@ describe('StandingsComponent', () => {
     const rowColors = Array.from(rows).map(
       (row) => getComputedStyle(row).backgroundColor,
     );
-    const firstPlaceUsername = rows[0].querySelector('.username-text') as HTMLElement;
+    const firstPlaceUsername = rows[0].querySelector(
+      '.username-text',
+    ) as HTMLElement;
     const firstPlacePoints = rows[0].querySelector('td.points') as HTMLElement;
     const firstPlaceTotalPoints = rows[0].querySelector(
       'td.total-points',
@@ -304,7 +556,9 @@ describe('StandingsComponent', () => {
     expect(rowColors[2]).toBe(rowColors[3]);
     expect(getComputedStyle(firstPlaceUsername).color).toBe('rgb(15, 23, 42)');
     expect(getComputedStyle(firstPlacePoints).color).toBe('rgb(51, 65, 85)');
-    expect(getComputedStyle(firstPlaceTotalPoints).color).toBe('rgb(15, 95, 76)');
+    expect(getComputedStyle(firstPlaceTotalPoints).color).toBe(
+      'rgb(15, 95, 76)',
+    );
     expect(getComputedStyle(rankPills[0]).color).toBe('rgb(146, 64, 14)');
   });
 
@@ -336,5 +590,4 @@ describe('StandingsComponent', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith(['/championship', 'champ-1']);
   });
-
 });

@@ -48,7 +48,7 @@ export interface StandingRowDto {
   bonusPointsByRule: Record<string, number>;
   bonusPointsByColumn: Record<string, number>;
   updatedAt: Date;
-  user: { id: number; username: string; email: string };
+  user: { id: number; username: string; email: string; image: string | null };
 }
 
 export interface StandingsResponseDto {
@@ -434,6 +434,7 @@ export class RankingService {
           id: r.user.id,
           username: r.user.username,
           email: r.user.email,
+          image: r.user.image ?? null,
         },
       }));
       return { evaluatedBonusRules: [], bonusColumns: [], standings };
@@ -511,6 +512,7 @@ export class RankingService {
           id: r.user.id,
           username: r.user.username,
           email: r.user.email,
+          image: r.user.image ?? null,
         },
       };
     });
@@ -852,13 +854,19 @@ export class RankingService {
       if (b.totalPoints !== a.totalPoints) {
         return b.totalPoints - a.totalPoints;
       }
-      if (b.pointsDistribution.threePoints.count !== a.pointsDistribution.threePoints.count) {
+      if (
+        b.pointsDistribution.threePoints.count !==
+        a.pointsDistribution.threePoints.count
+      ) {
         return (
           b.pointsDistribution.threePoints.count -
           a.pointsDistribution.threePoints.count
         );
       }
-      if (b.pointsDistribution.twoPoints.count !== a.pointsDistribution.twoPoints.count) {
+      if (
+        b.pointsDistribution.twoPoints.count !==
+        a.pointsDistribution.twoPoints.count
+      ) {
         return (
           b.pointsDistribution.twoPoints.count -
           a.pointsDistribution.twoPoints.count
@@ -928,7 +936,8 @@ export class RankingService {
             userId: rankedParticipants[rankedParticipants.length - 1].userId,
             username:
               rankedParticipants[rankedParticipants.length - 1].username,
-            points: rankedParticipants[rankedParticipants.length - 1].totalPoints,
+            points:
+              rankedParticipants[rankedParticipants.length - 1].totalPoints,
           };
 
     const mostResultativeGame =
@@ -1110,10 +1119,12 @@ export class RankingService {
   }
 
   private hasParticipatedInGame(tip: TipEntity | undefined): boolean {
-    return !!tip &&
+    return (
+      !!tip &&
       tip.outcomeType !== TipOutcome.NOT_TIPPED &&
       tip.homeTeamGoals !== null &&
-      tip.awayTeamGoals !== null;
+      tip.awayTeamGoals !== null
+    );
   }
 
   private resolvePointsForClosedGame(

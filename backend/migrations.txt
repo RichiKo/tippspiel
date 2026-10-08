@@ -7,6 +7,24 @@ npm run db:generate
 Migration rückgängig machen
 npm run db:revert
 
+Neue Preisgeldkonfiguration (1791417600000-AddPrizeFundConfiguration.ts)
+Vor Einsatz des neuen Backends npm run db:generate ausführen.
+Production nach dem Build: npm run db:run:prod.
+Bestehende Championships erhalten entryFeeMinorUnits = 0 und
+prizeFundRule = {"tieMode":"share_equal_points","prizePlaceCount":3}.
+Rollback entfernt beide Spalten und damit gespeicherte Preisgeldkonfigurationen.
+Die Migration ist vorbereitet; diese Liste bestätigt keine Ausführung auf einer Projektdatenbank.
+
+Feste Platzbeträge (1791417600001-UseFixedPrizeAmounts.ts)
+Ebenfalls vor Nutzung des neuen Backends mit npm run db:generate ausführen.
+Ersetzt prizePlaceCount durch prizeAmountsMinorUnits (geordnetes Array von Kopekenstrings).
+Bestehende Gleichverteilung wird einmalig aus Einsatz * aktiven Memberships
+in feste Platzbeträge überführt, inklusive Restkopeken an die vorderen Plätze.
+Neue Championships erhalten drei Platzbeträge von 0.
+Rollback stellt Platzanzahl und Gleichstandsregel wieder her, verliert aber die
+individuell vereinbarten Beträge: Das alte Format kann diese nicht darstellen.
+Vor einem Rollback Konfigurationen sichern. Keine Ausführung auf der Projektdatenbank bestätigt.
+
 Schema droppen
 npm run db:drop
 

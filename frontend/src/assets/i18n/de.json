@@ -522,6 +522,34 @@
     }
   },
   "championship": {
+    "prizeFund": {
+      "title": "Aktuelle Gewinner",
+      "edit": "Preisgeld konfigurieren",
+      "entryFee": "Einsatz pro Teilnehmer",
+      "participants": "Aktive Teilnehmer",
+      "total": "Aktueller Fonds",
+      "placeCount": "Anzahl der Preisplätze",
+      "places": "Preisplätze",
+      "placeAmount": "Gewinn für Platz {{ place }}",
+      "addPlace": "Preisplatz hinzufügen",
+      "removePlace": "Platz {{ place }} entfernen",
+      "rule": "Verteilungsregel",
+      "place": "Platz",
+      "participant": "Teilnehmer",
+      "share": "Anteil am Fonds",
+      "amount": "Gewinn",
+      "tableCaption": "Aktuelle Preisgeldverteilung",
+      "preview": "Vorschau",
+      "provisional": "Vorläufiger Stand. Gewinner und Prozentanteile werden aus den aktuellen Daten berechnet. Die vereinbarten Beträge pro Platz bleiben unverändert.",
+      "empty": "Noch keine aktiven Teilnehmer vorhanden.",
+      "feeHint": "Nichtnegativer Betrag in UAH mit höchstens zwei Nachkommastellen.",
+      "loading": "Gewinner werden geladen…",
+      "retry": "Erneut laden",
+      "views": { "label": "Ansichten der Ergebnistabelle", "standings": "Ergebnistabelle", "winners": "Gewinner & Preisgeld" },
+      "rules": { "share_equal_points": "Gleiche Punktzahl: Preisplatz teilen", "tie_breakers": "Ein Gewinner je Platz: Treffer entscheiden" },
+      "validation": { "fee": "Bitte einen gültigen, nichtnegativen Einsatz mit höchstens zwei Nachkommastellen eingeben.", "amount": "Bitte einen gültigen, nichtnegativen Gewinnbetrag mit höchstens zwei Nachkommastellen eingeben." },
+      "errors": { "load": "Gewinner und Preisgeldkonfiguration konnten nicht geladen werden.", "save": "Die Preisgeldkonfiguration konnte nicht gespeichert werden. Bitte erneut versuchen." }
+    },
     "detail": {
       "loading": "Laedt...",
       "links": {
