@@ -7,6 +7,7 @@ import {
   UrlTree,
 } from '@angular/router';
 import { PersistingService } from '../../auth/services/persisisting.service';
+import { notificationReturnUrl } from '../../auth/services/notification-return-url';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -20,7 +21,7 @@ export class AuthGuard implements CanActivate {
     const user = this.persistingService.currentUser();
     const isAuthenticated = Boolean(user?.token);
 
-    if (state.url === '/') {
+    if (state.url.split('?')[0] === '/') {
       if (isAuthenticated) {
         return this.router.parseUrl('/dashboard');
       }
@@ -32,6 +33,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    return this.router.parseUrl('/');
+    const returnUrl = notificationReturnUrl(state.url);
+    return returnUrl ? this.router.createUrlTree(['/'], { queryParams: { returnUrl } }) : this.router.parseUrl('/');
   }
 }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { DateAdapter } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -6,15 +7,40 @@ import { MatTimepicker } from '@angular/material/timepicker';
 import { GameDialogComponent } from './game-dialog.component';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TeamOrigin } from '../../../teams/types/team.interface';
+import { PersistingService } from '../../../auth/services/persisisting.service';
+import { CurrentUserInterface } from '../../../shared/types/current-user.interface';
+import { NotificationApiService } from '../../../notifications/notification-api.service';
+import { RoundNotificationStatus } from '../../../notifications/notification.types';
 
 describe('GameDialogComponent', () => {
   let component: GameDialogComponent;
   let fixture: ComponentFixture<GameDialogComponent>;
+  const currentUser = signal<CurrentUserInterface | null>(null);
+  const notificationStatus: RoundNotificationStatus = {
+    enabled: true, recipientUsers: 1, recipientDevices: 1, announced: false,
+    previews: {
+      new_round: { title: 'League', body: 'New round' },
+      round_results: { title: 'League', body: 'Results' },
+    },
+    dispatches: [],
+  };
+  const notificationApi = {
+    roundStatus: jasmine.createSpy('roundStatus').and.resolveTo(notificationStatus),
+    send: jasmine.createSpy('send').and.resolveTo(null),
+    retry: jasmine.createSpy('retry'),
+  };
 
   beforeEach(async () => {
+    currentUser.set(null);
+    notificationApi.roundStatus.calls.reset();
+    notificationApi.send.calls.reset();
     await TestBed.configureTestingModule({
       imports: [GameDialogComponent, TranslateModule.forRoot()],
-      providers: [provideNoopAnimations()],
+      providers: [
+        provideNoopAnimations(),
+        { provide: PersistingService, useValue: { currentUser } },
+        { provide: NotificationApiService, useValue: notificationApi },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(GameDialogComponent);
@@ -22,6 +48,34 @@ describe('GameDialogComponent', () => {
 
     fixture.componentRef.setInput('visible', true);
     fixture.detectChanges();
+  });
+
+  it('allows an explicit round results notification without scores or valid form data', async () => {
+    currentUser.set({ id: 1, username: 'Admin', email: 'admin@test.com', role: 'super_admin', image: null, token: '' });
+    fixture.componentRef.setInput('gameId', 'game-1');
+    fixture.componentRef.setInput('gameData', {
+      id: 'game-1', roundId: 'round-1', homeTeamId: '', awayTeamId: '',
+      homeScore: null, awayScore: null, isClosed: false,
+      kickoffTime: new Date(), createdAt: new Date(),
+    });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const action = fixture.nativeElement.querySelector('app-round-notification-action') as HTMLElement;
+    expect(action.closest('form')).toBeNull();
+    expect(component.isValid()).toBeFalsy();
+    expect(notificationApi.roundStatus).toHaveBeenCalledOnceWith('round-1');
+    const preview = action.querySelector('[data-action="preview"] button') as HTMLButtonElement;
+    expect(preview.disabled).toBeFalse();
+    preview.click();
+    fixture.detectChanges();
+    const send = action.querySelector('[data-action="send"] button') as HTMLButtonElement;
+    const saved = jasmine.createSpy('saved');
+    component.confirmed.subscribe(saved);
+    send.click();
+    await fixture.whenStable();
+    expect(notificationApi.send).toHaveBeenCalledWith('round-1', 'round_results', jasmine.any(String));
+    expect(saved).not.toHaveBeenCalled();
   });
 
   it('uses a material timepicker with 15 minute interval', () => {

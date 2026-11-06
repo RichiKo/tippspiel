@@ -10,6 +10,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { PersistingService } from '../../../auth/services/persisisting.service';
 import { HeaderComponent } from './header.component';
+import { PushClientService } from '../../../notifications/push-client.service';
 
 describe('HeaderComponent', () => {
   let fixture: ComponentFixture<HeaderComponent>;
@@ -43,6 +44,7 @@ describe('HeaderComponent', () => {
       providers: [
         { provide: Router, useValue: { navigate: navigateSpy } },
         { provide: PersistingService, useValue: persistingServiceMock },
+        { provide: PushClientService, useValue: { disable: () => Promise.resolve(true) } },
       ],
     }).compileComponents();
 

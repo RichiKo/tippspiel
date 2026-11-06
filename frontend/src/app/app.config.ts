@@ -3,6 +3,7 @@ import {
   ApplicationConfig,
   provideZoneChangeDetection,
   importProvidersFrom,
+  isDevMode,
 } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -19,8 +20,9 @@ import {
   TranslateService,
 } from '@ngx-translate/core';
 import { MondayFirstNativeDateAdapter } from './shared/adapters/monday-first-native-date-adapter';
+import { provideServiceWorker } from '@angular/service-worker';
 
-const TRANSLATION_ASSET_VERSION = '20261008-prize-amounts';
+const TRANSLATION_ASSET_VERSION = '20261105-push';
 
 class AppTranslateLoader implements TranslateLoader {
   constructor(private readonly http: HttpClient) {}
@@ -46,6 +48,7 @@ function initializeTranslations(translate: TranslateService): () => Promise<unkn
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideServiceWorker('ngsw-worker.js', { enabled: !isDevMode(), registrationStrategy: 'registerImmediately' }),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(
       routes,

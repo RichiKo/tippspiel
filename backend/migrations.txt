@@ -46,3 +46,9 @@ Ausgeführte Migrationen:
 13. 1741100000000-AddEliminatedTeamsToChampionships.ts
 14. 1741400000000-CreateArchiveEntriesTable.ts
 15. 1741500000000-AddArchiveWinnerPoints.ts
+
+Web-Push: 1793880000000-CreateNotifications.ts
+Erstellt push_subscriptions, notification_dispatches und notification_deliveries.
+Migration vor dem Frontend-Release ausfuehren: npm run db:run:prod
+Push bleibt ohne PUSH_ENABLED=true und gueltige VAPID-Konfiguration deaktiviert.
+Rollback: npm run db:revert:prod (loescht Subscriptions und Versandhistorie).

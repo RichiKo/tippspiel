@@ -1,5 +1,30 @@
 # Frontend
 
+## Web-Push / PWA
+
+Die vollstaendige [Schritt-fuer-Schritt-Anleitung fuer lokale Push-Tests](../backend/README.md#web-push-lokal-testen-schritt-fuer-schritt)
+enthaelt eine isolierte lokale Datenbank, VAPID-Konfiguration, Migrationen,
+Backend-/Frontend-Start und die manuellen Testfaelle.
+
+Production-Builds enthalten Angular Service Worker und ein Web-App-Manifest.
+Push wird pro Geraet in den Einstellungen aktiviert; auf iOS muss die Website
+zuerst als Web-App zum Home-Bildschirm hinzugefuegt werden. HTTPS ist erforderlich
+(localhost fuer Entwicklung ausgenommen). API-Antworten werden nicht vom Service
+Worker gecacht. `ng serve` im Development-Modus aktiviert keinen Service Worker.
+Fuer lokale Push-Tests `ng serve --configuration=production --no-hmr` verwenden.
+HMR ist fuer den Production-Teststart auch in `angular.json` deaktiviert, damit
+kein zusaetzlicher HMR-Compiler das Initial-Bundle-Budget ueberschreitet.
+
+Admins senden eine einmalige Tour-Ankuendigung im Tour-Bearbeitungsdialog und
+wiederholbare allgemeine Ergebnis-Meldungen im Spiel-Bearbeitungsdialog. Speichern
+allein sendet keine Nachricht. Push-Texte sind zunaechst ukrainisch.
+Benachrichtigungen oeffnen die betreffende Meisterschaft/Tour; beim Login bleibt
+dieses interne Ziel erhalten. Beim Abmelden wird die Geraete-Subscription getrennt.
+
+Zuerst Backend samt Migration und VAPID-Konfiguration bereitstellen (siehe
+`backend/API.md`), danach Frontend. Echte Zustellung auf Android und installierter
+iOS-Web-App separat ueber HTTPS pruefen; Unit-Tests simulieren die Browser-APIs.
+
 ## Gewinner- und Preisgeldübersicht
 
 Private Championships bieten in „Таблиця результатів“ einen Toggle zwischen Ergebnistabelle und Gewinnern. Öffentliche Championships behalten ausschließlich die Ergebnistabelle. Owner, Admin und Super-Admin konfigurieren im Dialog den Einsatz und den festen Gewinnbetrag für jeden Platz (UAH, maximal zwei Nachkommastellen). Standardmäßig gibt es drei Betragszeilen; Plätze können hinzugefügt oder entfernt werden (mindestens einer). Die Gleichstandsregel und Live-Vorschau bleiben verfügbar. Prozentwerte erscheinen ausschließlich als Information.

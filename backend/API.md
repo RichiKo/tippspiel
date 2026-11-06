@@ -1,5 +1,53 @@
 # API-Dokumentation
 
+## Web-Push
+
+Alle folgenden Endpunkte brauchen einen JWT. Versand und Tour-Status sind nur fuer
+`admin` und `super_admin` erlaubt. Spiel- und Tour-Updates senden niemals automatisch Push.
+
+| Methode | Pfad | Body / Antwort |
+| --- | --- | --- |
+| GET | `/notifications/config` | `{ enabled, publicKey }`, bei deaktiviertem Push `publicKey: null` |
+| POST | `/notifications/subscriptions` | `{ endpoint, keys: { p256dh, auth }, locale?: 'uk' \| 'de' }` -> `{ id }` |
+| DELETE | `/notifications/subscriptions/:id` | Eigene Subscription entfernen, `204` |
+| POST | `/notifications/subscriptions/:id/test` | Eigenes Geraet testen -> `{ accepted }` |
+| GET | `/rounds/:roundId/notifications` | `{ enabled, recipientUsers, recipientDevices, announced, previews, dispatches }` |
+| POST | `/rounds/:roundId/notifications` | `{ type: 'new_round' \| 'round_results', requestId: UUIDv4 }` -> Versandstatus oder `null` ohne Empfaenger |
+| POST | `/notifications/dispatches/:id/retry` | Fehlgeschlagene/ausstehende Geraete erneut bearbeiten -> Versandstatus |
+
+Versandstatus: `{ id, type, createdAt, recipientCount, accepted, failed, pending,
+expired, skipped, inProgress, canRetry }`. `accepted` bedeutet Annahme durch den
+Push-Anbieter, keine Lese- oder Zustellbestaetigung. Historie: letzte zehn Auftraege.
+Empfaenger werden aus aktiven Memberships der Tour-Meisterschaft ermittelt;
+vor Wiederholung wird die aktuelle Mitgliedschaft erneut geprueft.
+
+`new_round` kann einmal je Tour gesendet werden (`409` bei bereits angekuendigter
+Tour). Ohne Empfaenger wird keine Ankuendigung verbraucht. `round_results` ist
+eine allgemeine ukrainische Tour-Meldung, jederzeit manuell wiederholbar, auch
+ohne Ergebnisdaten. Gleiche `requestId` liefert den bestehenden Auftrag ohne
+erneuten Versand; fuer einen bewussten neuen Versand eine neue UUID verwenden.
+Fehlgeschlagene Sendungen ueber `/retry` wiederholen, bereits angenommene Geraete
+werden dabei uebersprungen. Netzwerkabbrueche koennen die tatsaechliche Annahme
+unklar lassen; Web-Push bietet keine Exactly-once-Zustellung.
+
+Subscriptions sind benutzergebunden; fremde IDs liefern `404`, fremd belegte
+Endpoints `409`. Erlaubt sind ausschliesslich HTTPS auf `fcm.googleapis.com`,
+`updates.push.services.mozilla.com` und Subdomains von `push.apple.com`, ohne
+abweichende Ports oder Zugangsdaten. `404/410` vom Anbieter entfernen abgelaufene
+Subscriptions. Ungueltige Eingaben liefern `400`, deaktivierter Versand `503`.
+
+Konfiguration beim Deployment: `PUSH_ENABLED=true`, `VAPID_PUBLIC_KEY`,
+`VAPID_PRIVATE_KEY` und `VAPID_SUBJECT` (oeffentliche HTTPS- oder mailto-Adresse).
+Ohne vollstaendige, gueltige Konfiguration bleibt Push deaktiviert. Ein stabiles
+VAPID-Schluesselpaar extern generieren und als Deployment-Secrets hinterlegen;
+ein Schluesselwechsel erfordert neue Browser-Subscriptions. Keine `.env`-Dateien
+oder Schluessel committen. Erst Backend und Migration, dann Frontend ausliefern.
+
+Integrationstest gegen eine eigene PostgreSQL-Datenbank namens
+`push_notification_test` mit explizitem `PUSH_TEST_DATABASE_URL`:
+`npm run test:e2e -- --runInBand notification.e2e-spec.ts`.
+Der Test loescht Testdaten; niemals eine produktive Datenbank verwenden.
+
 Vollständige API-Referenz für das Tipp-Spiel Backend.
 
 ---

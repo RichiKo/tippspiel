@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import {
   TranslateFakeLoader,
   TranslateLoader,
@@ -18,12 +18,15 @@ describe('LoginComponent', () => {
   let component: LoginComponent;
 
   const navigateSpy = jasmine.createSpy('navigate');
+  const navigateByUrlSpy = jasmine.createSpy('navigateByUrl').and.resolveTo(true);
+  let queryParams = convertToParamMap({});
   const saveSpy = jasmine.createSpy('save');
   const loginSpy = jasmine
     .createSpy('login')
     .and.returnValue(of({ user: { id: 1, token: 'abc' } }));
 
   beforeEach(async () => {
+    queryParams = convertToParamMap({});
     await TestBed.configureTestingModule({
       imports: [
         LoginComponent,
@@ -38,7 +41,8 @@ describe('LoginComponent', () => {
       providers: [
         { provide: AuthService, useValue: { login: loginSpy } },
         { provide: PersistingService, useValue: { save: saveSpy } },
-        { provide: Router, useValue: { navigate: navigateSpy } },
+        { provide: Router, useValue: { navigate: navigateSpy, navigateByUrl: navigateByUrlSpy } },
+        { provide: ActivatedRoute, useValue: { snapshot: { get queryParamMap() { return queryParams; } } } },
       ],
     }).compileComponents();
 
@@ -65,6 +69,15 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('returns to the notification tour after login', async () => {
+    queryParams = convertToParamMap({ returnUrl: '/championship/cup-1?roundId=tour-1' });
+    loginSpy.and.returnValue(of({ user: { id: 1, token: 'abc' } }));
+    component.form.setValue({ email: 'user@test.invalid', password: 'secret1' });
+    component.onLogin();
+    expect(navigateByUrlSpy).toHaveBeenCalledWith('/championship/cup-1?roundId=tour-1');
+    await navigateByUrlSpy.calls.mostRecent().returnValue;
   });
 
   it('renders translated submit label', () => {

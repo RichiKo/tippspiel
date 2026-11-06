@@ -20,10 +20,11 @@ import {
 import { Team } from '../../../teams/types/team.interface';
 import { MaterialModule } from '../../../material.module';
 import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-first-native-date-adapter';
+import { RoundNotificationActionComponent } from '../../../notifications/components/round-notification-action/round-notification-action.component';
 
 @Component({
   selector: 'app-game-dialog',
-  imports: [CommonModule, FormsModule, TranslateModule, MaterialModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MaterialModule, RoundNotificationActionComponent],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
     { provide: DateAdapter, useClass: MondayFirstNativeDateAdapter },
@@ -236,6 +237,13 @@ import { MondayFirstNativeDateAdapter } from '../../../shared/adapters/monday-fi
             </button>
           </div>
         </form>
+        @if (gameData()?.roundId) {
+          <app-round-notification-action
+            [roundId]="gameData()?.roundId"
+            type="round_results"
+            [visible]="visible()"
+          />
+        }
       </div>
     </div>
   `,

@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, inject, output } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialModule } from '../../../material.module';
 import { AuthService } from '../../services/auth.service';
 import {
@@ -11,6 +11,7 @@ import {
 import { PersistingService } from '../../services/persisisting.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { notificationReturnUrl } from '../../services/notification-return-url';
 
 @Component({
   selector: 'ts-login',
@@ -25,6 +26,7 @@ export class LoginComponent {
   fb = inject(FormBuilder);
   translate = inject(TranslateService);
   private readonly document = inject(DOCUMENT);
+  private readonly route = inject(ActivatedRoute, { optional: true });
 
   switchMode = output<void>();
 
@@ -55,7 +57,9 @@ export class LoginComponent {
       next: (user) => {
         this.persistingService.save(user.user);
         this.blurActiveElement();
-        this.router.navigate(['/dashboard']).then(() => {
+        const target = notificationReturnUrl(this.route?.snapshot.queryParamMap.get('returnUrl') ?? null);
+        const navigation = target ? this.router.navigateByUrl(target) : this.router.navigate(['/dashboard']);
+        navigation.then(() => {
           this.resetViewportPosition();
         });
       },

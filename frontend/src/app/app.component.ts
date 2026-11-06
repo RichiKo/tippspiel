@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { PersistingService } from './auth/services/persisisting.service';
 import { SeoService } from './shared/services/seo.service';
+import { PushClientService } from './notifications/push-client.service';
 
 @Component({
   selector: 'app-root',
@@ -22,10 +23,16 @@ export class AppComponent {
   title = 'TippsLiga';
   private readonly persistingService = inject(PersistingService);
   private readonly seoService = inject(SeoService);
+  private readonly push = inject(PushClientService);
   readonly currentUser = this.persistingService.currentUser;
 
   constructor() {
     this.seoService.init();
+
+    effect(() => {
+      this.currentUser()?.id;
+      void this.push.refresh();
+    });
 
     // Add/remove body class based on authentication status
     effect(() => {

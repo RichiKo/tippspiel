@@ -5,7 +5,9 @@ import {
   computed,
   inject,
   signal,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
@@ -81,6 +83,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
   private readonly persistingService = inject(PersistingService);
   private readonly bonusService = inject(BonusService);
   private readonly translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   championship = signal<Championship | null>(null);
   rounds = signal<Round[]>([]);
@@ -112,7 +115,7 @@ export class ChampionshipDetailComponent implements OnDestroy {
   private isBodyScrollLockedByDrawer = false;
 
   readonly currentUser = this.persistingService.currentUser;
-  readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
+  readonly isAdmin = computed(() => ['admin', 'super_admin'].includes(this.currentUser()?.role ?? ''));
   readonly icons = UI_ICONS;
   readonly eliminatedTeamIds = computed(
     () => this.championship()?.eliminatedTeamIds ?? [],
@@ -217,6 +220,10 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.loadTeams();
     this.loadActiveBonusRulesAvailability();
     this.loadRankingParticipants();
+    this.route.queryParamMap?.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const requested = this.rounds().find(round => round.id === params.get('roundId'));
+      if (requested && requested.id !== this.selectedRound()?.id) this.selectRound(requested);
+    });
   }
 
   private resetScrollPositionOnEntry(): void {
@@ -417,7 +424,8 @@ export class ChampionshipDetailComponent implements OnDestroy {
     this.roundService.getRoundsByChampionship(this.championshipId).subscribe({
       next: (data) => {
         this.rounds.set(data);
-        const initialRound = this.pickInitialRound(data);
+        const requestedRoundId = this.route.snapshot.queryParamMap?.get('roundId');
+        const initialRound = data.find(round => round.id === requestedRoundId) ?? this.pickInitialRound(data);
         if (initialRound) {
           this.selectRound(initialRound);
         } else {

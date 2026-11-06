@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { CreateRoundDto } from '../../types/round.interface';
+import { RoundNotificationActionComponent } from '../../../notifications/components/round-notification-action/round-notification-action.component';
 
 @Component({
   selector: 'app-round-dialog',
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RoundNotificationActionComponent],
   template: `
     <div class="dialog-overlay" *ngIf="visible()" (click)="onCancel()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
@@ -81,6 +82,13 @@ import { CreateRoundDto } from '../../types/round.interface';
             </div>
           }
         </form>
+        @if (roundId()) {
+          <app-round-notification-action
+            [roundId]="roundId()"
+            type="new_round"
+            [visible]="visible()"
+          />
+        }
       </div>
     </div>
   `,
@@ -110,6 +118,10 @@ import { CreateRoundDto } from '../../types/round.interface';
         )
       );
       max-width: 90vw;
+      max-height: 90vh;
+      max-height: 90dvh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
 
       h2 {
         margin: 0 0 1.5rem 0;
@@ -223,6 +235,7 @@ import { CreateRoundDto } from '../../types/round.interface';
         max-width: none;
         border-radius: 14px;
         padding: 1rem;
+        max-height: calc(100dvh - max(8px, env(safe-area-inset-top, 0px)) - max(8px, env(safe-area-inset-bottom, 0px)));
       }
 
       .dialog-content .form-field input {

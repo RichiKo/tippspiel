@@ -18,6 +18,7 @@ import { TeamOrigin } from '../teams/types/team.interface';
 describe('ChampionshipDetailComponent', () => {
   let component: ChampionshipDetailComponent;
   let fixture: ComponentFixture<ChampionshipDetailComponent>;
+  let queryParams = convertToParamMap({});
 
   const createRound = (
     id: string,
@@ -235,6 +236,7 @@ describe('ChampionshipDetailComponent', () => {
   };
 
   beforeEach(async () => {
+    queryParams = convertToParamMap({});
     mockRoundService.getRoundsByChampionship.and.returnValue(of(defaultRounds));
 
     await TestBed.configureTestingModule({
@@ -245,6 +247,7 @@ describe('ChampionshipDetailComponent', () => {
           useValue: {
             snapshot: {
               paramMap: convertToParamMap({ id: 'champ-1' }),
+              get queryParamMap() { return queryParams; },
             },
           },
         },
@@ -270,6 +273,24 @@ describe('ChampionshipDetailComponent', () => {
     fixture = TestBed.createComponent(ChampionshipDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('selects the tour from a notification link and falls back for a deleted tour', () => {
+    const rounds = [createRound('old', '2026-01-01', null), createRound('new', '2027-01-01', null)];
+    mockRoundService.getRoundsByChampionship.and.returnValue(of(rounds));
+    queryParams = convertToParamMap({ roundId: 'old' });
+    component['loadRounds']();
+    expect(component.selectedRound()?.id).toBe('old');
+    queryParams = convertToParamMap({ roundId: 'deleted' });
+    component['loadRounds']();
+    expect(component.selectedRound()).not.toBeNull();
+    expect(component.selectedRound()?.id).not.toBe('deleted');
+  });
+
+  it('allows super-admin to open the tour edit dialog', () => {
+    mockPersistingService.currentUser.set({ ...mockPersistingService.currentUser(), role: 'super_admin' });
+    component.onEditRound();
+    expect(component.showRoundDialog()).toBeTrue();
   });
 
   it('should switch to table view and render ranking table view', () => {

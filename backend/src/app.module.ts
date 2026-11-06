@@ -17,6 +17,7 @@ import { RankingModule } from './ranking/ranking.module';
 import { MembershipModule } from './membership/membership.module';
 import { BonusModule } from './bonus/bonus.module';
 import { ArchiveModule } from './archive/archive.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ArchiveModule } from './archive/archive.module';
     UploadModule,
     BonusModule,
     ArchiveModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

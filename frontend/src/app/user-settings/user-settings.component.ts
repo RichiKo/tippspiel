@@ -13,6 +13,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PersistingService } from '../auth/services/persisisting.service';
 import { UpdateUserDto, UserService } from '../shared/services/user.service';
+import { PushSettingsComponent } from '../notifications/components/push-settings/push-settings.component';
 import {
   UI_ICONS,
   UiBadgeComponent,
@@ -33,6 +34,7 @@ import {
     UiCardComponent,
     UiPageHeaderComponent,
     TranslateModule,
+    PushSettingsComponent,
   ],
   templateUrl: './user-settings.component.html',
   styleUrl: './user-settings.component.scss',

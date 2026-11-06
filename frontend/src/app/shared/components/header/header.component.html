@@ -37,7 +37,7 @@
           <lucide-icon [img]="icons.settings" [size]="18" aria-hidden="true" />
         </button>
 
-        <button class="logout-btn desktop-only" (click)="onLogoutClick()">
+        <button class="logout-btn desktop-only" (click)="onLogoutClick()" [disabled]="logoutBusy()">
           <lucide-icon [img]="icons.logOut" [size]="16" aria-hidden="true" />
           {{ 'header.logout' | translate }}
         </button>
@@ -71,7 +71,7 @@
           <lucide-icon [img]="icons.settings" [size]="16" aria-hidden="true" />
           {{ 'header.settings' | translate }}
         </button>
-        <button type="button" class="mobile-menu-item danger" (click)="onLogoutClick()">
+        <button type="button" class="mobile-menu-item danger" (click)="onLogoutClick()" [disabled]="logoutBusy()">
           <lucide-icon [img]="icons.logOut" [size]="16" aria-hidden="true" />
           {{ 'header.logout' | translate }}
         </button>
@@ -80,6 +80,9 @@
   }
 
 </header>
+@if (logoutError()) {
+  <p role="alert">{{ logoutError()! | translate }}</p>
+}
 
 <app-confirmation-dialog
   [visible]="showLogoutConfirm()"
