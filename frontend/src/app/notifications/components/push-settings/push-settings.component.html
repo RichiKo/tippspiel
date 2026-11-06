@@ -1,0 +1,51 @@
+<section
+  class="push-settings"
+  [attr.aria-busy]="client.busy() || !client.ready()"
+>
+  <h2>
+    <lucide-icon [img]="icons.bell" [size]="18" aria-hidden="true" />{{
+      "notifications.settings.title" | translate
+    }}
+  </h2>
+  <label class="opt-in">
+    <input
+      type="checkbox"
+      [checked]="client.active()"
+      [disabled]="toggleDisabled()"
+      (change)="toggle($event)"
+    />
+    <span>{{ "notifications.settings.optIn" | translate }}</span>
+  </label>
+  <p role="status">{{ "notifications.settings." + statusKey() | translate }}</p>
+  @if (client.error(); as errorKey) {
+    <p class="error" role="alert">{{ errorKey | translate }}</p>
+  }
+  @if (client.message(); as messageKey) {
+    <p role="status">{{ messageKey | translate }}</p>
+  }
+  <div class="actions">
+    <ui-button
+      type="button"
+      variant="secondary"
+      data-action="test"
+      [disabled]="testDisabled()"
+      (click)="test()"
+    >
+      <lucide-icon [img]="icons.send" [size]="16" aria-hidden="true" />
+      {{ "notifications.settings.test" | translate }}
+    </ui-button>
+    <ui-button
+      type="button"
+      variant="ghost"
+      [disabled]="client.busy() || !client.ready()"
+      (click)="refresh()"
+      [attr.title]="'notifications.settings.refresh' | translate"
+      [attr.aria-label]="'notifications.settings.refresh' | translate"
+    >
+      <lucide-icon [img]="icons.refresh" [size]="16" aria-hidden="true" />
+      <span class="visually-hidden">{{
+        "notifications.settings.refresh" | translate
+      }}</span>
+    </ui-button>
+  </div>
+</section>

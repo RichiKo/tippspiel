@@ -1,0 +1,164 @@
+@if (context()) {
+  <section class="notification-action" [attr.aria-busy]="loading() || busy()">
+    <div class="section-heading">
+      <h3>{{ "notifications.admin." + type() | translate }}</h3>
+      <ui-button
+        type="button"
+        variant="ghost"
+        size="sm"
+        data-action="refresh"
+        [disabled]="loading() || busy()"
+        (click)="refresh()"
+        [attr.title]="'notifications.admin.refresh' | translate"
+        [attr.aria-label]="'notifications.admin.refresh' | translate"
+      >
+        <lucide-icon [img]="icons.refresh" [size]="16" aria-hidden="true" />
+        <span class="visually-hidden">{{
+          "notifications.admin.refresh" | translate
+        }}</span>
+      </ui-button>
+    </div>
+
+    @if (loading()) {
+      <p role="status">{{ "notifications.admin.loading" | translate }}</p>
+    }
+    @if (error(); as errorKey) {
+      <p class="error" role="alert">{{ errorKey | translate }}</p>
+    }
+    @if (message(); as messageKey) {
+      <p role="status">{{ messageKey | translate }}</p>
+    }
+
+    @if (status(); as state) {
+      @if (!state.enabled) {
+        <p role="status">{{ "notifications.admin.disabled" | translate }}</p>
+      } @else if (type() === "new_round" && state.announced) {
+        <p role="status">{{ "notifications.admin.announced" | translate }}</p>
+      } @else if (!state.recipientDevices) {
+        <p role="status">
+          {{ "notifications.admin.noRecipients" | translate }}
+        </p>
+      }
+
+      <dl class="recipients">
+        <div>
+          <dt>{{ "notifications.admin.recipientUsers" | translate }}</dt>
+          <dd data-testid="recipient-users">{{ state.recipientUsers }}</dd>
+        </div>
+        <div>
+          <dt>{{ "notifications.admin.recipientDevices" | translate }}</dt>
+          <dd data-testid="recipient-devices">{{ state.recipientDevices }}</dd>
+        </div>
+      </dl>
+
+      @if (confirming()) {
+        <div class="confirmation">
+          <h4>{{ "notifications.admin.preview" | translate }}</h4>
+          <strong>{{ state.previews[type()].title }}</strong>
+          <p class="preview-body">{{ state.previews[type()].body }}</p>
+          <p>{{ "notifications.admin.confirm" | translate }}</p>
+          <div class="actions">
+            <ui-button
+              type="button"
+              variant="secondary"
+              data-action="cancel"
+              [disabled]="busy()"
+              (click)="cancel()"
+            >
+              {{ "common.cancel" | translate }}
+            </ui-button>
+            <ui-button
+              type="button"
+              data-action="send"
+              [disabled]="!canSend()"
+              [loading]="busy()"
+              (click)="send()"
+            >
+              <lucide-icon [img]="icons.send" [size]="16" aria-hidden="true" />
+              {{
+                (pendingRequest()
+                  ? "notifications.admin.retryRequest"
+                  : "notifications.admin.send"
+                ) | translate
+              }}
+            </ui-button>
+          </div>
+        </div>
+      } @else {
+        <ui-button
+          type="button"
+          data-action="preview"
+          [disabled]="!canSend()"
+          (click)="preview()"
+        >
+          <lucide-icon [img]="icons.send" [size]="16" aria-hidden="true" />
+          {{
+            (pendingRequest()
+              ? "notifications.admin.retryRequest"
+              : "notifications.admin.send"
+            ) | translate
+          }}
+        </ui-button>
+      }
+
+      @if (dispatches().length) {
+        <div class="history" aria-live="polite">
+          <h4>{{ "notifications.admin.history" | translate }}</h4>
+          @for (dispatch of dispatches(); track dispatch.id) {
+            <div class="dispatch">
+              <time [attr.datetime]="dispatch.createdAt">{{
+                dispatch.createdAt | date: "dd.MM.yyyy HH:mm"
+              }}</time>
+              @if (dispatch.inProgress) {
+                <p>{{ "notifications.admin.inProgress" | translate }}</p>
+              }
+              <dl class="counts">
+                <div>
+                  <dt>{{ "notifications.admin.total" | translate }}</dt>
+                  <dd>{{ dispatch.recipientCount }}</dd>
+                </div>
+                <div>
+                  <dt>{{ "notifications.admin.accepted" | translate }}</dt>
+                  <dd>{{ dispatch.accepted }}</dd>
+                </div>
+                <div>
+                  <dt>{{ "notifications.admin.failed" | translate }}</dt>
+                  <dd>{{ dispatch.failed }}</dd>
+                </div>
+                <div>
+                  <dt>{{ "notifications.admin.pending" | translate }}</dt>
+                  <dd>{{ dispatch.pending }}</dd>
+                </div>
+                <div>
+                  <dt>{{ "notifications.admin.expired" | translate }}</dt>
+                  <dd>{{ dispatch.expired }}</dd>
+                </div>
+                <div>
+                  <dt>{{ "notifications.admin.skipped" | translate }}</dt>
+                  <dd>{{ dispatch.skipped }}</dd>
+                </div>
+              </dl>
+              @if (dispatch.canRetry && !dispatch.inProgress) {
+                <ui-button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  data-action="retry"
+                  [disabled]="busy() || loading() || !state.enabled"
+                  (click)="retry(dispatch.id)"
+                >
+                  <lucide-icon
+                    [img]="icons.refresh"
+                    [size]="16"
+                    aria-hidden="true"
+                  />
+                  {{ "notifications.admin.retry" | translate }}
+                </ui-button>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </section>
+}
